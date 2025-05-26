@@ -4,6 +4,7 @@ import { Platform } from 'react-native';
 
 import { HapticTab } from '@/components/HapticTab';
 import { IconSymbol } from '@/components/ui/IconSymbol';
+import {Ionicons} from '@expo/vector-icons';
 import TabBarBackground from '@/components/ui/TabBarBackground';
 import { Colors } from '@/constants/Colors';
 import { useColorScheme } from '@/hooks/useColorScheme';
@@ -34,10 +35,31 @@ export default function TabLayout() {
         }}
       />
       <Tabs.Screen
-        name="explore"
+        name="Groups"
         options={{
-          title: 'Explore',
-          tabBarIcon: ({ color }) => <IconSymbol size={28} name="paperplane.fill" color={color} />,
+          title: 'Groups',
+          tabBarIcon: ({ color }) => <Ionicons size={28} name="people" color={color} />,
+        }}
+      />
+         <Tabs.Screen
+        name="AddExpense"
+        options={{
+          title: '',
+          tabBarIcon: ({ color }) => <Ionicons size={28} name="add-circle" color={color}/>,
+        }}
+      />
+      <Tabs.Screen
+        name="History"
+        options={{
+          title: 'History',
+          tabBarIcon: ({ color }) => <Ionicons size={28} name="reload" color={color}/>,
+        }}
+      />
+      <Tabs.Screen
+        name="Profile"
+        options={{
+          title: 'Profile',
+          tabBarIcon: ({ color }) => <Ionicons size={28} name="person" color={color}/>,
         }}
       />
     </Tabs>

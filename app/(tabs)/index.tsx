@@ -1,75 +1,302 @@
-import { Image } from 'expo-image';
-import { Platform, StyleSheet } from 'react-native';
-
-import { HelloWave } from '@/components/HelloWave';
-import ParallaxScrollView from '@/components/ParallaxScrollView';
-import { ThemedText } from '@/components/ThemedText';
-import { ThemedView } from '@/components/ThemedView';
+import {
+  Text,
+  StyleSheet,
+  View,
+  SafeAreaView,
+  FlatList,
+  Image,
+} from "react-native";
+import { Ionicons } from "@expo/vector-icons";
+import dummyProfile from "../../assets/images/dummyProfile.png";
 
 export default function HomeScreen() {
+  // Dummy data for splitmates
+  const Splitmates = [
+    {
+      id: "1",
+      name: "John Doe",
+      image: dummyProfile,
+    },
+    {
+      id: "2",
+      name: "Jane Smith",
+      image: dummyProfile,
+    },
+    {
+      id: "3",
+      name: "Alice Johnson",
+      image: dummyProfile,
+    },
+    {
+      id: "4",
+      name: "Bob Brown",
+      image: dummyProfile,
+    },
+    {
+      id: "5",
+      name: "Larry Wheels",
+      image: dummyProfile,
+    },
+    {
+      id: "6",
+      name: "Osma BinLaden",
+      image: dummyProfile,
+    },
+    {
+      id: "7",
+      name: "Tony Stark",
+      image: dummyProfile,
+    },
+    {
+      id: "8",
+      name: "Bruce Wayne",
+      image: dummyProfile,
+    },
+  ];
+
+  const renderSplitmate = ({ item }) => {
+    return (
+      <View>
+        <Image style={styles.splitmateImage} source={item.image} />
+        <Text style={styles.splitmateName}>
+          {" "}
+          {item.name.split(" ").join("\n")}
+        </Text>
+      </View>
+    );
+  };
+
+  // Dummy data for recent groups
+  const recentGroups = [
+    {
+      id: "1",
+      name: "Friends Trip",
+      image: dummyProfile,
+      totalExpense: 250,
+      members: [],
+    },
+    {
+      id: "2",
+      name: "Office Lunch",
+      image: dummyProfile,
+      totalExpense: 150,
+      members: [],
+    },
+    {
+      id: "3",
+      name: "Family Dinner",
+      image: dummyProfile,
+      totalExpense: 300,
+      members: [],
+    },
+  ];
+
+  const renderRecentGroup = ({ item }) => {
+    return (
+      <View style={styles.renderRecentGroupSection}>
+        <Image style={styles.groupImage} source={item.image} />
+        <View style={styles.groupDetails}>
+          <Text style={styles.groupName}> {item.name}</Text>
+          <Text>Total Expense: ${item.totalExpense}</Text>
+        </View>
+      </View>
+    );
+  };
+
   return (
-    <ParallaxScrollView
-      headerBackgroundColor={{ light: '#A1CEDC', dark: '#1D3D47' }}
-      headerImage={
-        <Image
-          source={require('@/assets/images/partial-react-logo.png')}
-          style={styles.reactLogo}
+    <SafeAreaView style={styles.mainContainer}>
+      {/* Topbar */}
+      <View style={styles.topBar}>
+        <Ionicons size={28} name="person" />
+
+        <Text style={styles.title}>Home</Text>
+
+        <View style={styles.rightTop}>
+          <Ionicons size={28} name="scan" style={styles.iconSpacing} />
+          <Ionicons size={28} name="notifications" />
+        </View>
+      </View>
+
+      {/* Owe section */}
+      <View style={styles.amountSection}>
+        <View style={styles.oweSection}>
+          <Text style={styles.amountTitle}>I'm owed</Text>
+          <Text style={styles.amount}>$200</Text>
+        </View>
+        <View style={styles.amountSubSection}>
+          <View style={styles.paySection}>
+            <Text style={styles.amountTitle}>Need to pay</Text>
+            <Text style={styles.amount}>-$12</Text>
+          </View>
+          <View style={styles.expenseSection}>
+            <Text style={styles.amountTitle}>Total expenses</Text>
+            <Text style={styles.amount}>$1230</Text>
+          </View>
+        </View>
+      </View>
+
+      {/* Splitmates */}
+      <View style={styles.splitMatesContainer}>
+        <View style={styles.texts}>
+          <Text style={styles.eachTitle}>Your Splitmates</Text>
+          <Text>see all</Text>
+        </View>
+
+        <FlatList
+          data={Splitmates}
+          renderItem={renderSplitmate}
+          keyExtractor={(item) => item.id}
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          contentContainerStyle={styles.splitmatesList}
         />
-      }>
-      <ThemedView style={styles.titleContainer}>
-        <ThemedText type="title">Welcome!</ThemedText>
-        <HelloWave />
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 1: Try it</ThemedText>
-        <ThemedText>
-          Edit <ThemedText type="defaultSemiBold">app/(tabs)/index.tsx</ThemedText> to see changes.
-          Press{' '}
-          <ThemedText type="defaultSemiBold">
-            {Platform.select({
-              ios: 'cmd + d',
-              android: 'cmd + m',
-              web: 'F12',
-            })}
-          </ThemedText>{' '}
-          to open developer tools.
-        </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 2: Explore</ThemedText>
-        <ThemedText>
-          {`Tap the Explore tab to learn more about what's included in this starter app.`}
-        </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 3: Get a fresh start</ThemedText>
-        <ThemedText>
-          {`When you're ready, run `}
-          <ThemedText type="defaultSemiBold">npm run reset-project</ThemedText> to get a fresh{' '}
-          <ThemedText type="defaultSemiBold">app</ThemedText> directory. This will move the current{' '}
-          <ThemedText type="defaultSemiBold">app</ThemedText> to{' '}
-          <ThemedText type="defaultSemiBold">app-example</ThemedText>.
-        </ThemedText>
-      </ThemedView>
-    </ParallaxScrollView>
+      </View>
+
+      {/* Recent Group Section */}
+      <View style={styles.recentGroupSection}>
+        <View style={styles.texts}>
+          <Text style={styles.eachTitle}>Recent Groups</Text>
+          <Text>see all</Text>
+        </View>
+        <FlatList
+          data={recentGroups}
+          renderItem={renderRecentGroup}
+          keyExtractor={(item) => item.id}
+          contentContainerStyle={styles.recentGroupList}
+          showsVerticalScrollIndicator={false}
+        />
+      </View>
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
-  titleContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
+  mainContainer: {
+    marginHorizontal: 15,
+    marginTop: 10,
   },
-  stepContainer: {
-    gap: 8,
-    marginBottom: 8,
+  topBar: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
   },
-  reactLogo: {
-    height: 178,
-    width: 290,
-    bottom: 0,
+  title: {
+    fontSize: 20,
+    fontWeight: "600",
+    position: "absolute",
     left: 0,
-    position: 'absolute',
+    right: 0,
+    textAlign: "center",
+  },
+  rightTop: {
+    flexDirection: "row",
+    alignItems: "center",
+  },
+  iconSpacing: {
+    marginRight: 10,
+  },
+  amountSection: {
+    height: 250,
+    width: "100%",
+    borderWidth: 2,
+    borderRadius: 8,
+    marginTop: 24,
+  },
+  oweSection: {
+    backgroundColor: "#9DF144",
+    height: 100,
+    margin: 12,
+    borderRadius: 8,
+    padding: 12,
+  },
+  amountSubSection: {
+    flexDirection: "row",
+    gap: 12,
+  },
+  paySection: {
+    backgroundColor: "#FE8888",
+    height: 100,
+    width: 180,
+    marginLeft: 12,
+    borderRadius: 8,
+    padding: 12,
+  },
+  expenseSection: {
+    backgroundColor: "#D5D5D5",
+    height: 100,
+    width: 180,
+    borderRadius: 8,
+    padding: 12,
+  },
+  splitMatesContainer: {
+    height: 160,
+    width: "100%",
+    borderWidth: 2,
+    borderRadius: 8,
+    marginTop: 24,
+    padding: 12,
+  },
+  texts: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+  },
+
+  splitmateImage: {
+    width: 60,
+    height: 60,
+    borderRadius: 25,
+  },
+  splitmatesList: {
+    gap: 16,
+    marginTop: 12,
+  },
+  splitmateName: {
+    textAlign: "center",
+    marginTop: 4,
+  },
+  recentGroupSection: {
+    height: 250,
+    width: "100%",
+    borderWidth: 2,
+    borderRadius: 8,
+    marginTop: 24,
+    padding: 12,
+  },
+  renderRecentGroupSection: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 12,
+    backgroundColor: "#D9D9D9",
+    padding: 12,
+    borderRadius: 8,
+  },
+  groupImage: {
+    width: 60,
+    height: 60,
+    padding: 8,
+  },
+  recentGroupList: {
+    padding: 12,
+    gap: 12,
+  },
+  groupDetails: {
+    gap: 12,
+  },
+  groupName: {
+    fontWeight: "600",
+    fontSize: 16,
+  },
+  eachTitle: {
+    fontWeight: "600",
+    fontSize: 16,
+  },
+  amountTitle: {
+    fontWeight: "600",
+    fontSize: 16,
+    marginBottom: 4,
+  },
+  amount: {
+    fontWeight: "600",
+    fontSize: 35,
   },
 });
