@@ -1,96 +1,32 @@
-import {
-  View,
-  Text,
-  SafeAreaView,
-  Image,
-  FlatList,
-  StyleSheet,
-} from "react-native";
-import React from "react";
+import GroupsContext from "@/contexts/GroupsContext";
 import { Link } from "expo-router";
-import dummyProfile from "../../assets/images/dummyProfile.png";
+import React, { useContext } from "react";
+import {
+  FlatList,
+  Image,
+  SafeAreaView,
+  StyleSheet,
+  Text,
+  View,
+} from "react-native";
+
+interface Group {
+  id: string;
+  name: string;
+  image: any;
+  totalExpense: number;
+  members: any[];
+}
 
 const Groups = () => {
-  // Dummy data for recent groups
-  const recentGroups = [
-    {
-      id: "1",
-      name: "Friends Trip",
-      image: dummyProfile,
-      totalExpense: 250,
-      members: [],
-    },
-    {
-      id: "2",
-      name: "Office Lunch",
-      image: dummyProfile,
-      totalExpense: 150,
-      members: [],
-    },
-    {
-      id: "3",
-      name: "Family Dinner",
-      image: dummyProfile,
-      totalExpense: 300,
-      members: [],
-    },
-    {
-      id: "4",
-      name: "Birthday Bash",
-      image: dummyProfile,
-      totalExpense: 500,
-      members: [],
-    },
-    {
-      id: "5",
-      name: "Weekend Getaway",
-      image: dummyProfile,
-      totalExpense: 420,
-      members: [],
-    },
-    {
-      id: "6",
-      name: "Team Outing",
-      image: dummyProfile,
-      totalExpense: 380,
-      members: [],
-    },
-    {
-      id: "7",
-      name: "Roommates Rent",
-      image: dummyProfile,
-      totalExpense: 1200,
-      members: [],
-    },
-    {
-      id: "8",
-      name: "Festival Shopping",
-      image: dummyProfile,
-      totalExpense: 700,
-      members: [],
-    },
-    {
-      id: "9",
-      name: "Road Trip",
-      image: dummyProfile,
-      totalExpense: 950,
-      members: [],
-    },
-    {
-      id: "10",
-      name: "College Reunion",
-      image: dummyProfile,
-      totalExpense: 1100,
-      members: [],
-    },
-  ];
+  const { groups } = useContext(GroupsContext);
 
-  const renderRecentGroup = ({ item }) => {
+  const renderRecentGroup = ({ item }: { item: Group }) => {
     return (
       <View style={styles.renderRecentGroupSection}>
         <Image style={styles.groupImage} source={item.image} />
         <View style={styles.groupDetails}>
-          <Text style={styles.groupName}> {item.name}</Text>
+          <Text style={styles.groupName}>{item.name}</Text>
           <Text>Total Expense: ${item.totalExpense}</Text>
         </View>
       </View>
@@ -107,17 +43,17 @@ const Groups = () => {
         </Link>
       </View>
 
-      {recentGroups.length === 0 ? (
+      {groups.length === 0 ? (
         <View style={styles.noGroupsContainer}>
-    <Image
-      source={require("../../assets/images/noGroups.png")}
-      style={styles.noGroups}
-    />
-    <Text style={styles.noGroupsText}>No groups joined</Text>
-  </View>
+          <Image
+            source={require("../../assets/images/noGroups.png")}
+            style={styles.noGroups}
+          />
+          <Text style={styles.noGroupsText}>No groups joined</Text>
+        </View>
       ) : (
         <FlatList
-          data={recentGroups}
+          data={groups}
           renderItem={renderRecentGroup}
           keyExtractor={(item) => item.id}
           contentContainerStyle={styles.recentGroupList}

@@ -8,8 +8,11 @@ import {
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import dummyProfile from "../../assets/images/dummyProfile.png";
+import GroupsContext from "@/contexts/GroupsContext";
+import { useContext } from "react";
 
 export default function HomeScreen() {
+  const { groups } = useContext(GroupsContext);
   // Dummy data for splitmates
   const Splitmates = [
     {
@@ -67,29 +70,29 @@ export default function HomeScreen() {
   };
 
   // Dummy data for recent groups
-  const recentGroups = [
-    {
-      id: "1",
-      name: "Friends Trip",
-      image: dummyProfile,
-      totalExpense: 250,
-      members: [],
-    },
-    {
-      id: "2",
-      name: "Office Lunch",
-      image: dummyProfile,
-      totalExpense: 150,
-      members: [],
-    },
-    {
-      id: "3",
-      name: "Family Dinner",
-      image: dummyProfile,
-      totalExpense: 300,
-      members: [],
-    },
-  ];
+  // const recentGroups = [
+  //   {
+  //     id: "1",
+  //     name: "Friends Trip",
+  //     image: dummyProfile,
+  //     totalExpense: 250,
+  //     members: [],
+  //   },
+  //   {
+  //     id: "2",
+  //     name: "Office Lunch",
+  //     image: dummyProfile,
+  //     totalExpense: 150,
+  //     members: [],
+  //   },
+  //   {
+  //     id: "3",
+  //     name: "Family Dinner",
+  //     image: dummyProfile,
+  //     totalExpense: 300,
+  //     members: [],
+  //   },
+  // ];
 
   const renderRecentGroup = ({ item }) => {
     return (
@@ -159,7 +162,7 @@ export default function HomeScreen() {
           <Text>see all</Text>
         </View>
         <FlatList
-          data={recentGroups}
+          data={groups}
           renderItem={renderRecentGroup}
           keyExtractor={(item) => item.id}
           contentContainerStyle={styles.recentGroupList}
