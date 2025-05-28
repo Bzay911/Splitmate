@@ -1,6 +1,5 @@
-import GroupsContext from "@/contexts/GroupsContext";
 import { Link } from "expo-router";
-import React, { useContext } from "react";
+import React, { useEffect, useState } from "react";
 import {
   FlatList,
   Image,
@@ -19,7 +18,27 @@ interface Group {
 }
 
 const Groups = () => {
-  const { groups } = useContext(GroupsContext);
+
+  const [groups, setGroups] = useState([]);
+
+  useEffect(() => {
+    async function getGroups() {
+      const url = "http://192.168.1.12:3000/groups";
+      try {
+        const response = await fetch(url);
+        if (!response.ok) {
+          throw new Error(`Response status: ${response.status}`);
+        }
+
+        const data = await response.json();
+        setGroups(data.groups);
+      } catch (error) {
+        console.error(error.message);
+      }
+    }
+   getGroups();
+  }, []);
+
 
   const renderRecentGroup = ({ item }: { item: Group }) => {
     return (
@@ -126,12 +145,12 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
   },
-  noGroupsText:{
+  noGroupsText: {
     fontSize: 18,
     fontWeight: "500",
     color: "#666",
     marginTop: 16,
-  }
+  },
 });
 
 export default Groups;
