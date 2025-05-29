@@ -41,13 +41,13 @@ export default function TabLayout() {
           tabBarIcon: ({ color }) => <Ionicons size={28} name="people" color={color} />,
         }}
       />
-         <Tabs.Screen
+         {/* <Tabs.Screen
         name="AddExpense"
         options={{
           title: '',
           tabBarIcon: ({ color }) => <Ionicons size={28} name="add-circle" color={color}/>,
         }}
-      />
+      /> */}
       <Tabs.Screen
         name="History"
         options={{

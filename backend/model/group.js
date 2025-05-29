@@ -17,8 +17,8 @@ const GroupSchema = new Schema({
     default: 0
   },
   members: [{
-    type: String,
-    trim: true
+    name:String,
+    phone:String,
   }],
 }, {
   timestamps: true // Adds createdAt and updatedAt fields

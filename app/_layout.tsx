@@ -8,7 +8,6 @@ import {
 import { useFonts } from "expo-font";
 import { Stack } from "expo-router";
 import { StatusBar } from "expo-status-bar";
-import { Text, TouchableOpacity } from "react-native";
 import "react-native-reanimated";
 
 export default function RootLayout() {
@@ -61,6 +60,14 @@ export default function RootLayout() {
             options={{
               headerShown: true,
               title: "Group Details",
+              headerBackTitle: "Back",
+            }}
+          />
+          <Stack.Screen
+            name="GroupSettings"
+            options={{
+              headerShown: true,
+              title: "Group Settings",
               headerBackTitle: "Back",
             }}
           />

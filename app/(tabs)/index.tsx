@@ -69,31 +69,6 @@ export default function HomeScreen() {
     );
   };
 
-  // Dummy data for recent groups
-  // const recentGroups = [
-  //   {
-  //     id: "1",
-  //     name: "Friends Trip",
-  //     image: dummyProfile,
-  //     totalExpense: 250,
-  //     members: [],
-  //   },
-  //   {
-  //     id: "2",
-  //     name: "Office Lunch",
-  //     image: dummyProfile,
-  //     totalExpense: 150,
-  //     members: [],
-  //   },
-  //   {
-  //     id: "3",
-  //     name: "Family Dinner",
-  //     image: dummyProfile,
-  //     totalExpense: 300,
-  //     members: [],
-  //   },
-  // ];
-
   const renderRecentGroup = ({ item }) => {
     return (
       <View style={styles.renderRecentGroupSection}>
@@ -201,7 +176,7 @@ const styles = StyleSheet.create({
   amountSection: {
     height: 250,
     width: "100%",
-    borderWidth: 2,
+    // borderWidth: 2,
     borderRadius: 8,
     marginTop: 24,
   },
@@ -234,10 +209,11 @@ const styles = StyleSheet.create({
   splitMatesContainer: {
     height: 160,
     width: "100%",
-    borderWidth: 2,
+    // borderWidth: 2,
     borderRadius: 8,
     marginTop: 24,
     padding: 12,
+    backgroundColor: "#D9D9D9",
   },
   texts: {
     flexDirection: "row",
@@ -260,7 +236,7 @@ const styles = StyleSheet.create({
   recentGroupSection: {
     height: 250,
     width: "100%",
-    borderWidth: 2,
+    // borderWidth: 2,
     borderRadius: 8,
     marginTop: 24,
     padding: 12,
