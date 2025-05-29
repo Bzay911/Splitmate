@@ -71,6 +71,18 @@ export default function RootLayout() {
               headerBackTitle: "Back",
             }}
           />
+          <Stack.Screen
+            name="SignUp"
+            options={{
+              headerShown: false,
+            }}
+          />
+          <Stack.Screen
+            name="index"
+            options={{
+              headerShown: false,
+            }}
+          />
         </Stack>
       </GroupsProvider>
 

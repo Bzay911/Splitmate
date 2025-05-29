@@ -1,0 +1,338 @@
+import { MaterialIcons } from "@expo/vector-icons";
+import { LinearGradient } from "expo-linear-gradient";
+import { router } from "expo-router";
+import React from "react";
+import {
+  KeyboardAvoidingView,
+  Platform,
+  Pressable,
+  StyleSheet,
+  Text,
+  TextInput,
+  TextInputProps,
+  View
+} from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
+
+interface InputFieldProps extends Omit<TextInputProps, 'style'> {
+  label: string;
+  icon: keyof typeof MaterialIcons.glyphMap;
+  value: string;
+  onChangeText: (text: string) => void;
+  placeholder: string;
+}
+
+function InputField({
+  label,
+  icon,
+  value,
+  onChangeText,
+  placeholder,
+  ...props
+}: InputFieldProps) {
+  return (
+    <View style={styles.inputContainer}>
+      <Text style={styles.label}>{label}</Text>
+      <View style={styles.inputWrapper}>
+        <MaterialIcons name={icon} size={20} color="#71717a" style={styles.inputIcon} />
+        <TextInput
+          style={styles.input}
+          placeholder={placeholder}
+          placeholderTextColor="#a1a1aa"
+          value={value}
+          onChangeText={onChangeText}
+          autoCorrect={false}
+          {...props}
+        />
+      </View>
+    </View>
+  );
+}
+
+export function SignUpScreen() {
+  const [fullName, setFullName] = React.useState("");
+  const [email, setEmail] = React.useState("");
+  const [password, setPassword] = React.useState("");
+  const [confirmPassword, setConfirmPassword] = React.useState("");
+  const [agreedToTerms, setAgreedToTerms] = React.useState(false);
+
+  return (
+    <SafeAreaView style={styles.safeArea} edges={["top"]}>
+      <KeyboardAvoidingView 
+        behavior={Platform.OS === "ios" ? "padding" : "height"}
+        style={styles.container}
+      >
+        <View style={styles.header}>
+          <Text style={styles.title}>Create Account</Text>
+          <Text style={styles.subtitle}>
+            Join thousands of users splitting bills
+          </Text>
+        </View>
+
+        <View style={styles.form}>
+          <InputField
+            label="Full Name"
+            icon="person-outline"
+            value={fullName}
+            onChangeText={setFullName}
+            placeholder="Enter your full name"
+            autoCapitalize="words"
+            autoComplete="name"
+            textContentType="name"
+            returnKeyType="next"
+          />
+
+          <InputField
+            label="Email"
+            icon="mail-outline"
+            value={email}
+            onChangeText={setEmail}
+            placeholder="Enter your email"
+            keyboardType="email-address"
+            autoCapitalize="none"
+            autoComplete="email"
+            textContentType="emailAddress"
+            returnKeyType="next"
+          />
+
+          <InputField
+            label="Password"
+            icon="lock-outline"
+            value={password}
+            onChangeText={setPassword}
+            placeholder="Create a password"
+            secureTextEntry
+            autoCapitalize="none"
+            autoComplete="password-new"
+            textContentType="newPassword"
+            returnKeyType="next"
+          />
+
+          <InputField
+            label="Confirm Password"
+            icon="lock-outline"
+            value={confirmPassword}
+            onChangeText={setConfirmPassword}
+            placeholder="Confirm your password"
+            secureTextEntry
+            autoCapitalize="none"
+            autoComplete="password-new"
+            textContentType="newPassword"
+            returnKeyType="done"
+          />
+
+          <View style={styles.termsContainer}>
+            <Pressable
+              onPress={() => setAgreedToTerms(!agreedToTerms)}
+              accessibilityRole="checkbox"
+              accessibilityState={{ checked: agreedToTerms }}
+              style={[styles.checkbox, agreedToTerms && styles.checkboxChecked]}
+            >
+              {agreedToTerms && <MaterialIcons name="check" size={16} color="#fff" />}
+            </Pressable>
+            <Text style={styles.termsText}>
+              I agree to the{" "}
+              <Text style={styles.termsLink}>
+                Terms of Service
+              </Text>
+              {" "}and{" "}
+              <Text style={styles.termsLink}>
+                Privacy Policy
+              </Text>
+            </Text>
+          </View>
+
+          <Pressable
+            style={[
+              styles.createAccountButton,
+              !agreedToTerms && styles.createAccountButtonDisabled,
+            ]}
+            accessibilityRole="button"
+            onPress={() => {
+              // Basic form validation
+              if (!fullName.trim()) {
+                alert("Please enter your full name");
+                return;
+              }
+              if (!email.trim()) {
+                alert("Please enter your email");
+                return;
+              }
+              if (!password) {
+                alert("Please enter a password");
+                return;
+              }
+              if (password !== confirmPassword) {
+                alert("Passwords do not match");
+                return;
+              }
+              
+              // Navigate to index page after successful signup
+              router.push("/");
+            }}
+            disabled={!agreedToTerms}
+          >
+            <LinearGradient
+              colors={agreedToTerms ? ["#2563eb", "#1d4ed8"] : ["#93c5fd", "#60a5fa"]}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 1, y: 1 }}
+              style={styles.gradient}
+            >
+              <Text style={styles.createAccountButtonText}>Create Account</Text>
+            </LinearGradient>
+          </Pressable>
+
+          <Text style={styles.signInText}>
+            Already have an account?{" "}
+            <Text 
+              style={styles.termsLink}
+              onPress={() => router.push("/")}
+            >
+              Login
+            </Text>
+          </Text>
+        </View>
+      </KeyboardAvoidingView>
+    </SafeAreaView>
+  );
+}
+
+const styles = StyleSheet.create({
+  safeArea: {
+    flex: 1,
+    backgroundColor: "#fff",
+  },
+  container: {
+    flex: 1,
+    padding: 24,
+  },
+  header: {
+    alignItems: "center",
+    marginTop: 20,
+    marginBottom: 32,
+  },
+  form: {
+    width: "100%",
+  },
+  title: {
+    fontSize: 32,
+    fontWeight: "700",
+    marginBottom: 8,
+    textAlign: "center",
+    color: "#18181b",
+  },
+  subtitle: {
+    fontSize: 16,
+    textAlign: "center",
+    color: "#71717a",
+  },
+  inputContainer: {
+    marginBottom: 20,
+  },
+  label: {
+    fontSize: 16,
+    fontWeight: "600",
+    marginBottom: 8,
+    color: "#18181b",
+  },
+  inputWrapper: {
+    flexDirection: "row",
+    alignItems: "center",
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: "#e4e4e7",
+    backgroundColor: "#f4f4f5",
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 1,
+    },
+    shadowOpacity: 0.05,
+    shadowRadius: 2,
+    elevation: 2,
+  },
+  inputIcon: {
+    paddingLeft: 16,
+  },
+  input: {
+    flex: 1,
+    height: 52,
+    paddingHorizontal: 16,
+    fontSize: 16,
+    color: "#18181b",
+  },
+  termsContainer: {
+    flexDirection: "row",
+    alignItems: "flex-start",
+    marginBottom: 24,
+  },
+  checkbox: {
+    width: 20,
+    height: 20,
+    borderRadius: 4,
+    borderWidth: 1.5,
+    borderColor: "#e4e4e7",
+    alignItems: "center",
+    justifyContent: "center",
+    marginRight: 12,
+    marginTop: 2,
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 1,
+    },
+    shadowOpacity: 0.05,
+    shadowRadius: 1,
+    elevation: 1,
+  },
+  checkboxChecked: {
+    backgroundColor: "#2563eb",
+    borderColor: "#2563eb",
+  },
+  termsText: {
+    flex: 1,
+    fontSize: 14,
+    lineHeight: 20,
+    color: "#18181b",
+  },
+  termsLink: {
+    color: "#2563eb",
+    fontWeight: "500",
+  },
+  createAccountButton: {
+    width: "100%",
+    height: 52,
+    borderRadius: 12,
+    marginBottom: 16,
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
+  },
+  createAccountButtonDisabled: {
+    opacity: 0.9,
+  },
+  gradient: {
+    width: "100%",
+    height: "100%",
+    borderRadius: 12,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  createAccountButtonText: {
+    color: "#fff",
+    fontSize: 16,
+    fontWeight: "600",
+  },
+  signInText: {
+    fontSize: 14,
+    textAlign: "center",
+    color: "#71717a",
+  },
+});
+
+export default SignUpScreen;
