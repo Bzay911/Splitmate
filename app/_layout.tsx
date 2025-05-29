@@ -22,7 +22,6 @@ export default function RootLayout() {
     return null;
   }
 
-  
   return (
     <ThemeProvider value={colorScheme === "dark" ? DarkTheme : DefaultTheme}>
       <GroupsProvider>
@@ -57,6 +56,14 @@ export default function RootLayout() {
             }}
           />
           <Stack.Screen name="+not-found" />
+          <Stack.Screen
+            name="GroupDetails"
+            options={{
+              headerShown: true,
+              title: "Group Details",
+              headerBackTitle: "Back",
+            }}
+          />
         </Stack>
       </GroupsProvider>
 

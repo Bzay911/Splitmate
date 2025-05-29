@@ -1,91 +1,54 @@
-const express = require('express')
-const app = express()
-const port = 3000
-const cors = require('cors')
- 
-app.use(cors())
+import cors from 'cors';
+import express from 'express';
+import mongoose from 'mongoose';
+import { Group } from './model/group.js';
+import dotenv from 'dotenv';
+
+dotenv.config();
+const mongoURI = process.env.MONGO_URI;
+const app = express();
+const port = 3000;
+
+// Middlewares
+app.use(cors());
+app.use(express.json());
+
+// MongoDB Connection
+mongoose.connect(mongoURI)
+  .then(() => console.log('Connected to MongoDB'))
+  .catch((err) => console.error('MongoDB connection error:', err));
 
 app.get('/', (req, res) => {
-  res.send('Hello World!')
-})
+  res.send('Hello World!');
+});
 
-app.get('/groups', (req, res) => {
-  res.json({
-    groups: [
-        {
-            id: "1",
-            name: "Friends Trip",
-            // image: require("../assets/images/dummyProfile.png"),
-            totalExpense: 250,
-            members: [],
-          },
-          {
-            id: "2",
-            name: "Office Lunch",
-            // image: require("../assets/images/dummyProfile.png"),
-            totalExpense: 150,
-            members: [],
-          },
-          {
-            id: "3",
-            name: "Family Dinner",
-            // image: require("../assets/images/dummyProfile.png"),
-            totalExpense: 300,
-            members: [],
-          },
-          {
-            id: "4",
-            name: "Birthday Bash",
-            // image: require("../assets/images/dummyProfile.png"),
-            totalExpense: 500,
-            members: [],
-          },
-          {
-            id: "5",
-            name: "Weekend Getaway",
-            // image: require("../assets/images/dummyProfile.png"),
-            totalExpense: 420,
-            members: [],
-          },
-          {
-            id: "6",
-            name: "Team Outing",
-            // image: require("../assets/images/dummyProfile.png"),
-            totalExpense: 380,
-            members: [],
-          },
-          {
-            id: "7",
-            name: "Roommates Rent",
-            // image: require("../assets/images/dummyProfile.png"),
-            totalExpense: 1200,
-            members: [],
-          },
-          {
-            id: "8",
-            name: "Festival Shopping",
-            // image: require("../assets/images/dummyProfile.png"),
-            totalExpense: 700,
-            members: [],
-          },
-          {
-            id: "9",
-            name: "Road Trip",
-            // image: require("../assets/images/dummyProfile.png"),
-            totalExpense: 950,
-            members: [],
-          },
-          {
-            id: "10",
-            name: "College Reunion",
-            //  image: require("../assets/images/dummyProfile.png"),
-            totalExpense: 1100,
-            members: [],
-          },
-    ]
-  })
-})
+// Get all groups
+app.get('/groups', async (req, res) => {
+  try {
+    const groups = await Group.find();
+    res.json({ groups });
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to fetch groups' });
+  }
+});
+
+// Add a new group
+app.post('/addGroup', async (req, res) => {
+  try {
+    const group = new Group({
+      name: req.body.name,
+      image: req.body.image,
+      totalExpense: req.body.totalExpense,
+      members: req.body.members,
+    });
+    
+    const savedGroup = await group.save();
+    res.status(201).json({ message: "Group added successfully", group: savedGroup });
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to add group' });
+  }
+});
 
 app.listen(port, () => {
-  console.log(`Example app listening on port ${port}`)
-})
+  console.log(`Server listening on port ${port}`);
+});

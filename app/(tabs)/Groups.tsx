@@ -1,4 +1,4 @@
-import { Link } from "expo-router";
+import { Link, router } from "expo-router";
 import React, { useEffect, useState } from "react";
 import {
   FlatList,
@@ -7,10 +7,11 @@ import {
   StyleSheet,
   Text,
   View,
+  TouchableOpacity,
 } from "react-native";
 
 interface Group {
-  id: string;
+  _id: string;
   name: string;
   image: any;
   totalExpense: number;
@@ -37,18 +38,24 @@ const Groups = () => {
       }
     }
    getGroups();
-  }, []);
+  }, [groups]);
 
+  const handleGroupPress = (group: Group) => {
+    router.push({
+      pathname: "/GroupDetails",
+      params: { groupId: group._id, groupName: group.name, totalExpense: group.totalExpense, image: group.image },
+    });
+  };
 
   const renderRecentGroup = ({ item }: { item: Group }) => {
     return (
-      <View style={styles.renderRecentGroupSection}>
-        <Image style={styles.groupImage} source={item.image} />
+      <TouchableOpacity style={styles.renderRecentGroupSection} onPress={() => handleGroupPress(item)}>
+        <Image style={styles.groupImage} source={{ uri: item.image }} />
         <View style={styles.groupDetails}>
           <Text style={styles.groupName}>{item.name}</Text>
           <Text>Total Expense: ${item.totalExpense}</Text>
         </View>
-      </View>
+        </TouchableOpacity>
     );
   };
 
@@ -74,7 +81,7 @@ const Groups = () => {
         <FlatList
           data={groups}
           renderItem={renderRecentGroup}
-          keyExtractor={(item) => item.id}
+          keyExtractor={(item) => item._id}
           contentContainerStyle={styles.recentGroupList}
           showsVerticalScrollIndicator={false}
         />

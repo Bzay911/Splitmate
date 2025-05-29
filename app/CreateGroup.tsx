@@ -4,21 +4,29 @@ import React, { useContext, useState } from 'react';
 import { SafeAreaView, StyleSheet, Text, TextInput, TouchableOpacity } from 'react-native';
 
 const CreateGroup = () => {
-  const { addGroup } = useContext(GroupsContext);
+  // const { addGroup } = useContext(GroupsContext);
   const [groupName, setGroupName] = useState("");
 
-  const handleCreate = () => {
+  const handleCreate = async() => {
     if (!groupName.trim()) return;
-    
-    addGroup({
-      id: Date.now().toString(), // Using timestamp as a unique ID
-      name: groupName,
-      image: require("../assets/images/dummyProfile.png"),
-      totalExpense: 0,
-      members: [],
-    });
-    setGroupName(""); // Clear input after creating
-    router.back();  
+    try{
+      const response = await fetch('http://192.168.1.12:3000/addGroup',{
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ name: groupName, totalExpense: 0, members: [], image: "https://www.ibcs.com/wp-content/uploads/2024/01/Projekt-bez-nazwy-15.png" }),
+      });
+      if (!response.ok) {
+        throw new Error('Failed to create group');
+      }
+      const data = await response.json();
+      console.log("Group created successfully");
+      setGroupName("");
+      router.back();
+    } catch (error) {
+      console.error("Error creating group:", error);
+    }
   };
 
   return (
