@@ -1,7 +1,15 @@
 import { Ionicons } from "@expo/vector-icons";
 import { router, useLocalSearchParams } from "expo-router";
 import React, { useEffect, useState } from "react";
-import { Image, SafeAreaView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import {
+  Image,
+  SafeAreaView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
+import { auth } from "../src/firebaseConfig";
 
 interface GroupMember {
   name: string;
@@ -22,12 +30,32 @@ const GroupDetails = () => {
 
   useEffect(() => {
     const fetchGroupDetails = async () => {
+      const user = auth.currentUser;
+      if (!user) {
+        router.push("/");
+        return;
+      }
+      const token = await user.getIdToken();
+
       try {
-        const response = await fetch(`http://192.168.1.12:3000/groups/${groupId}`);
+        const response = await fetch(
+          `http://192.168.1.12:3000/api/groups/${groupId}`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+              "Content-Type": "application/json",
+            },
+          }
+        );
+
+        if (!response.ok) {
+          throw new Error(`Failed to fetch group (${response.status})`);
+        }
+
         const data = await response.json();
         setGroupDetails(data.group);
       } catch (error) {
-        console.error('Error fetching group details:', error);
+        console.error("Error fetching group details:", error);
       }
     };
     fetchGroupDetails();
@@ -42,7 +70,6 @@ const GroupDetails = () => {
     );
   }
 
-
   const handleSettingsPress = () => {
     if (groupDetails) {
       router.push({
@@ -50,15 +77,18 @@ const GroupDetails = () => {
         params: {
           groupId: groupDetails._id,
           groupName: groupDetails.name,
-          members: JSON.stringify(groupDetails.members)
-        }
+          members: JSON.stringify(groupDetails.members),
+        },
       });
     }
   };
 
   return (
     <SafeAreaView style={styles.container}>
-      <TouchableOpacity style={styles.settingsBtn} onPress={handleSettingsPress}>
+      <TouchableOpacity
+        style={styles.settingsBtn}
+        onPress={handleSettingsPress}
+      >
         <Ionicons name="settings" size={24} color="black" />
       </TouchableOpacity>
       <View style={styles.header}>
@@ -81,8 +111,12 @@ const GroupDetails = () => {
 
       <View style={styles.dividendSection}>
         <Text style={styles.ownerDividend}>You are owed $100 overall</Text>
-        <Text style={styles.matesDividend}>Alex owes you <Text style={styles.money}>$30</Text></Text>
-        <Text style={styles.matesDividend}>Mathew owes you <Text style={styles.money}>$70</Text></Text>
+        <Text style={styles.matesDividend}>
+          Alex owes you <Text style={styles.money}>$30</Text>
+        </Text>
+        <Text style={styles.matesDividend}>
+          Mathew owes you <Text style={styles.money}>$70</Text>
+        </Text>
       </View>
 
       <View style={styles.buttonContainer}>
@@ -113,9 +147,9 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: "#fff",
   },
-  settingsBtn:{
-    alignSelf:'flex-end',
-    margin:12
+  settingsBtn: {
+    alignSelf: "flex-end",
+    margin: 12,
   },
   header: {
     alignItems: "center",
@@ -162,8 +196,8 @@ const styles = StyleSheet.create({
   },
   verticalLine: {
     width: 1,
-    height: '80%',
-    backgroundColor: '#000',
+    height: "80%",
+    backgroundColor: "#000",
   },
   dividendSection: {
     marginLeft: 12,
@@ -173,7 +207,7 @@ const styles = StyleSheet.create({
   ownerDividend: {
     fontSize: 20,
     fontWeight: "bold",
-    color:'green'
+    color: "green",
   },
   matesDividend: {
     fontSize: 16,
@@ -201,8 +235,8 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
   },
   errorText: {
-    color: 'red',
-    textAlign: 'center',
+    color: "red",
+    textAlign: "center",
     marginTop: 20,
   },
 });

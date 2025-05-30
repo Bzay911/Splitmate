@@ -9,6 +9,7 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
+import { auth } from "../../src/firebaseConfig";
 
 interface Group {
   _id: string;
@@ -19,43 +20,110 @@ interface Group {
 }
 
 const Groups = () => {
-
-  const [groups, setGroups] = useState([]);
+  const [groups, setGroups] = useState<Group[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     async function getGroups() {
-      const url = "http://192.168.1.12:3000/groups";
+      setIsLoading(true);
       try {
-        const response = await fetch(url);
+        // Get current user and token
+        const user = auth.currentUser;
+        if (!user) {
+          router.replace("/"); // Redirect to login if no user
+          return;
+        }
+
+        const token = await user.getIdToken();
+
+        // Make authenticated request
+        const response = await fetch("http://192.168.1.12:3000/api/groups", {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        });
+
         if (!response.ok) {
-          throw new Error(`Response status: ${response.status}`);
+          throw new Error(`Failed to fetch groups (${response.status})`);
         }
 
         const data = await response.json();
         setGroups(data.groups);
-      } catch (error) {
-        console.error(error.message);
+      } catch (error: any) {
+        console.error("Error fetching groups:", error);
+        setError(error.message);
+
+        // Handle authentication errors
+        if (error.code === "auth/user-token-expired") {
+          router.replace("/"); // Redirect to login
+        }
+      } finally {
+        setIsLoading(false);
       }
     }
-   getGroups();
-  }, [groups]);
+
+    getGroups();
+  }, []);
+
+  // Add a refresh function
+  const refreshGroups = async () => {
+    setIsLoading(true);
+    try {
+      const user = auth.currentUser;
+      if (!user) {
+        router.replace("/");
+        return;
+      }
+
+      const token = await user.getIdToken(true); // Force refresh token
+
+      const response = await fetch("http://192.168.1.12:3000/api/groups", {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error(`Failed to fetch groups (${response.status})`);
+      }
+
+      const data = await response.json();
+      setGroups(data.groups);
+    } catch (error: any) {
+      console.error("Error refreshing groups:", error);
+      setError(error.message);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   const handleGroupPress = (group: Group) => {
     router.push({
       pathname: "/GroupDetails",
-      params: { groupId: group._id, groupName: group.name, totalExpense: group.totalExpense, image: group.image },
+      params: {
+        groupId: group._id,
+        groupName: group.name,
+        totalExpense: group.totalExpense,
+        image: group.image,
+      },
     });
   };
 
   const renderRecentGroup = ({ item }: { item: Group }) => {
     return (
-      <TouchableOpacity style={styles.renderRecentGroupSection} onPress={() => handleGroupPress(item)}>
+      <TouchableOpacity
+        style={styles.renderRecentGroupSection}
+        onPress={() => handleGroupPress(item)}
+      >
         <Image style={styles.groupImage} source={{ uri: item.image }} />
         <View style={styles.groupDetails}>
           <Text style={styles.groupName}>{item.name}</Text>
           <Text>Total Expense: ${item.totalExpense}</Text>
         </View>
-        </TouchableOpacity>
+      </TouchableOpacity>
     );
   };
 
@@ -69,7 +137,18 @@ const Groups = () => {
         </Link>
       </View>
 
-      {groups.length === 0 ? (
+      {isLoading ? (
+        <View style={styles.centerContainer}>
+          <Text>Loading groups...</Text>
+        </View>
+      ) : error ? (
+        <View style={styles.centerContainer}>
+          <Text style={styles.errorText}>{error}</Text>
+          <TouchableOpacity style={styles.retryButton} onPress={refreshGroups}>
+            <Text style={styles.retryText}>Retry</Text>
+          </TouchableOpacity>
+        </View>
+      ) : groups.length === 0 ? (
         <View style={styles.noGroupsContainer}>
           <Image
             source={require("../../assets/images/noGroups.png")}
@@ -84,6 +163,8 @@ const Groups = () => {
           keyExtractor={(item) => item._id}
           contentContainerStyle={styles.recentGroupList}
           showsVerticalScrollIndicator={false}
+          refreshing={isLoading}
+          onRefresh={refreshGroups}
         />
       )}
     </SafeAreaView>
@@ -140,8 +221,8 @@ const styles = StyleSheet.create({
   },
   topBarTitle: {
     fontSize: 32,
-    fontWeight: '700',
-    color: '#1e293b',
+    fontWeight: "700",
+    color: "#1e293b",
     marginBottom: 8,
   },
   noGroups: {
@@ -159,6 +240,27 @@ const styles = StyleSheet.create({
     fontWeight: "500",
     color: "#666",
     marginTop: 16,
+  },
+  centerContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  errorText: {
+    color: "#ef4444",
+    fontSize: 16,
+    marginBottom: 16,
+  },
+  retryButton: {
+    backgroundColor: "#2563eb",
+    paddingHorizontal: 20,
+    paddingVertical: 10,
+    borderRadius: 8,
+  },
+  retryText: {
+    color: "#ffffff",
+    fontSize: 16,
+    fontWeight: "500",
   },
 });
 

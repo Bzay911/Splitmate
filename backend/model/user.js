@@ -12,7 +12,6 @@ const userSchema = new mongoose.Schema({
     unique: true,
   },
   displayName: String,
-  phoneNumber: String,
   createdAt: {
     type: Date,
     default: Date.now,

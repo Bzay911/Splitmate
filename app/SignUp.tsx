@@ -25,20 +25,21 @@ interface InputFieldProps extends Omit<TextInputProps, 'style'> {
 }
 
 const handleSignUp = async (email: string, password: string, fullName: string) => {
-  try{
+  try {
+    // 1. Create Firebase Auth User
     const userCredential = await createUserWithEmailAndPassword(auth, email, password);
     const user = userCredential.user;
 
+    // 2. Update Firebase Profile
     await updateProfile(user, {
       displayName: fullName
     });
-    const token = await user.getIdToken();
 
+    // 3. Create user in backend
     const response = await fetch('http://192.168.1.12:3000/api/users', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`,
       },
       body: JSON.stringify({
         firebaseUid: user.uid,
@@ -47,15 +48,35 @@ const handleSignUp = async (email: string, password: string, fullName: string) =
       }),
     });
 
-    if(!response.ok){
+    if (!response.ok) {
       const errorData = await response.json();
       throw new Error(errorData.error || 'Failed to create user profile');
     }
 
     return user;
-  } catch (error) {
-    console.error("Error creating user", error);
-    alert("Error creating user");
+  } catch (error: any) {
+    // Firebase Auth specific errors
+    if (error.code) {
+      switch (error.code) {
+        case 'auth/email-already-in-use':
+          alert('This email is already registered. Please try logging in instead.');
+          break;
+        case 'auth/invalid-email':
+          alert('Please enter a valid email address.');
+          break;
+        case 'auth/operation-not-allowed':
+          alert('Email/password accounts are not enabled. Please contact support.');
+          break;
+        case 'auth/weak-password':
+          alert('Please choose a stronger password (at least 6 characters).');
+          break;
+        default:
+          alert(`Error creating account: ${error.message}`);
+      }
+    } else {
+      // Backend or other errors
+      alert(error.message || 'Error creating user. Please try again.');
+    }
     return null;
   }
 }
@@ -93,6 +114,67 @@ export default function SignUp() {
   const [password, setPassword] = React.useState("");
   const [confirmPassword, setConfirmPassword] = React.useState("");
   const [agreedToTerms, setAgreedToTerms] = React.useState(false);
+  const [isLoading, setIsLoading] = React.useState(false);
+
+  // Form validation function
+  const validateForm = () => {
+    if (!fullName.trim()) {
+      alert("Please enter your full name");
+      return false;
+    }
+
+    if (!email.trim()) {
+      alert("Please enter your email address");
+      return false;
+    }
+
+    // Email format validation
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      alert("Please enter a valid email address");
+      return false;
+    }
+
+    if (!password) {
+      alert("Please enter a password");
+      return false;
+    }
+
+    // Password strength validation
+    if (password.length < 6) {
+      alert("Password must be at least 6 characters long");
+      return false;
+    }
+
+    if (password !== confirmPassword) {
+      alert("Passwords do not match");
+      return false;
+    }
+
+    if (!agreedToTerms) {
+      alert("Please agree to the Terms of Service and Privacy Policy");
+      return false;
+    }
+
+    return true;
+  };
+
+  // Update the onPress handler
+  const handleSubmit = async () => {
+    if (!validateForm()) return;
+
+    setIsLoading(true);
+    try {
+      const user = await handleSignUp(email, password, fullName);
+      if (user) {
+        router.push("/Home");
+      }
+    } catch (error) {
+      console.error("Error creating user", error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   return (
     <SafeAreaView style={styles.safeArea} edges={["top"]}>
@@ -183,38 +265,11 @@ export default function SignUp() {
           <Pressable
             style={[
               styles.createAccountButton,
-              !agreedToTerms && styles.createAccountButtonDisabled,
+              (!agreedToTerms || isLoading) && styles.createAccountButtonDisabled,
             ]}
             accessibilityRole="button"
-            onPress={async() => {
-              // Basic form validation
-              if (!fullName.trim()) {
-                alert("Please enter your full name");
-                return;
-              }
-              if (!email.trim()) {
-                alert("Please enter your email");
-                return;
-              }
-              if (!password) {
-                alert("Please enter a password");
-                return;
-              }
-              if (password !== confirmPassword) {
-                alert("Passwords do not match");
-                return;
-              }
-              try{
-                const user = await handleSignUp(email, password, fullName);
-                if(user){
-                  router.push("/Home");
-                }
-              } catch (error){
-                console.error("Error creating user", error);
-                alert("Error creating user");
-              }
-            }}
-            disabled={!agreedToTerms}
+            onPress={handleSubmit}
+            disabled={!agreedToTerms || isLoading}
           >
             <LinearGradient
               colors={agreedToTerms ? ["#2563eb", "#1d4ed8"] : ["#93c5fd", "#60a5fa"]}
@@ -222,7 +277,9 @@ export default function SignUp() {
               end={{ x: 1, y: 1 }}
               style={styles.gradient}
             >
-              <Text style={styles.createAccountButtonText}>Create Account</Text>
+              <Text style={styles.createAccountButtonText}>
+                {isLoading ? "Creating Account..." : "Create Account"}
+              </Text>
             </LinearGradient>
           </Pressable>
 
@@ -358,7 +415,7 @@ const styles = StyleSheet.create({
     elevation: 3,
   },
   createAccountButtonDisabled: {
-    opacity: 0.9,
+    opacity: 0.7,
   },
   gradient: {
     width: "100%",

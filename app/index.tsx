@@ -14,6 +14,24 @@ import { auth } from "../src/firebaseConfig";
 
 const handleSignin = async (email: string, password: string) => {
   try {
+    // Input validation
+    if (!email.trim()) {
+      alert("Please enter your email address");
+      return null;
+    }
+
+    // Email format validation
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      alert("Please enter a valid email address");
+      return null;
+    }
+
+    if (!password) {
+      alert("Please enter your password");
+      return null;
+    }
+
     // 1. Authenticate with Firebase
     const userCredential = await signInWithEmailAndPassword(auth, email, password);
     const token = await userCredential.user.getIdToken();
@@ -26,27 +44,47 @@ const handleSignin = async (email: string, password: string) => {
       }
     });
 
+    const data = await response.json();
+
     if (response.status === 404) {
-      // User doesn't exist in your database
-      alert("Please create an account first");
-      router.push("/SignUp");  // Redirect to signup
+      alert("Account not found. Please create an account first.");
+      router.push("/SignUp");
       return null;
     }
 
     if (!response.ok) {
-      throw new Error('Failed to sign in');
+      throw new Error(data.error || 'Failed to sign in');
     }
 
     console.log("User signed in successfully", userCredential.user);
     router.push("/Home");
     return userCredential.user;
 
-  } catch (error) {
+  } catch (error: any) {
     console.error("Error signing in", error);
-    if (error.code === 'auth/user-not-found' || error.code === 'auth/wrong-password') {
-      alert("Invalid email or password");
-    } else {
-      alert("Error signing in. Please try again.");
+    
+    // Firebase Auth specific errors
+    switch (error.code) {
+      case 'auth/user-not-found':
+        alert("No account found with this email. Please sign up first.");
+        break;
+      case 'auth/wrong-password':
+        alert("Incorrect password. Please try again.");
+        break;
+      case 'auth/invalid-email':
+        alert("Please enter a valid email address.");
+        break;
+      case 'auth/user-disabled':
+        alert("This account has been disabled. Please contact support.");
+        break;
+      case 'auth/too-many-requests':
+        alert("Too many failed attempts. Please try again later.");
+        break;
+      case 'auth/invalid-credential':
+        alert("Invalid email or password. Please try again.");
+        break;
+      default:
+        alert(error.message || "Error signing in. Please try again.");
     }
     return null;
   }
@@ -96,6 +134,52 @@ function InputField({
 export function LoginScreen() {
   const [email, setEmail] = React.useState("");
   const [password, setPassword] = React.useState("");
+  const [isLoading, setIsLoading] = React.useState(false);
+  const [emailError, setEmailError] = React.useState("");
+  const [passwordError, setPasswordError] = React.useState("");
+
+  // Validate form
+  const validateForm = () => {
+    let isValid = true;
+    
+    // Reset errors
+    setEmailError("");
+    setPasswordError("");
+
+    // Email validation
+    if (!email.trim()) {
+      setEmailError("Email is required");
+      isValid = false;
+    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      setEmailError("Please enter a valid email address");
+      isValid = false;
+    }
+
+    // Password validation
+    if (!password) {
+      setPasswordError("Password is required");
+      isValid = false;
+    }
+
+    return isValid;
+  };
+
+  // Handle sign in
+  const handleSubmit = async () => {
+    if (!validateForm()) return;
+
+    setIsLoading(true);
+    try {
+      const user = await handleSignin(email, password);
+      if (user) {
+        console.log("User signed in successfully", user.email);
+      }
+    } catch (error) {
+      console.error("Error signing in", error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   return (
     <SafeAreaView style={styles.safeArea} edges={["top"]}>
@@ -112,7 +196,10 @@ export function LoginScreen() {
             label="Email"
             icon="mail-outline"
             value={email}
-            onChangeText={setEmail}
+            onChangeText={(text) => {
+              setEmail(text);
+              setEmailError(""); // Clear error on change
+            }}
             placeholder="Enter your email"
             keyboardType="email-address"
             autoCapitalize="none"
@@ -120,12 +207,16 @@ export function LoginScreen() {
             textContentType="emailAddress"
             returnKeyType="next"
           />
+          {emailError ? <Text style={styles.errorText}>{emailError}</Text> : null}
 
           <InputField
             label="Password"
             icon="lock-outline"
             value={password}
-            onChangeText={setPassword}
+            onChangeText={(text) => {
+              setPassword(text);
+              setPasswordError(""); // Clear error on change
+            }}
             placeholder="Enter your password"
             secureTextEntry
             autoCapitalize="none"
@@ -133,6 +224,7 @@ export function LoginScreen() {
             textContentType="password"
             returnKeyType="done"
           />
+          {passwordError ? <Text style={styles.errorText}>{passwordError}</Text> : null}
 
           <View style={styles.forgotPasswordContainer}>
             <Pressable onPress={() => {}}>
@@ -141,22 +233,14 @@ export function LoginScreen() {
           </View>
 
           <Pressable
-            style={styles.signInButton}
+            style={[styles.signInButton, isLoading && styles.signInButtonDisabled]}
             accessibilityRole="button"
-            onPress={async() => {
-              try{
-                const user = await handleSignin(email, password);
-                // const user = await handleSignin("gurungbeejaya@gmail.com", "aaaaaaaa");
-                if(user){
-                  router.push("/Home");
-                  console.log("User signed in successfully", user.email);
-                }
-              } catch (error){
-                console.error("Error signing in", error);
-              }
-            }}
+            onPress={handleSubmit}
+            disabled={isLoading}
           >
-            <Text style={styles.signInText}>Sign In to Splitmate</Text>
+            <Text style={styles.signInText}>
+              {isLoading ? "Signing in..." : "Sign In to Splitmate"}
+            </Text>
           </Pressable>
 
           <View style={styles.dividerContainer}>
@@ -170,7 +254,7 @@ export function LoginScreen() {
           <Pressable
             style={styles.googleButton}
             accessibilityRole="button"
-            onPress={() => {}}
+            onPress={() => router.push("/Home")}
           >
             <FontAwesome name="google" size={20} color="#18181b" />
             <Text style={styles.googleText}>Continue with Google</Text>
@@ -338,6 +422,17 @@ const styles = StyleSheet.create({
   link: {
     color: "#2563eb",
     fontWeight: "500",
+  },
+  errorText: {
+    color: "#ef4444", // Red color
+    fontSize: 12,
+    marginTop: -16,
+    marginBottom: 16,
+    marginLeft: 4,
+  },
+  signInButtonDisabled: {
+    opacity: 0.7,
+    backgroundColor: "#93c5fd", // Lighter blue
   },
 });
 
