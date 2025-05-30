@@ -1,6 +1,7 @@
 import { MaterialIcons } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
 import { router } from "expo-router";
+import { createUserWithEmailAndPassword } from "firebase/auth";
 import React from "react";
 import {
   KeyboardAvoidingView,
@@ -13,6 +14,7 @@ import {
   View
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { auth } from "../src/firebaseConfig";
 
 interface InputFieldProps extends Omit<TextInputProps, 'style'> {
   label: string;
@@ -20,6 +22,17 @@ interface InputFieldProps extends Omit<TextInputProps, 'style'> {
   value: string;
   onChangeText: (text: string) => void;
   placeholder: string;
+}
+
+const handleSignUp = async (email: string, password: string) => {
+  try{
+    const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+    return userCredential.user;
+  } catch (error) {
+    console.error("Error creating user", error);
+    alert("Error creating user");
+    return null;
+  }
 }
 
 function InputField({
@@ -49,7 +62,7 @@ function InputField({
   );
 }
 
-export function SignUpScreen() {
+export default function SignUp() {
   const [fullName, setFullName] = React.useState("");
   const [email, setEmail] = React.useState("");
   const [password, setPassword] = React.useState("");
@@ -148,7 +161,7 @@ export function SignUpScreen() {
               !agreedToTerms && styles.createAccountButtonDisabled,
             ]}
             accessibilityRole="button"
-            onPress={() => {
+            onPress={async() => {
               // Basic form validation
               if (!fullName.trim()) {
                 alert("Please enter your full name");
@@ -166,9 +179,15 @@ export function SignUpScreen() {
                 alert("Passwords do not match");
                 return;
               }
-              
-              // Navigate to index page after successful signup
-              router.push("/");
+              try{
+                const user = await handleSignUp(email, password);
+                if(user){
+                  router.push("/Home");
+                }
+              } catch (error){
+                console.error("Error creating user", error);
+                alert("Error creating user");
+              }
             }}
             disabled={!agreedToTerms}
           >
@@ -334,5 +353,3 @@ const styles = StyleSheet.create({
     color: "#71717a",
   },
 });
-
-export default SignUpScreen;

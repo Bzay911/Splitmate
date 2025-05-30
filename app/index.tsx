@@ -9,6 +9,18 @@ import {
   View
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { signInWithEmailAndPassword } from "firebase/auth";
+import { auth } from "../src/firebaseConfig";
+
+const handleSignin = async (email: string, password: string) =>{
+  try{
+    const userCredential = await signInWithEmailAndPassword(auth, email, password);
+    console.log("User signed in successfully", userCredential.user);
+    return userCredential.user;
+  } catch (error){
+    console.error("Error signing in", error);
+  }
+}
 
 interface InputFieldProps {
   label: string;
@@ -101,8 +113,16 @@ export function LoginScreen() {
           <Pressable
             style={styles.signInButton}
             accessibilityRole="button"
-            onPress={() => {
-              router.push("/Home");
+            onPress={async() => {
+              try{
+                const user = await handleSignin(email, password);
+                if(user){
+                  router.push("/Home");
+                  console.log("User signed in successfully", user.email);
+                }
+              } catch (error){
+                console.error("Error signing in", error);
+              }
             }}
           >
             <Text style={styles.signInText}>Sign In to Splitmate</Text>
