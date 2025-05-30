@@ -1,7 +1,7 @@
 import { MaterialIcons } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
 import { router } from "expo-router";
-import { createUserWithEmailAndPassword } from "firebase/auth";
+import { createUserWithEmailAndPassword, updateProfile } from "firebase/auth";
 import React from "react";
 import {
   KeyboardAvoidingView,
@@ -24,10 +24,35 @@ interface InputFieldProps extends Omit<TextInputProps, 'style'> {
   placeholder: string;
 }
 
-const handleSignUp = async (email: string, password: string) => {
+const handleSignUp = async (email: string, password: string, fullName: string) => {
   try{
     const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-    return userCredential.user;
+    const user = userCredential.user;
+
+    await updateProfile(user, {
+      displayName: fullName
+    });
+    const token = await user.getIdToken();
+
+    const response = await fetch('http://192.168.1.12:3000/api/users', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`,
+      },
+      body: JSON.stringify({
+        firebaseUid: user.uid,
+        email: user.email,
+        displayName: fullName,
+      }),
+    });
+
+    if(!response.ok){
+      const errorData = await response.json();
+      throw new Error(errorData.error || 'Failed to create user profile');
+    }
+
+    return user;
   } catch (error) {
     console.error("Error creating user", error);
     alert("Error creating user");
@@ -180,7 +205,7 @@ export default function SignUp() {
                 return;
               }
               try{
-                const user = await handleSignUp(email, password);
+                const user = await handleSignUp(email, password, fullName);
                 if(user){
                   router.push("/Home");
                 }

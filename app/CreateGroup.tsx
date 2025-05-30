@@ -3,6 +3,7 @@ import * as Contacts from "expo-contacts";
 import { router } from "expo-router";
 import React, { useEffect, useState } from "react";
 import {
+  Alert,
   FlatList,
   SafeAreaView,
   StyleSheet,
@@ -10,7 +11,6 @@ import {
   TextInput,
   TouchableOpacity,
   View,
-  Alert,
 } from "react-native";
 
 // Define the Contact type

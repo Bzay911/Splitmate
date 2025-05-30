@@ -1,5 +1,6 @@
 import { FontAwesome, MaterialIcons } from "@expo/vector-icons";
 import { router } from "expo-router";
+import { signInWithEmailAndPassword } from "firebase/auth";
 import React from "react";
 import {
   Pressable,
@@ -9,18 +10,47 @@ import {
   View
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { signInWithEmailAndPassword } from "firebase/auth";
 import { auth } from "../src/firebaseConfig";
 
-const handleSignin = async (email: string, password: string) =>{
-  try{
+const handleSignin = async (email: string, password: string) => {
+  try {
+    // 1. Authenticate with Firebase
     const userCredential = await signInWithEmailAndPassword(auth, email, password);
+    const token = await userCredential.user.getIdToken();
+
+    // 2. Check if user exists in your backend
+    const response = await fetch('http://192.168.1.12:3000/api/auth/login', {
+      method: 'GET',  
+      headers: {
+        'Authorization': `Bearer ${token}`,
+      }
+    });
+
+    if (response.status === 404) {
+      // User doesn't exist in your database
+      alert("Please create an account first");
+      router.push("/SignUp");  // Redirect to signup
+      return null;
+    }
+
+    if (!response.ok) {
+      throw new Error('Failed to sign in');
+    }
+
     console.log("User signed in successfully", userCredential.user);
+    router.push("/Home");
     return userCredential.user;
-  } catch (error){
+
+  } catch (error) {
     console.error("Error signing in", error);
+    if (error.code === 'auth/user-not-found' || error.code === 'auth/wrong-password') {
+      alert("Invalid email or password");
+    } else {
+      alert("Error signing in. Please try again.");
+    }
+    return null;
   }
-}
+};
 
 interface InputFieldProps {
   label: string;
@@ -116,6 +146,7 @@ export function LoginScreen() {
             onPress={async() => {
               try{
                 const user = await handleSignin(email, password);
+                // const user = await handleSignin("gurungbeejaya@gmail.com", "aaaaaaaa");
                 if(user){
                   router.push("/Home");
                   console.log("User signed in successfully", user.email);

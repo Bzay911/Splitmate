@@ -30,15 +30,15 @@ export default function TabLayout() {
       <Tabs.Screen
         name="Home"
         options={{
-          title: 'Home',
-          tabBarIcon: ({ color }) => <IconSymbol size={28} name="house.fill" color={color} />,
+          title: '',
+          tabBarIcon: ({ color }) => <IconSymbol size={32} name="house.fill" color={color} />,
         }}
       />
       <Tabs.Screen
         name="Groups"
         options={{
-          title: 'Groups',
-          tabBarIcon: ({ color }) => <Ionicons size={28} name="people" color={color} />,
+          title: '',
+          tabBarIcon: ({ color }) => <Ionicons size={32} name="people" color={color} />,
         }}
       />
          {/* <Tabs.Screen
@@ -51,15 +51,15 @@ export default function TabLayout() {
       <Tabs.Screen
         name="History"
         options={{
-          title: 'History',
-          tabBarIcon: ({ color }) => <Ionicons size={28} name="reload" color={color}/>,
+          title: '',
+          tabBarIcon: ({ color }) => <Ionicons size={32} name="reload" color={color}/>,
         }}
       />
       <Tabs.Screen
         name="Profile"
         options={{
-          title: 'Profile',
-          tabBarIcon: ({ color }) => <Ionicons size={28} name="person" color={color}/>,
+          title: '',
+          tabBarIcon: ({ color }) => <Ionicons size={32} name="person" color={color}/>,
         }}
       />
     </Tabs>

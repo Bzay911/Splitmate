@@ -48,7 +48,7 @@ const Profile = () => {
           </View>
           <View style={styles.userInfo}>
             <Text style={styles.userName} numberOfLines={1}>{user?.displayName || 'User'}</Text>
-            <Text style={styles.userEmail} numberOfLines={1}>{user?.email}</Text>
+            <Text style={styles.userEmail} numberOfLines={1}>{user?.email || 'No email'}</Text>
           </View>
         </View>
         <TouchableOpacity style={styles.editButton}>

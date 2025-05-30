@@ -6,8 +6,8 @@ import {
   SafeAreaView,
   StyleSheet,
   Text,
-  View,
   TouchableOpacity,
+  View,
 } from "react-native";
 
 interface Group {
@@ -62,7 +62,7 @@ const Groups = () => {
   return (
     <SafeAreaView style={styles.safeAreaView}>
       <View style={styles.topSection}>
-        <View style={{ width: 90 }} />
+        {/* <View style={{ width: 90 }} /> */}
         <Text style={styles.topBarTitle}>All Groups</Text>
         <Link href="/CreateGroup">
           <Text style={styles.createBtn}>Create New Group</Text>
@@ -139,8 +139,10 @@ const styles = StyleSheet.create({
     fontWeight: "500",
   },
   topBarTitle: {
-    fontSize: 18,
-    fontWeight: "bold",
+    fontSize: 32,
+    fontWeight: '700',
+    color: '#1e293b',
+    marginBottom: 8,
   },
   noGroups: {
     width: "100%",

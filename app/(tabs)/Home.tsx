@@ -85,8 +85,6 @@ export default function HomeScreen() {
     <SafeAreaView style={styles.mainContainer}>
       {/* Topbar */}
       <View style={styles.topBar}>
-        <Ionicons size={28} name="person" />
-
         <Text style={styles.title}>Home</Text>
 
         <View style={styles.rightTop}>
@@ -155,16 +153,13 @@ const styles = StyleSheet.create({
   },
   topBar: {
     flexDirection: "row",
-    alignItems: "center",
+    alignItems: "flex-end",
     justifyContent: "space-between",
   },
   title: {
-    fontSize: 20,
-    fontWeight: "600",
-    position: "absolute",
-    left: 0,
-    right: 0,
-    textAlign: "center",
+    fontSize: 32,
+    fontWeight: '700',
+    color: '#1e293b',
   },
   rightTop: {
     flexDirection: "row",
