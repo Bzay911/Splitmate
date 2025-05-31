@@ -11,7 +11,10 @@ const userSchema = new mongoose.Schema({
     required: true,
     unique: true,
   },
-  displayName: String,
+  displayName: {
+    type: String,
+    required: true,
+  },
   createdAt: {
     type: Date,
     default: Date.now,

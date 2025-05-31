@@ -16,9 +16,14 @@ const GroupSchema = new Schema({
     type: Number,
     default: 0
   },
+  createdBy: {
+    type: Schema.Types.ObjectId,
+    ref: "User",
+    required: true
+  },
   members: [{
-    name:String,
-    phone:String,
+    type: Schema.Types.ObjectId,
+    ref: "User"
   }],
 }, {
   timestamps: true // Adds createdAt and updatedAt fields

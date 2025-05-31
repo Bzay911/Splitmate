@@ -2,18 +2,21 @@ import { Ionicons } from "@expo/vector-icons";
 import { router, useLocalSearchParams } from "expo-router";
 import React, { useEffect, useState } from "react";
 import {
+  Alert,
   Image,
   SafeAreaView,
   StyleSheet,
   Text,
+  TextInput,
   TouchableOpacity,
-  View,
+  View
 } from "react-native";
 import { auth } from "../src/firebaseConfig";
 
 interface GroupMember {
-  name: string;
-  phone: string;
+  _id: string;
+  displayName: string;
+  email: string;
 }
 
 interface GroupDetails {
@@ -22,11 +25,53 @@ interface GroupDetails {
   image: string;
   totalExpense: number;
   members: GroupMember[];
+  createdBy: GroupMember;
+}
+
+interface InviteFormData {
+  inviteeEmail: string;
 }
 
 const GroupDetails = () => {
   const { groupId, groupName, totalExpense, image } = useLocalSearchParams();
   const [groupDetails, setGroupDetails] = useState<GroupDetails | null>(null);
+  const [inviteeEmail, setInviteeEmail] = useState("");
+const [isInviting, setIsInviting] = useState(false);
+
+const handleInviteUser = async() => {
+  if(!inviteeEmail || !inviteeEmail.includes("@")) {
+    Alert.alert("Invalid Email", "Please enter a valid email address");
+    return;
+  }
+  setIsInviting(true);
+  const user = auth.currentUser;
+  try{
+    const token = await user?.getIdToken();
+    const response = await fetch(`http://192.168.1.12:3000/api/groups/${groupId}/invite`, {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        groupId: groupId,
+        inviteeEmail: inviteeEmail,
+      }),
+    });
+
+    if(!response.ok){
+      throw new Error("Failed to invite user");
+    }
+
+    Alert.alert("Invitation Sent", "Invitation has been sent to the user");
+    setInviteeEmail("");
+  } catch (error) {
+    console.error("Error inviting user:", error);
+    Alert.alert("Error", "Failed to invite user");
+  } finally {
+    setIsInviting(false);
+  }
+};
 
   useEffect(() => {
     const fetchGroupDetails = async () => {
@@ -61,7 +106,6 @@ const GroupDetails = () => {
     fetchGroupDetails();
   }, [groupId]);
 
-  // console.log(groupDetails?.members.length);
   if (!groupDetails) {
     return (
       <SafeAreaView style={styles.container}>
@@ -84,7 +128,7 @@ const GroupDetails = () => {
   };
 
   return (
-    <SafeAreaView style={styles.container}>
+    groupDetails.members.length > 0 ? (  <SafeAreaView style={styles.container}>
       <TouchableOpacity
         style={styles.settingsBtn}
         onPress={handleSettingsPress}
@@ -130,22 +174,52 @@ const GroupDetails = () => {
 
       <View style={styles.membersSection}>
         <Text style={styles.sectionTitle}>Group Members</Text>
-        {groupDetails.members.map((member, index) => (
-          <View key={index} style={styles.memberItem}>
-            <Text style={styles.memberName}>{member.name}</Text>
-            <Text style={styles.memberPhone}>{member.phone}</Text>
+        {groupDetails.members.map((member) => (
+          <View key={member._id} style={styles.memberItem}>
+            <Text style={styles.memberName}>{member.displayName}</Text>
+            <Text style={styles.memberEmail}>{member.email}</Text>
           </View>
         ))}
       </View>
       {/* Add more group details here */}
+    </SafeAreaView> ) : (
+    <SafeAreaView style={styles.noMembersContainer}>
+      <Text style={styles.errorText}>No members in this group</Text>
+      <View style={styles.inviteSection}>
+    <Text style={styles.sectionTitle}>Invite Members</Text>
+    <TextInput
+      style={styles.emailInput}
+      placeholder="Enter email address"
+      value={inviteeEmail}
+      onChangeText={setInviteeEmail}
+      keyboardType="email-address"
+      autoCapitalize="none"
+    />
+    <TouchableOpacity 
+      style={[styles.inviteBtn, isInviting && styles.inviteBtnDisabled]}
+      onPress={handleInviteUser}
+      disabled={isInviting}
+    >
+      <Text style={styles.inviteBtnText}>
+        {isInviting ? 'Sending...' : 'Send Invitation'}
+      </Text>
+    </TouchableOpacity>
+  </View>
     </SafeAreaView>
-  );
+  )
+);
 };
 
 const styles = StyleSheet.create({
-  container: {
+  container: { 
     flex: 1,
     backgroundColor: "#fff",
+  },
+  noMembersContainer:{
+    flex: 1,
+    backgroundColor: "#fff",
+    justifyContent: "center",
+    alignItems: "center",
   },
   settingsBtn: {
     alignSelf: "flex-end",
@@ -238,6 +312,47 @@ const styles = StyleSheet.create({
     color: "red",
     textAlign: "center",
     marginTop: 20,
+  },
+  inviteBtn:{
+    backgroundColor: "#FF9D00",
+    padding: 12,
+    borderRadius: 8,
+    marginTop: 12,
+  },
+  inviteBtnText:{
+    color: "white",
+    fontWeight: "bold",
+  },
+  inviteSection: {
+    padding: 16,
+    marginTop: 20,
+  },
+  emailInput: {
+    borderWidth: 1,
+    borderColor: '#ddd',
+    borderRadius: 8,
+    padding: 12,
+    marginBottom: 16,
+    fontSize: 16,
+  },
+  inviteBtnDisabled: {
+    opacity: 0.7,
+  },
+  memberItem: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    padding: 12,
+  },
+  memberName: {
+    fontSize: 16,
+  },
+  memberEmail: {
+    fontSize: 16,
+  },
+  sectionTitle: {
+    fontSize: 20,
+    fontWeight: "bold",
+    marginBottom: 12,
   },
 });
 

@@ -128,7 +128,7 @@ const Groups = () => {
   };
 
   return (
-    <SafeAreaView style={styles.safeAreaView}>
+   <SafeAreaView style={styles.safeAreaView}>
       <View style={styles.topSection}>
         {/* <View style={{ width: 90 }} /> */}
         <Text style={styles.topBarTitle}>All Groups</Text>

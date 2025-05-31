@@ -13,8 +13,9 @@ import {
 } from "react-native";
 
 interface GroupMember {
-  name: string;
-  phone: string;
+  _id: string;
+  displayName: string;
+  email: string;
 }
 
 const GroupSettings = () => {
@@ -78,8 +79,8 @@ const GroupSettings = () => {
   const renderMember = ({ item }: { item: GroupMember }) => (
     <View style={styles.memberItem}>
       <View style={styles.memberInfo}>
-        <Text style={styles.memberName}>{item.name}</Text>
-        <Text style={styles.memberPhone}>{item.phone}</Text>
+        <Text style={styles.memberName}>{item.displayName}</Text>
+        <Text style={styles.memberPhone}>{item.email}</Text>
       </View>
     </View>
   );

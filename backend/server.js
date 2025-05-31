@@ -3,6 +3,7 @@ import dotenv from "dotenv";
 import express from "express";
 import admin from "firebase-admin";
 import mongoose from "mongoose";
+import nodemailer from "nodemailer";
 import { authMiddleware } from "./middleware/auth.js";
 import { Group } from "./model/group.js";
 import { User } from "./model/user.js";
@@ -54,7 +55,10 @@ app.get("/api/groups", async (req, res) => {
 // Get group details by ID
 app.get("/api/groups/:groupId", async (req, res) => {
   try {
-    const group = await Group.findById(req.params.groupId);
+    const group = await Group.findById(req.params.groupId)
+      .populate('members', 'displayName email') // Only get displayName and email fields
+      .populate('createdBy', 'displayName email');
+    
     if (!group) {
       return res.status(404).json({ error: "Group not found" });
     }
@@ -65,14 +69,69 @@ app.get("/api/groups/:groupId", async (req, res) => {
   }
 });
 
+// Invite a user to a group
+app.post("/api/groups/:groupId/invite", async (req, res) => {
+  try {
+    const { groupId, inviteeEmail } = req.body;
+    const group = await Group.findById(groupId);
+    if (!group) {
+      return res.status(404).json({ error: "Group not found" });
+    }
+
+    const invitee = await User.findOne({ email: inviteeEmail });
+    
+    // If user exists, add them to the group
+    if (invitee) {
+      if (group.members.includes(invitee._id)) {
+        return res.status(400).json({ error: "User already in group" });
+      }
+      console.log("user found adding to the group now");
+      
+      group.members.push(invitee._id);
+      await group.save();
+      return res.json({ message: "User added to group successfully" });
+    }
+
+    // If user doesn't exist, send invitation email
+    const transporter = nodemailer.createTransport({
+      service: process.env.SMTP_SERVICE,
+      auth: {
+        user: process.env.SMTP_USER,
+        pass: process.env.SMTP_PASS,
+      },
+    });
+
+    const mailOptions = {
+      from: process.env.SMTP_USER,
+      to: inviteeEmail,
+      subject: "Join Splitmate Group",
+      text: `You have been invited to join the group ${group.name} on Splitmate. Please download the app and accept the invitation.`,
+    };
+
+    // Convert sendMail to Promise
+    await new Promise((resolve, reject) => {
+      transporter.sendMail(mailOptions, (error, info) => {
+        if (error) {
+          console.error("Error sending email:", error);
+          reject(error);
+        } else {
+          resolve(info);
+        }
+      });
+    });
+
+    return res.json({ message: "Invitation email sent successfully" });
+
+  } catch (error) {
+    console.error("Error inviting user:", error);
+    return res.status(500).json({ error: "Failed to invite user" });
+  }
+});
+
 // Add a new group
 app.post("/api/addGroup", async (req, res) => {
   try {
     const group = new Group({
-      // name: req.body.name,
-      // image: req.body.image,
-      // totalExpense: req.body.totalExpense,
-      // members: req.body.members,
       ...req.body,
       createdBy: req.user._id,
     });

@@ -56,7 +56,7 @@ const handleSignin = async (email: string, password: string) => {
       throw new Error(data.error || 'Failed to sign in');
     }
 
-    console.log("User signed in successfully", userCredential.user);
+    // console.log("User signed in successfully", userCredential.user);
     router.push("/Home");
     return userCredential.user;
 
