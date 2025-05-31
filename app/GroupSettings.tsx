@@ -11,6 +11,7 @@ import {
   TouchableOpacity,
   View
 } from "react-native";
+import  InviteMatesBtn  from "../components/InviteMatesBtn";
 
 interface GroupMember {
   _id: string;
@@ -99,6 +100,7 @@ const GroupSettings = () => {
           contentContainerStyle={styles.membersList}
         />
       </View>
+      <InviteMatesBtn groupId={groupId as string} />
       <View style={styles.deleteSection}>
         <TouchableOpacity 
           style={[styles.deleteButton, isDeleting && styles.deleteButtonDisabled]} 
