@@ -43,6 +43,7 @@ const CreateGroup = () => {
           name: groupName,
           image:
             "https://www.ibcs.com/wp-content/uploads/2024/01/Projekt-bez-nazwy-15.png",
+      
         }),
       });
 
@@ -50,7 +51,6 @@ const CreateGroup = () => {
         Alert.alert("Error", "Failed to create group");
         return;
       }
-      const data = await response.json();
       Alert.alert("Success", "Group created successfully");
       setGroupName("");
       router.back();

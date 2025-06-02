@@ -83,6 +83,14 @@ export default function RootLayout() {
               headerShown: false,
             }}
           />
+          <Stack.Screen
+            name="AddExpense"
+            options={{
+              headerShown: true,
+              title: "Add Expense",
+              headerBackVisible: false,
+            }}
+          />
         </Stack>
       </GroupsProvider>
 

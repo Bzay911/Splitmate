@@ -7,6 +7,7 @@ import nodemailer from "nodemailer";
 import { authMiddleware } from "./middleware/auth.js";
 import { Group } from "./model/group.js";
 import { User } from "./model/user.js";
+import { Expense } from "./model/expenses.js";
 
 dotenv.config();
 const mongoURI = process.env.MONGO_URI;
@@ -131,19 +132,86 @@ app.post("/api/groups/:groupId/invite", async (req, res) => {
 // Add a new group
 app.post("/api/addGroup", async (req, res) => {
   try {
+    // Create the group with the current user as both creator and first member
     const group = new Group({
-      ...req.body,
+      name: req.body.name,
+      image: req.body.image,
+      members: [req.user._id], // Add the creator as the first member
       createdBy: req.user._id,
+      totalExpense: 0 // Initialize with 0
     });
 
     const savedGroup = await group.save();
-    res
-      .status(201)
-      .json({ message: "Group added successfully", group: savedGroup });
+    
+    // Populate the saved group with member details
+    const populatedGroup = await Group.findById(savedGroup._id)
+      .populate('members', 'displayName email')
+
+    res.status(201).json({ 
+      message: "Group added successfully", 
+      group: populatedGroup 
+    });
   } catch (error) {
+    console.error("Error creating group:", error);
     res.status(500).json({ error: "Failed to add group" });
   }
 });
+
+// Add an expense to a group
+app.post("/api/groups/:groupId/addExpense", async (req, res) => {
+  try{
+    const {groupId} = req.params;
+    const {amount, description} = req.body;
+
+    // Verifying if the group exists
+    const group = await Group.findById(groupId);
+    if(!group){
+      return res.status(404).json({error: "Group not found"});
+    }
+    // Verifying if the user is a member of the group
+    if(!group.members.includes(req.user._id)){
+      return res.status(403).json({error: "User is not a member of the group"});
+    }
+
+    // Creating the expense
+    const expense = new Expense({
+      groupID: groupId,
+      paidBy: req.user._id,
+      amount,
+      description
+    })
+
+    await expense.save();
+    group.totalExpense += amount;
+    await group.save();
+
+    // Populate the expense with paidBy user's details
+    const populatedExpense = await Expense.findById(expense._id)
+      .populate('paidBy', 'displayName email')
+
+    res.status(201).json({message: "Expense added successfully", expense});
+
+  } catch (error) {
+    console.error("Error adding expense:", error);
+    res.status(500).json({error: "Failed to add expense"});
+  }
+})
+
+// Get all expenses for a group
+app.get("/api/groups/:groupId/expenses", async (req,res) => {
+  try{
+    const {groupId} = req.params;
+    const expenses = await Expense.find({groupID: groupId})
+    .populate('paidBy', 'displayName email')
+    .sort({createdAt: -1})
+
+    res.json({expenses});
+
+  } catch (error) {
+    console.error("Error fetching expenses:", error);
+    res.status(500).json({error: "Failed to fetch expenses"});
+  }
+})
 
 // Delete a group
 app.delete("/api/groups/:groupId", async (req, res) => {

@@ -1,18 +1,18 @@
 import { Ionicons } from "@expo/vector-icons";
+import { LinearGradient } from "expo-linear-gradient";
 import { router, useLocalSearchParams } from "expo-router";
 import React, { useEffect, useState } from "react";
 import {
-  Alert,
   Image,
   SafeAreaView,
+  ScrollView,
   StyleSheet,
   Text,
-  TextInput,
   TouchableOpacity,
   View,
 } from "react-native";
+import { FloatingAction } from "react-native-floating-action";
 import { auth } from "../src/firebaseConfig";
-import InviteMatesBtn from "../components/InviteMatesBtn";
 
 interface GroupMember {
   _id: string;
@@ -29,13 +29,31 @@ interface GroupDetails {
   createdBy: GroupMember;
 }
 
+interface Expense {
+  _id: string;
+  paidBy: GroupMember;
+  amount: number;
+  description: string;
+  date: Date;
+}
+
+const formatDate = (date: Date) => {
+  const options: Intl.DateTimeFormatOptions = {
+    month: "long",
+    day: "numeric",
+  };
+  return new Date(date).toLocaleDateString("en-US", options);
+};
+
 const GroupDetails = () => {
   const { groupId, groupName, totalExpense, image } = useLocalSearchParams();
   const [groupDetails, setGroupDetails] = useState<GroupDetails | null>(null);
+  const [expenses, setExpenses] = useState<Expense[]>([]);
+  const user = auth.currentUser;
 
   useEffect(() => {
+    // Fetching group details
     const fetchGroupDetails = async () => {
-      const user = auth.currentUser;
       if (!user) {
         router.push("/");
         return;
@@ -63,8 +81,42 @@ const GroupDetails = () => {
         console.error("Error fetching group details:", error);
       }
     };
+ 
     fetchGroupDetails();
   }, [groupId]);
+
+  useEffect(() => {
+       // Fetching expenses
+       const fetchExpenses = async () => {
+        try {
+          const user = auth.currentUser;
+          if (!user) {
+            router.push("/");
+            return;
+          }
+          const token = await user.getIdToken();
+          const response = await fetch(
+            `http:/192.168.1.12:3000/api/groups/${groupId}/expenses`,
+            {
+              headers: {
+                Authorization: `Bearer ${token}`,
+                "Content-Type": "application/json",
+              },
+            }
+          );
+  
+          if (!response.ok) {
+            throw new Error(`Failed to fetch expenses (${response.status})`);
+          }
+  
+          const data = await response.json();
+          setExpenses(data.expenses);
+        } catch (error) {
+          console.error("Error fetching expenses:", error);
+        }
+      };
+    fetchExpenses();
+  }, [expenses]);
 
   if (!groupDetails) {
     return (
@@ -87,73 +139,142 @@ const GroupDetails = () => {
     }
   };
 
-  return groupDetails.members.length > 0 ? (
+  return (
     <SafeAreaView style={styles.container}>
-      <TouchableOpacity
-        style={styles.settingsBtn}
-        onPress={handleSettingsPress}
-      >
-        <Ionicons name="settings" size={24} color="black" />
-      </TouchableOpacity>
-      <View style={styles.header}>
-        <Image source={{ uri: image as string }} style={styles.groupImage} />
-        <Text style={styles.groupName}>{groupName}</Text>
-      </View>
-      <View style={styles.oweSection}>
-        <View>
-          <Text style={styles.billTitle}>Total Expense</Text>
-          <Text style={styles.billAmount}>{totalExpense}</Text>
+      <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
+        <TouchableOpacity
+          style={styles.settingsBtn}
+          onPress={handleSettingsPress}
+        >
+          <Ionicons name="settings" size={24} color="black" />
+        </TouchableOpacity>
+        <View style={styles.header}>
+          <Image source={{ uri: image as string }} style={styles.groupImage} />
+          <Text style={styles.groupName}>{groupName}</Text>
+        </View>
+        <LinearGradient
+          colors={["#4ADE80", "#10B981"]}
+          style={styles.oweSection}
+          start={{ x: 0, y: 0 }}
+          end={{ x: 1, y: 0 }}
+        >
+          <View>
+            <Text style={styles.billTitle}>Total Expense</Text>
+            <Text style={styles.billAmount}>${totalExpense}</Text>
+          </View>
+
+          <View style={styles.verticalLine} />
+
+          <View>
+            <Text style={styles.splitTitle}>Split Between</Text>
+            <Text style={styles.splitMembers}>{groupDetails.members.length}</Text>
+          </View>
+        </LinearGradient>
+
+        <View style={styles.dividendSection}>
+          <Text style={styles.ownerDividend}>You are owed $100 overall</Text>
+          <View style={styles.memberOwesContainer}>
+            <View style={styles.memberInfo}>
+              <View style={styles.memberAvatar}>
+                <Ionicons name="person" size={24} color="#666" />
+              </View>
+              <View>
+                <Text style={styles.memberName}>Alex</Text>
+                <Text style={styles.memberEmail}>alex@gmail.com</Text>
+              </View>
+            </View>
+            <Text style={styles.positiveAmount}>+$30</Text>
+          </View>
+          <View style={styles.memberOwesContainer}>
+            <View style={styles.memberInfo}>
+              <View style={styles.memberAvatar}>
+                <Ionicons name="person" size={24} color="#666" />
+              </View>
+              <View>
+                <Text style={styles.memberName}>Mathew</Text>
+                <Text style={styles.memberEmail}>mathew@gmail.com</Text>
+              </View>
+            </View>
+            <Text style={styles.positiveAmount}>+$70</Text>
+          </View>
         </View>
 
-        <View style={styles.verticalLine} />
+        <View style={styles.buttonContainer}>
+          <TouchableOpacity style={styles.buttonWrapper}>
+            <LinearGradient
+              colors={["#EF4444", "#EC4899"]}
+              style={styles.settleupBtn}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 1, y: 0 }}
+            >
+              <Text style={styles.buttonText}>Settle up</Text>
+            </LinearGradient>
+          </TouchableOpacity>
 
-        <View>
-          <Text style={styles.splitTitle}>Split Between</Text>
-          <Text style={styles.splitMembers}>{groupDetails.members.length}</Text>
+          <TouchableOpacity style={styles.buttonWrapper}>
+            <LinearGradient
+              colors={["#FB923C", "#EAB308"]}
+              style={styles.exportBtn}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 1, y: 0 }}
+            >
+              <Text style={styles.buttonText}>Export</Text>
+            </LinearGradient>
+          </TouchableOpacity>
         </View>
-      </View>
 
-      <View style={styles.dividendSection}>
-        <Text style={styles.ownerDividend}>You are owed $100 overall</Text>
-        <Text style={styles.matesDividend}>
-          Alex owes you <Text style={styles.money}>$30</Text>
-        </Text>
-        <Text style={styles.matesDividend}>
-          Mathew owes you <Text style={styles.money}>$70</Text>
-        </Text>
-      </View>
+        <Text style={styles.sectionTitle}>Expenses</Text>
 
-      <View style={styles.buttonContainer}>
-        <TouchableOpacity style={styles.settleupBtn}>
-          <Text style={styles.buttonText}>Settle up</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.exportBtn}>
-          <Text style={styles.buttonText}>Export</Text>
-        </TouchableOpacity>
-      </View>
+        {expenses.map((expense) => (
+          <View key={expense._id} style={styles.expensesContainer}>
 
-      <View style={styles.membersSection}>
-        <Text style={styles.sectionTitle}>Group Members</Text>
-        {groupDetails.members.map((member) => (
-          <View key={member._id} style={styles.memberItem}>
-            <Text style={styles.memberName}>{member.displayName}</Text>
-            <Text style={styles.memberEmail}>{member.email}</Text>
+            <View style={styles.expenseIcon}>
+              <Ionicons name="cart" size={24} color="black" />
+            </View>
+
+            <View style={styles.dateContainer}>
+              <Text style={styles.dateText}>{formatDate(expense.date)}</Text>
+            </View>
+
+            <View style={styles.expenses}>
+            <Text style={styles.expenseDescription}>
+              {expense.description}
+            </Text>
+            <Text style={styles.expenseAmount}>
+              {user?.email} added{" "}
+              <Text style={styles.addedTotalCost}>${expense.amount}</Text>
+            </Text>
+            </View>
+
           </View>
         ))}
-      </View>
-      {/* Add more group details here */}
-    </SafeAreaView>
-  ) : (
-    <SafeAreaView style={styles.noMembersContainer}>
-      <Text style={styles.errorText}>No members in this group</Text>
-
-      <InviteMatesBtn groupId={groupId as string} />
+      </ScrollView>
+      
+      <FloatingAction
+        color="#007AFF"
+        floatingIcon={<Ionicons name="add" size={24} color="white" />}
+        onPressMain={() => {
+          router.push({
+            pathname: "/AddExpense",
+            params: {
+              groupId: groupDetails._id,
+            },
+          });
+        }}
+        showBackground={false}
+        position="right"
+        distanceToEdge={16}
+      />
     </SafeAreaView>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
+    flex: 1,
+    backgroundColor: "#fff",
+  },
+  scrollView: {
     flex: 1,
     backgroundColor: "#fff",
   },
@@ -187,10 +308,9 @@ const styles = StyleSheet.create({
     color: "#666",
   },
   oweSection: {
-    backgroundColor: "#9DF144",
     height: 100,
     margin: 12,
-    borderRadius: 8,
+    borderRadius: 16,
     padding: 18,
     flexDirection: "row",
     justifyContent: "space-around",
@@ -198,57 +318,102 @@ const styles = StyleSheet.create({
   },
   billTitle: {
     fontSize: 16,
+    color: "white",
   },
   billAmount: {
     fontSize: 32,
     fontWeight: "bold",
+    color: "white",
   },
   splitTitle: {
     fontSize: 16,
+    color: "white",
   },
   splitMembers: {
     fontSize: 32,
     fontWeight: "bold",
+    color: "white",
   },
   verticalLine: {
     width: 1,
     height: "80%",
-    backgroundColor: "#000",
+    backgroundColor: "white",
+    opacity: 0.5,
   },
   dividendSection: {
-    marginLeft: 12,
-    marginRight: 12,
-    padding: 12,
+    margin: 12,
+    padding: 16,
+    backgroundColor: "white",
+    borderRadius: 16,
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
+    elevation: 3,
   },
   ownerDividend: {
     fontSize: 20,
-    fontWeight: "bold",
-    color: "green",
+    fontWeight: "600",
+    color: "#16A34A",
+    marginBottom: 16,
   },
-  matesDividend: {
+  memberOwesContainer: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginBottom: 12,
+  },
+  memberInfo: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 12,
+  },
+  memberAvatar: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: "#f3f4f6",
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  memberName: {
     fontSize: 16,
+    fontWeight: "500",
   },
-  money: {
-    fontWeight: "bold",
+  memberEmail: {
+    fontSize: 14,
+    color: "#666",
+  },
+  positiveAmount: {
+    fontSize: 16,
+    fontWeight: "600",
+    color: "#16A34A",
   },
   buttonContainer: {
     flexDirection: "row",
     margin: 12,
     gap: 18,
   },
+  buttonWrapper: {
+    flex: 1,
+  },
   settleupBtn: {
-    backgroundColor: "red",
-    padding: 12,
-    borderRadius: 8,
+    padding: 16,
+    borderRadius: 16,
+    alignItems: "center",
   },
   exportBtn: {
-    backgroundColor: "#FF9D00",
-    padding: 12,
-    borderRadius: 8,
+    padding: 16,
+    borderRadius: 16,
+    alignItems: "center",
   },
   buttonText: {
     color: "white",
-    fontWeight: "bold",
+    fontSize: 16,
+    fontWeight: "600",
   },
   errorText: {
     color: "red",
@@ -285,16 +450,47 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     padding: 12,
   },
-  memberName: {
-    fontSize: 16,
-  },
-  memberEmail: {
-    fontSize: 16,
-  },
   sectionTitle: {
     fontSize: 20,
     fontWeight: "bold",
     marginBottom: 12,
+    marginLeft: 12,
+    paddingLeft:16,
+    paddingTop:16,
+  },
+  expensesContainer: {
+    margin: 12,
+    flexDirection: "row",
+    gap: 12,
+    
+  },
+  expenseIcon:{
+    width: 40,
+    height: 40,
+    backgroundColor: "#f3f4f6",
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  expenses:{
+    flexDirection: "column",
+  },
+  expenseAmount: {
+    fontSize: 14,
+    color: "gray",
+  },
+  expenseDescription: {
+    fontSize: 18,
+  },
+  addedTotalCost: {
+    fontWeight: "bold",
+  },
+  dateContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+  },
+  dateText: {
+    fontSize: 14,
+    color: "#666",
   },
 });
 
