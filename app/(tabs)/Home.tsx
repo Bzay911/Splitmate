@@ -1,15 +1,16 @@
+import GroupsContext from "@/contexts/GroupsContext";
+import { Ionicons } from "@expo/vector-icons";
+import { useContext } from "react";
 import {
-  Text,
-  StyleSheet,
-  View,
-  SafeAreaView,
   FlatList,
   Image,
+  SafeAreaView,
+  ScrollView,
+  StyleSheet,
+  Text,
+  View,
 } from "react-native";
-import { Ionicons } from "@expo/vector-icons";
 import dummyProfile from "../../assets/images/dummyProfile.png";
-import GroupsContext from "@/contexts/GroupsContext";
-import { useContext } from "react";
 
 export default function HomeScreen() {
   const { groups } = useContext(GroupsContext);
@@ -83,65 +84,70 @@ export default function HomeScreen() {
 
   return (
     <SafeAreaView style={styles.mainContainer}>
-      {/* Topbar */}
-      <View style={styles.topBar}>
-        <Text style={styles.title}>Home</Text>
+      {/* <ScrollView
+        style={styles.scrollView}
+        showsVerticalScrollIndicator={false}
+      > */}
+        {/* Topbar */}
+        <View style={styles.topBar}>
+          <Text style={styles.title}>Home</Text>
 
-        <View style={styles.rightTop}>
-          <Ionicons size={28} name="scan" style={styles.iconSpacing} />
-          <Ionicons size={28} name="notifications" />
-        </View>
-      </View>
-
-      {/* Owe section */}
-      <View style={styles.amountSection}>
-        <View style={styles.oweSection}>
-          <Text style={styles.amountTitle}>I'm owed</Text>
-          <Text style={styles.amount}>$200</Text>
-        </View>
-        <View style={styles.amountSubSection}>
-          <View style={styles.paySection}>
-            <Text style={styles.amountTitle}>Need to pay</Text>
-            <Text style={styles.amount}>-$12</Text>
-          </View>
-          <View style={styles.expenseSection}>
-            <Text style={styles.amountTitle}>Total expenses</Text>
-            <Text style={styles.amount}>$1230</Text>
+          <View style={styles.rightTop}>
+            <Ionicons size={28} name="scan" style={styles.iconSpacing} />
+            <Ionicons size={28} name="notifications" />
           </View>
         </View>
-      </View>
 
-      {/* Splitmates */}
-      <View style={styles.splitMatesContainer}>
-        <View style={styles.texts}>
-          <Text style={styles.eachTitle}>Your Splitmates</Text>
-          <Text>see all</Text>
+        {/* Owe section */}
+        <View style={styles.amountSection}>
+          <View style={styles.oweSection}>
+            <Text style={styles.amountTitle}>I'm owed</Text>
+            <Text style={styles.amount}>$200</Text>
+          </View>
+          <View style={styles.amountSubSection}>
+            <View style={styles.paySection}>
+              <Text style={styles.amountTitle}>Need to pay</Text>
+              <Text style={styles.amount}>-$12</Text>
+            </View>
+            <View style={styles.expenseSection}>
+              <Text style={styles.amountTitle}>Total expenses</Text>
+              <Text style={styles.amount}>$1230</Text>
+            </View>
+          </View>
         </View>
 
-        <FlatList
-          data={Splitmates}
-          renderItem={renderSplitmate}
-          keyExtractor={(item) => item.id}
-          horizontal
-          showsHorizontalScrollIndicator={false}
-          contentContainerStyle={styles.splitmatesList}
-        />
-      </View>
+        {/* Splitmates */}
+        <View style={styles.splitMatesContainer}>
+          <View style={styles.texts}>
+            <Text style={styles.eachTitle}>Your Splitmates</Text>
+            <Text>see all</Text>
+          </View>
 
-      {/* Recent Group Section */}
-      <View style={styles.recentGroupSection}>
-        <View style={styles.texts}>
-          <Text style={styles.eachTitle}>Recent Groups</Text>
-          <Text>see all</Text>
+          <FlatList
+            data={Splitmates}
+            renderItem={renderSplitmate}
+            keyExtractor={(item) => item.id}
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            contentContainerStyle={styles.splitmatesList}
+          />
         </View>
-        <FlatList
-          data={groups}
-          renderItem={renderRecentGroup}
-          keyExtractor={(item) => item.id}
-          contentContainerStyle={styles.recentGroupList}
-          showsVerticalScrollIndicator={false}
-        />
-      </View>
+
+        {/* Recent Group Section */}
+        <View style={styles.recentGroupSection}>
+          <View style={styles.texts}>
+            <Text style={styles.eachTitle}>Recent Groups</Text>
+            <Text>see all</Text>
+          </View>
+          <FlatList
+            data={groups}
+            renderItem={renderRecentGroup}
+            keyExtractor={(item) => item.id}
+            contentContainerStyle={styles.recentGroupList}
+            showsVerticalScrollIndicator={false}
+          />
+        </View>
+      {/* </ScrollView> */}
     </SafeAreaView>
   );
 }
@@ -150,6 +156,10 @@ const styles = StyleSheet.create({
   mainContainer: {
     marginHorizontal: 15,
     marginTop: 10,
+    flex: 1,
+  },
+  scrollView: {
+    flex: 1,
   },
   topBar: {
     flexDirection: "row",
@@ -158,8 +168,8 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 32,
-    fontWeight: '700',
-    color: '#1e293b',
+    fontWeight: "700",
+    color: "#1e293b",
   },
   rightTop: {
     flexDirection: "row",
@@ -272,5 +282,9 @@ const styles = StyleSheet.create({
   amount: {
     fontWeight: "600",
     fontSize: 35,
+  },
+  recentGroupHeader: {
+    padding: 12,
+    marginTop: 24,
   },
 });

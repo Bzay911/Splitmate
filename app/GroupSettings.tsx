@@ -1,6 +1,8 @@
+import { auth } from "@/src/firebaseConfig";
 import { Ionicons } from "@expo/vector-icons";
+import { LinearGradient } from "expo-linear-gradient";
 import { router, useLocalSearchParams } from "expo-router";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   ActivityIndicator,
   Alert,
@@ -11,7 +13,7 @@ import {
   TouchableOpacity,
   View
 } from "react-native";
-import  InviteMatesBtn  from "../components/InviteMatesBtn";
+import InviteMatesBtn from "../components/InviteMatesBtn";
 
 interface GroupMember {
   _id: string;
@@ -19,12 +21,74 @@ interface GroupMember {
   email: string;
 }
 
+interface GroupDetails {
+  _id: string;
+  name: string;
+  createdBy: {
+    _id: string;
+    email: string;
+    displayName: string;
+  };
+  members: GroupMember[];
+}
+
 const GroupSettings = () => {
   const { groupId, groupName, members } = useLocalSearchParams();
   const [isDeleting, setIsDeleting] = useState(false);
   const parsedMembers: GroupMember[] = JSON.parse(members as string);
+  const [isAdmin, setIsAdmin] = useState(false);
+  const [groupDetails, setGroupDetails] = useState<GroupDetails | null>(null);
+  const user = auth.currentUser;
+  
+  useEffect(() => {
+    // Fetching group details
+    const fetchGroupDetails = async () => {
+      if (!user) {
+        router.push("/");
+        return;
+      }
+      const token = await user.getIdToken();
+
+      try {
+        const response = await fetch(
+          `http://192.168.1.12:3000/api/groups/${groupId}`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+              "Content-Type": "application/json",
+            },
+          }
+        );
+
+        if (!response.ok) {
+          throw new Error(`Failed to fetch group (${response.status})`);
+        }
+
+        const data = await response.json();
+        setGroupDetails(data.group);
+      } catch (error) {
+        console.error("Error fetching group details:", error);
+      }
+    };
+
+    fetchGroupDetails();
+  }, [groupId]);
+
+  // setting isAdmin to true if the user is the admin of the group
+  useEffect(() => {
+    if (groupDetails && user) {
+      setIsAdmin(groupDetails.createdBy.email === user.email);
+    }
+  }, [groupDetails, user]);
+
+  
 
   const handleDeleteGroup = async () => {
+    if(!isAdmin){
+      Alert.alert("Error", "You are not the admin of this group");
+      return;
+    }
+    
     // Show confirmation dialog
     Alert.alert(
       "Delete Group",
@@ -77,12 +141,23 @@ const GroupSettings = () => {
     );
   };
 
+  
   const renderMember = ({ item }: { item: GroupMember }) => (
     <View style={styles.memberItem}>
       <View style={styles.memberInfo}>
         <Text style={styles.memberName}>{item.displayName}</Text>
         <Text style={styles.memberPhone}>{item.email}</Text>
       </View>
+      {item.email === groupDetails?.createdBy.email && (
+        <LinearGradient
+          colors={["#4ADE80", "#10B981"]}
+          style={styles.adminContainer}
+          start={{ x: 0, y: 0 }}
+          end={{ x: 1, y: 0 }}
+        >
+          <Text style={styles.adminText}>Admin</Text>
+        </LinearGradient>
+      )}
     </View>
   );
 
@@ -96,7 +171,7 @@ const GroupSettings = () => {
         <FlatList
           data={parsedMembers}
           renderItem={renderMember}
-          keyExtractor={(item, index) => `${item.phone}-${index}`}
+          keyExtractor={(item, index) => `${item.email}-${index}`}
           contentContainerStyle={styles.membersList}
         />
       </View>
@@ -149,6 +224,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#f8f8f8",
     borderRadius: 8,
     marginBottom: 12,
+    position: "relative",
   },
   memberInfo: {
     flex: 1,
@@ -187,6 +263,19 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: '600',
   },
+  adminContainer: {
+    position: "absolute",
+    top: 8,
+    right: 8,
+    backgroundColor: "red",
+    borderRadius: 8,
+    padding: 4,
+  },
+  adminText: {
+    color: "white",
+    fontSize: 12,
+    fontWeight: "600",
+  }
 });
 
 export default GroupSettings;

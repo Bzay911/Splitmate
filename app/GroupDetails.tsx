@@ -45,12 +45,26 @@ const formatDate = (date: Date) => {
   return new Date(date).toLocaleDateString("en-US", options);
 };
 
+const calculateDividend = (totalExpense: number, totalMembers: number) => {
+  const dividend = parseFloat((totalExpense / totalMembers).toFixed(2));
+  return dividend;
+}
+
+
+
 const GroupDetails = () => {
-  const { groupId, groupName, totalExpense, image } = useLocalSearchParams();
+  const { groupId, groupName, image } = useLocalSearchParams();
   const [groupDetails, setGroupDetails] = useState<GroupDetails | null>(null);
   const [expenses, setExpenses] = useState<Expense[]>([]);
   const user = auth.currentUser;
+  const [dividend, setDividend] = useState<number>(0);
 
+  useEffect(() => {
+    if (groupDetails) {
+      setDividend(calculateDividend(groupDetails.totalExpense, groupDetails.members.length));
+    }
+  }, [groupDetails]);
+  
   useEffect(() => {
     // Fetching group details
     const fetchGroupDetails = async () => {
@@ -81,40 +95,40 @@ const GroupDetails = () => {
         console.error("Error fetching group details:", error);
       }
     };
- 
+
     fetchGroupDetails();
   }, [groupId]);
 
   useEffect(() => {
-       // Fetching expenses
-       const fetchExpenses = async () => {
-        try {
-          const user = auth.currentUser;
-          if (!user) {
-            router.push("/");
-            return;
-          }
-          const token = await user.getIdToken();
-          const response = await fetch(
-            `http:/192.168.1.12:3000/api/groups/${groupId}/expenses`,
-            {
-              headers: {
-                Authorization: `Bearer ${token}`,
-                "Content-Type": "application/json",
-              },
-            }
-          );
-  
-          if (!response.ok) {
-            throw new Error(`Failed to fetch expenses (${response.status})`);
-          }
-  
-          const data = await response.json();
-          setExpenses(data.expenses);
-        } catch (error) {
-          console.error("Error fetching expenses:", error);
+    // Fetching expenses
+    const fetchExpenses = async () => {
+      try {
+        const user = auth.currentUser;
+        if (!user) {
+          router.push("/");
+          return;
         }
-      };
+        const token = await user.getIdToken();
+        const response = await fetch(
+          `http:/192.168.1.12:3000/api/groups/${groupId}/expenses`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+              "Content-Type": "application/json",
+            },
+          }
+        );
+
+        if (!response.ok) {
+          throw new Error(`Failed to fetch expenses (${response.status})`);
+        }
+
+        const data = await response.json();
+        setExpenses(data.expenses);
+      } catch (error) {
+        console.error("Error fetching expenses:", error);
+      }
+    };
     fetchExpenses();
   }, [expenses]);
 
@@ -139,9 +153,16 @@ const GroupDetails = () => {
     }
   };
 
+  const nonAdminMembers = groupDetails.members.filter(member => 
+    member.email !== groupDetails?.createdBy.email
+  );
+
   return (
     <SafeAreaView style={styles.container}>
-      <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
+      <ScrollView
+        style={styles.scrollView}
+        showsVerticalScrollIndicator={false}
+      >
         <TouchableOpacity
           style={styles.settingsBtn}
           onPress={handleSettingsPress}
@@ -160,43 +181,44 @@ const GroupDetails = () => {
         >
           <View>
             <Text style={styles.billTitle}>Total Expense</Text>
-            <Text style={styles.billAmount}>${totalExpense}</Text>
+            <Text style={styles.billAmount}>${groupDetails.totalExpense}</Text>
           </View>
 
           <View style={styles.verticalLine} />
 
           <View>
             <Text style={styles.splitTitle}>Split Between</Text>
-            <Text style={styles.splitMembers}>{groupDetails.members.length}</Text>
+            <Text style={styles.splitMembers}>
+              {groupDetails.members.length}
+            </Text>
           </View>
         </LinearGradient>
 
         <View style={styles.dividendSection}>
           <Text style={styles.ownerDividend}>You are owed $100 overall</Text>
-          <View style={styles.memberOwesContainer}>
-            <View style={styles.memberInfo}>
-              <View style={styles.memberAvatar}>
-                <Ionicons name="person" size={24} color="#666" />
+
+          {nonAdminMembers.map((member) => {
+            return (
+              <View key={member._id} style={styles.memberOwesContainer}>
+                <View style={styles.memberInfo}>
+                  <View style={styles.memberAvatar}>
+                    <Ionicons name="person" size={24} color="#666" />
+                  </View>
+                  <View>
+                    <Text style={styles.memberName}>
+                      {member.displayName || "Anonymous"}
+                    </Text>
+                    <Text style={styles.memberEmail}>{member.email}</Text>
+                  </View>
+                </View>
+                {dividend > 0 ? (
+                  <Text style={styles.positiveAmount}> +{dividend}</Text>
+                ) : (
+                  <Text style={styles.negativeAmount}> -{dividend}</Text>
+                )}
               </View>
-              <View>
-                <Text style={styles.memberName}>Alex</Text>
-                <Text style={styles.memberEmail}>alex@gmail.com</Text>
-              </View>
-            </View>
-            <Text style={styles.positiveAmount}>+$30</Text>
-          </View>
-          <View style={styles.memberOwesContainer}>
-            <View style={styles.memberInfo}>
-              <View style={styles.memberAvatar}>
-                <Ionicons name="person" size={24} color="#666" />
-              </View>
-              <View>
-                <Text style={styles.memberName}>Mathew</Text>
-                <Text style={styles.memberEmail}>mathew@gmail.com</Text>
-              </View>
-            </View>
-            <Text style={styles.positiveAmount}>+$70</Text>
-          </View>
+            );
+          })}
         </View>
 
         <View style={styles.buttonContainer}>
@@ -227,7 +249,6 @@ const GroupDetails = () => {
 
         {expenses.map((expense) => (
           <View key={expense._id} style={styles.expensesContainer}>
-
             <View style={styles.expenseIcon}>
               <Ionicons name="cart" size={24} color="black" />
             </View>
@@ -237,19 +258,18 @@ const GroupDetails = () => {
             </View>
 
             <View style={styles.expenses}>
-            <Text style={styles.expenseDescription}>
-              {expense.description}
-            </Text>
-            <Text style={styles.expenseAmount}>
-              {user?.email} added{" "}
-              <Text style={styles.addedTotalCost}>${expense.amount}</Text>
-            </Text>
+              <Text style={styles.expenseDescription}>
+                {expense.description}
+              </Text>
+              <Text style={styles.expenseAmount}>
+                {expense?.paidBy?.displayName || "Anonymous"} added{" "}
+                <Text style={styles.addedTotalCost}>${expense.amount}</Text>
+              </Text>
             </View>
-
           </View>
         ))}
       </ScrollView>
-      
+
       <FloatingAction
         color="#007AFF"
         floatingIcon={<Ionicons name="add" size={24} color="white" />}
@@ -392,6 +412,11 @@ const styles = StyleSheet.create({
     fontWeight: "600",
     color: "#16A34A",
   },
+  negativeAmount: {
+    fontSize: 16,
+    fontWeight: "600",
+    color: "#EF4444",
+  },
   buttonContainer: {
     flexDirection: "row",
     margin: 12,
@@ -455,23 +480,22 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     marginBottom: 12,
     marginLeft: 12,
-    paddingLeft:16,
-    paddingTop:16,
+    paddingLeft: 16,
+    paddingTop: 16,
   },
   expensesContainer: {
     margin: 12,
     flexDirection: "row",
-    gap: 12,
-    
+    gap: 14,
   },
-  expenseIcon:{
+  expenseIcon: {
     width: 40,
     height: 40,
     backgroundColor: "#f3f4f6",
     justifyContent: "center",
     alignItems: "center",
   },
-  expenses:{
+  expenses: {
     flexDirection: "column",
   },
   expenseAmount: {

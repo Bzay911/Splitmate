@@ -1,6 +1,7 @@
 import { View, Text, SafeAreaView, StyleSheet, TouchableOpacity, TextInput, Alert } from 'react-native'
 import React, { useState } from 'react'
 import { auth } from "../src/firebaseConfig";
+import { Ionicons } from '@expo/vector-icons';
 
 interface InviteMatesBtnProps {
     groupId: string;
@@ -86,6 +87,8 @@ const styles = StyleSheet.create({
       inviteBtnText:{
         color: "white",
         fontWeight: "bold",
+        textAlign: "center",
+        padding: 8,
       },
       inviteSection: {
         padding: 16,

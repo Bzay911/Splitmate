@@ -5,9 +5,9 @@ import admin from "firebase-admin";
 import mongoose from "mongoose";
 import nodemailer from "nodemailer";
 import { authMiddleware } from "./middleware/auth.js";
+import { Expense } from "./model/expenses.js";
 import { Group } from "./model/group.js";
 import { User } from "./model/user.js";
-import { Expense } from "./model/expenses.js";
 
 dotenv.config();
 const mongoURI = process.env.MONGO_URI;
@@ -46,9 +46,13 @@ app.get("/api/profile", async (req, res) => {
 // Get all groups
 app.get("/api/groups", async (req, res) => {
   try {
-    const groups = await Group.find();
+    // Find groups where the current user is a member
+    const groups = await Group.find({ members: req.user._id })
+      .populate('members', 'displayName email')
+      .populate('createdBy', 'displayName email');
     res.json({ groups });
   } catch (error) {
+    console.error("Error fetching groups:", error);
     res.status(500).json({ error: "Failed to fetch groups" });
   }
 });
@@ -57,12 +61,18 @@ app.get("/api/groups", async (req, res) => {
 app.get("/api/groups/:groupId", async (req, res) => {
   try {
     const group = await Group.findById(req.params.groupId)
-      .populate('members', 'displayName email') // Only get displayName and email fields
+      .populate('members', 'displayName email') 
       .populate('createdBy', 'displayName email');
     
     if (!group) {
       return res.status(404).json({ error: "Group not found" });
     }
+
+    // Check if the current user is a member of the group
+    if (!group.members.some(member => member._id.equals(req.user._id))) {
+      return res.status(403).json({ error: "Access denied: You are not a member of this group" });
+    }
+
     res.json({ group });
   } catch (error) {
     console.error("Error fetching group:", error);
@@ -86,7 +96,7 @@ app.post("/api/groups/:groupId/invite", async (req, res) => {
       if (group.members.includes(invitee._id)) {
         return res.status(400).json({ error: "User already in group" });
       }
-      console.log("user found adding to the group now");
+      // console.log("user found adding to the group now");
       
       group.members.push(invitee._id);
       await group.save();

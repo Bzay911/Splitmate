@@ -12,7 +12,7 @@ const userSchema = new mongoose.Schema({
     unique: true,
   },
   displayName: {
-    type: String,
+    type: String || 'Anonymous',
     required: true,
   },
   createdAt: {
@@ -22,6 +22,10 @@ const userSchema = new mongoose.Schema({
   updatedAt: {
     type: Date,
     default: Date.now,
+  },
+  expenses:{
+    type: Number,
+    default: 0
   }
 });
 
