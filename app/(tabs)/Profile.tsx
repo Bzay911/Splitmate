@@ -1,10 +1,9 @@
 import { MaterialIcons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { SafeAreaView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { auth } from '../../src/firebaseConfig';
-
-const user = auth.currentUser;
+import { onAuthStateChanged, User } from "firebase/auth";
 
 interface StatItemProps {
   title: string;
@@ -24,6 +23,19 @@ const StatItem = ({ title, value, icon }: StatItemProps) => (
 
 const Profile = () => {
   const router = useRouter();
+  const [user, setUser] = useState<User | null>(null);
+
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      if (user) {
+        setUser(user);
+      } else {
+        setUser(null);
+        router.push("/");
+      }
+    });
+    return () => unsubscribe();
+  }, []);
 
   const handleSignOut = async () => {
     try {

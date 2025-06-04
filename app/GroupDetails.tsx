@@ -1,6 +1,7 @@
 import { Ionicons } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
 import { router, useLocalSearchParams } from "expo-router";
+import { onAuthStateChanged, User } from "firebase/auth";
 import React, { useEffect, useState } from "react";
 import {
   Image,
@@ -37,6 +38,11 @@ interface Expense {
   date: Date;
 }
 
+interface Balance {
+  email: string;
+  balance: number;
+}
+
 const formatDate = (date: Date) => {
   const options: Intl.DateTimeFormatOptions = {
     month: "long",
@@ -50,31 +56,40 @@ const calculateDividend = (totalExpense: number, totalMembers: number) => {
   return dividend;
 }
 
-
-
 const GroupDetails = () => {
   const { groupId, groupName, image } = useLocalSearchParams();
   const [groupDetails, setGroupDetails] = useState<GroupDetails | null>(null);
   const [expenses, setExpenses] = useState<Expense[]>([]);
-  const user = auth.currentUser;
-  const [dividend, setDividend] = useState<number>(0);
+  const [balances, setBalances] = useState<Balance[]>([]);
+  const [fairshare, setFairshare] = useState<number>(0);
+  const [creditors, setCreditors] = useState<Balance[]>([]);
+  const [debtors, setDebtors] = useState<Balance[]>([]);
+  const [user, setUser] = useState<User | null>(null);
 
   useEffect(() => {
     if (groupDetails) {
-      setDividend(calculateDividend(groupDetails.totalExpense, groupDetails.members.length));
+      setFairshare(calculateDividend(groupDetails.totalExpense, groupDetails.members.length));
     }
   }, [groupDetails]);
   
   useEffect(() => {
-    // Fetching group details
-    const fetchGroupDetails = async () => {
-      if (!user) {
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      if (user) {
+        setUser(user);
+      } else {
+        setUser(null);
         router.push("/");
-        return;
       }
-      const token = await user.getIdToken();
+    });
+    return () => unsubscribe();
+  }, []);
 
+  useEffect(() => {
+    const fetchGroupDetails = async () => {
+      if (!user) return;
+      
       try {
+        const token = await user.getIdToken();
         const response = await fetch(
           `http://192.168.1.12:3000/api/groups/${groupId}`,
           {
@@ -96,18 +111,14 @@ const GroupDetails = () => {
       }
     };
 
-    fetchGroupDetails();
-  }, [groupId]);
+    if (user) fetchGroupDetails();
+  }, [groupId, user]);
 
   useEffect(() => {
-    // Fetching expenses
     const fetchExpenses = async () => {
+      if (!user) return;
+      
       try {
-        const user = auth.currentUser;
-        if (!user) {
-          router.push("/");
-          return;
-        }
         const token = await user.getIdToken();
         const response = await fetch(
           `http:/192.168.1.12:3000/api/groups/${groupId}/expenses`,
@@ -129,8 +140,36 @@ const GroupDetails = () => {
         console.error("Error fetching expenses:", error);
       }
     };
-    fetchExpenses();
-  }, [expenses]);
+
+    if (user) fetchExpenses();
+  }, [groupId, user]);
+
+  useEffect(() => {
+    if(groupDetails && expenses && fairshare) {
+        const newBalances = groupDetails.members.map(member => {
+          const balance = (getIndividualExpense(member) - fairshare);
+          return{
+            email: member.email,
+            balance: balance,
+          }
+        })
+        setBalances(newBalances);
+      }
+      }, [groupDetails, expenses, fairshare]);
+    
+  console.log(balances);
+  console.log(creditors);
+  console.log(debtors);
+
+  useEffect(() => {
+    if (balances.length > 0) {
+      const whoGetsPayment = balances.filter(item => item.balance > 0).sort((a, b) => b.balance - a.balance);
+      const whoNeedToPay = balances.filter(item => item.balance < 0).sort((a, b) => a.balance - b.balance);;
+      
+      setCreditors(whoGetsPayment);
+      setDebtors(whoNeedToPay);
+    }
+  }, [balances]);
 
   if (!groupDetails) {
     return (
@@ -153,9 +192,86 @@ const GroupDetails = () => {
     }
   };
 
+  const totalExpense = groupDetails.totalExpense;
+  console.log(`Group total expense: ${totalExpense}`);
+
+const getIndividualExpense = (member: GroupMember) => {
+    const totalExpense = expenses.reduce((sum, expense) => {
+        if (expense.paidBy._id === member._id) {
+            return sum + expense.amount;
+        }
+        return sum;
+    }, 0);
+    return totalExpense;
+  }
+
+  const whoNeedsToPayWhom = () => {
+    let i = 0;
+    let j = 0;
+    const settlements: { from: string; to: string; amount: number }[] = [];
+
+    while (i < debtors.length && j < creditors.length) {
+      const debtor = debtors[i];
+      const creditor = creditors[j];
+
+      const debtAmount = Math.abs(debtor.balance);
+      const creditAmount = creditor.balance;
+      const transferAmount = Math.min(debtAmount, creditAmount);
+
+      if (transferAmount > 0.01) {
+        const debtorMember = groupDetails?.members.find(
+          (member) => member.email === debtor.email
+        );
+        const creditorMember = groupDetails?.members.find(
+          (member) => member.email === creditor.email
+        );
+
+        if (debtorMember && creditorMember) {
+          settlements.push({
+            from: debtorMember.displayName,
+            to: creditorMember.displayName,
+            amount: Number(transferAmount.toFixed(2))
+          });
+        }
+
+        debtor.balance += transferAmount;
+        creditor.balance -= transferAmount;
+      }
+
+      if (Math.abs(debtor.balance) < 0.01) i++;
+      if (Math.abs(creditor.balance) < 0.01) j++;
+    }
+
+    return settlements;
+  };
+    
   const nonAdminMembers = groupDetails.members.filter(member => 
     member.email !== groupDetails?.createdBy.email
   );
+  const adminExpense = getIndividualExpense(groupDetails.createdBy);
+
+  const renderSettlements = () => {
+    const settlements = whoNeedsToPayWhom();
+    if (settlements.length === 0) return null;
+
+    return (
+      <View>
+        {settlements.map((settlement, index) => (
+          <View key={index} style={styles.settlementItem}>
+            <Text style={styles.settlementText}>
+              <Text style={styles.debtorName}>
+                {settlement.from === user?.displayName ? "You" : settlement.from}
+              </Text> should pay{' '}
+              <Text style={styles.settlementAmount}>${settlement.amount}</Text> to{' '}
+              <Text style={styles.creditorName}>
+                {settlement.to === user?.displayName ? "You" : settlement.to}
+              </Text>
+            </Text>
+          </View>
+        ))}
+      </View>
+    );
+  };
 
   return (
     <SafeAreaView style={styles.container}>
@@ -195,30 +311,18 @@ const GroupDetails = () => {
         </LinearGradient>
 
         <View style={styles.dividendSection}>
-          <Text style={styles.ownerDividend}>You are owed $100 overall</Text>
-
-          {nonAdminMembers.map((member) => {
-            return (
-              <View key={member._id} style={styles.memberOwesContainer}>
-                <View style={styles.memberInfo}>
-                  <View style={styles.memberAvatar}>
-                    <Ionicons name="person" size={24} color="#666" />
-                  </View>
-                  <View>
-                    <Text style={styles.memberName}>
-                      {member.displayName || "Anonymous"}
-                    </Text>
-                    <Text style={styles.memberEmail}>{member.email}</Text>
-                  </View>
-                </View>
-                {dividend > 0 ? (
-                  <Text style={styles.positiveAmount}> +{dividend}</Text>
-                ) : (
-                  <Text style={styles.negativeAmount}> -{dividend}</Text>
-                )}
-              </View>
-            );
-          })}
+          {creditors.find(item => item.email === user?.email) ? (
+            <Text style={styles.ownerDividend}>
+              You are owed ${creditors.find(item => item.email === user?.email)?.balance.toFixed(2)} overall
+            </Text>
+          ) : debtors.find(item => item.email === user?.email) ? (
+            <Text style={styles.ownerOwe}>
+              You owe ${Math.abs(debtors.find(item => item.email === user?.email)?.balance || 0).toFixed(2)} overall
+            </Text>
+          ) : (
+            <Text style={styles.settlementText}>You are all settled up!</Text>
+          )}
+          {renderSettlements()}
         </View>
 
         <View style={styles.buttonContainer}>
@@ -378,6 +482,12 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: "600",
     color: "#16A34A",
+    marginBottom: 12,
+  },
+  ownerOwe: {
+    fontSize: 20,
+    fontWeight: "600",
+    color: "#EF4444",
     marginBottom: 16,
   },
   memberOwesContainer: {
@@ -402,10 +512,6 @@ const styles = StyleSheet.create({
   memberName: {
     fontSize: 16,
     fontWeight: "500",
-  },
-  memberEmail: {
-    fontSize: 14,
-    color: "#666",
   },
   positiveAmount: {
     fontSize: 16,
@@ -515,6 +621,28 @@ const styles = StyleSheet.create({
   dateText: {
     fontSize: 14,
     color: "#666",
+  },
+  settlementItem: {
+    marginBottom: 8,
+    paddingVertical: 4,
+  },
+  settlementText: {
+    fontSize: 16,
+    fontWeight: "600",
+    color: "#4B5563",
+    marginBottom: 8,
+  },
+  debtorName: {
+    fontWeight: '600',
+    color: '#EF4444',
+  },
+  creditorName: {
+    fontWeight: '600',
+    color: '#10B981',
+  },
+  settlementAmount: {
+    fontWeight: '600',
+    color: '#374151',
   },
 });
 
