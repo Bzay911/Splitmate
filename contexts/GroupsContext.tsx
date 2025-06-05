@@ -1,113 +1,71 @@
-import { createContext, ReactNode, useState } from "react";
+import { auth } from "@/src/firebaseConfig";
+import { createContext, ReactNode, useCallback, useContext, useState } from "react";
 
 interface Group {
-  id: string;
+  _id: string;
   name: string;
-  image: any;
+  image: string;
   totalExpense: number;
   members: any[];
 }
 
 interface GroupsContextType {
   groups: Group[];
-  addGroup: (item: Group) => void;
-  removeGroup: (index: number) => void;
+  isLoading: boolean;
+  error: string | null;
+  refreshGroups: () => Promise<void>;
 }
 
 const GroupsContext = createContext<GroupsContextType>({
   groups: [],
-  addGroup: () => {},
-  removeGroup: () => {},
+  isLoading: false,
+  error: null,
+  refreshGroups: async () => {},
 });
 
-export const GroupsProvider = ({children}: {children: ReactNode}) => {
-    const [groups, setGroups] = useState<Group[]>([
-        {
-            id: "1",
-            name: "Friends Trip",
-            image: require("../assets/images/dummyProfile.png"),
-            totalExpense: 250,
-            members: [],
-          },
-          {
-            id: "2",
-            name: "Office Lunch",
-            image: require("../assets/images/dummyProfile.png"),
-            totalExpense: 150,
-            members: [],
-          },
-          {
-            id: "3",
-            name: "Family Dinner",
-            image: require("../assets/images/dummyProfile.png"),
-            totalExpense: 300,
-            members: [],
-          },
-          {
-            id: "4",
-            name: "Birthday Bash",
-            image: require("../assets/images/dummyProfile.png"),
-            totalExpense: 500,
-            members: [],
-          },
-          {
-            id: "5",
-            name: "Weekend Getaway",
-            image: require("../assets/images/dummyProfile.png"),
-            totalExpense: 420,
-            members: [],
-          },
-          {
-            id: "6",
-            name: "Team Outing",
-            image: require("../assets/images/dummyProfile.png"),
-            totalExpense: 380,
-            members: [],
-          },
-          {
-            id: "7",
-            name: "Roommates Rent",
-            image: require("../assets/images/dummyProfile.png"),
-            totalExpense: 1200,
-            members: [],
-          },
-          {
-            id: "8",
-            name: "Festival Shopping",
-            image: require("../assets/images/dummyProfile.png"),
-            totalExpense: 700,
-            members: [],
-          },
-          {
-            id: "9",
-            name: "Road Trip",
-            image: require("../assets/images/dummyProfile.png"),
-            totalExpense: 950,
-            members: [],
-          },
-          {
-            id: "10",
-            name: "College Reunion",
-            image: require("../assets/images/dummyProfile.png"),
-            totalExpense: 1100,
-            members: [],
-          },
-    ]);
+export const GroupsProvider = ({ children }: { children: ReactNode }) => {
+  const [groups, setGroups] = useState<Group[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
-    const addGroup = (item: Group) => {
-        setGroups((prev) => [...prev, item]);
+  const refreshGroups = useCallback(async () => {
+    setIsLoading(true);
+    try {
+      const user = auth.currentUser;
+      if (!user) {
+        throw new Error("No user logged in");
+      }
+
+      const token = await user.getIdToken();
+      const response = await fetch("http://192.168.1.12:3000/api/groups", {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error(`Failed to fetch groups (${response.status})`);
+      }
+
+      const data = await response.json();
+      setGroups(data.groups);
+      setError(null);
+    } catch (error: any) {
+      console.error("Error fetching groups:", error);
+      setError(error.message);
+    } finally {
+      setIsLoading(false);
     }
+  }, []);
 
-    const removeGroup = (index: number) => {
-        setGroups((prev) => prev.filter((_, i) => i !== index));
-    }
+  return (
+    <GroupsContext.Provider value={{ groups, isLoading, error, refreshGroups }}>
+      {children}
+    </GroupsContext.Provider>
+  );
+};
 
-    return(
-        <GroupsContext.Provider value={{groups, addGroup, removeGroup}}>
-            {children}
-        </GroupsContext.Provider> 
-    )
-}
-
+export const useGroups = () => useContext(GroupsContext);
 export default GroupsContext;
 

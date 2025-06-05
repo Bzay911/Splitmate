@@ -1,21 +1,20 @@
-import { Ionicons } from "@expo/vector-icons";
+import { useGroups } from "@/contexts/GroupsContext";
 import { router } from "expo-router";
 import React, { useState } from "react";
 import {
   Alert,
-  FlatList,
   SafeAreaView,
   StyleSheet,
   Text,
   TextInput,
-  TouchableOpacity,
-  View,
+  TouchableOpacity
 } from "react-native";
-import {auth} from "../src/firebaseConfig";
+import { auth } from "../src/firebaseConfig";
 
 
 const CreateGroup = () => {
   const [groupName, setGroupName] = useState("");
+  const { refreshGroups } = useGroups();
 
 
   const handleCreate = async () => {
@@ -51,6 +50,7 @@ const CreateGroup = () => {
         Alert.alert("Error", "Failed to create group");
         return;
       }
+      await refreshGroups();
       Alert.alert("Success", "Group created successfully");
       setGroupName("");
       router.back();

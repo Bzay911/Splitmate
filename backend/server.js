@@ -2,27 +2,45 @@ import cors from "cors";
 import dotenv from "dotenv";
 import express from "express";
 import admin from "firebase-admin";
-import mongoose from "mongoose";
 import nodemailer from "nodemailer";
+import { connectDB } from "./src/config/database.js";
 import { authMiddleware } from "./middleware/auth.js";
-import { Expense } from "./model/expenses.js";
+import {Expense} from "./model/expenses.js"
 import { Group } from "./model/group.js";
 import { User } from "./model/user.js";
 
+// Import routes
+import expenseRoutes from "./src/routes/expenses.routes.js";
+import groupRoutes from "./src/routes/group.routes.js";
+import userRoutes from "./src/routes/user.routes.js";
+
+// Load environment variables
 dotenv.config();
-const mongoURI = process.env.MONGO_URI;
+
+// Initialize express app
 const app = express();
 const port = 3000;
 
-// Middlewares
+// Basic Middleware
 app.use(cors());
 app.use(express.json());
 
-// MongoDB Connection
-mongoose
-  .connect(mongoURI)
-  .then(() => console.log("Connected to MongoDB"))
-  .catch((err) => console.error("MongoDB connection error:", err));
+// Connect to MongoDB using the imported function
+connectDB();
+
+// Initialize Firebase Admin
+try {
+  admin.initializeApp({
+    credential: admin.credential.applicationDefault()
+  });
+} catch (error) {
+  console.error("Firebase admin initialization error:", error);
+}
+
+// Routes
+app.use("/api/auth", userRoutes);     // Auth & user-related routes
+app.use("/api/groups", groupRoutes);   // Group-related routes
+app.use("/api/expenses", expenseRoutes); // Expense-related routes
 
 // Public routes
 app.post("/api/users", async (req, res) => {
@@ -322,6 +340,13 @@ app.get("/api/auth/login", async (req, res) => {
   }
 });
 
+// Basic error handler
+app.use((err, req, res, next) => {
+  console.error(err);
+  res.status(500).json({ error: "Something went wrong!" });
+});
+
+// Start server
 app.listen(port, () => {
-  console.log(`Server listening on port ${port}`);
+  console.log(`Server running on port ${port}`);
 });

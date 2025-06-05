@@ -14,10 +14,13 @@ import {
   View
 } from "react-native";
 import dummyProfile from "../../assets/images/dummyProfile.png";
+import { LinearGradient } from "expo-linear-gradient";
 
 export default function HomeScreen() {
   const { financialSummary, refreshFinancialSummary } = useFinancial();
   const [user, setUser] = useState<User | null>(null);
+  const { groups, refreshGroups } = useContext(GroupsContext);
+
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
@@ -29,10 +32,10 @@ export default function HomeScreen() {
         router.push("/");
       }
     });
+    refreshGroups();
     return () => unsubscribe();
-  }, [refreshFinancialSummary]);
+  }, [refreshFinancialSummary, refreshGroups]);
 
-  const { groups } = useContext(GroupsContext);
   // Dummy data for splitmates
   const Splitmates = [
     {
@@ -92,7 +95,7 @@ export default function HomeScreen() {
   const renderRecentGroup = ({ item }) => {
     return (
       <View style={styles.renderRecentGroupSection}>
-        <Image style={styles.groupImage} source={item.image} />
+        <Image style={styles.groupImage} source={{ uri: item.image }} />
         <View style={styles.groupDetails}>
           <Text style={styles.groupName}> {item.name}</Text>
           <Text>Total Expense: ${item.totalExpense}</Text>
@@ -103,10 +106,7 @@ export default function HomeScreen() {
 
   return (
     <SafeAreaView style={styles.mainContainer}>
-      {/* <ScrollView
-        style={styles.scrollView}
-        showsVerticalScrollIndicator={false}
-      > */}
+    
         {/* Topbar */}
         <View style={styles.topBar}>
           <Text style={styles.title}>Home</Text>
@@ -119,10 +119,16 @@ export default function HomeScreen() {
 
         {/* Owe section */}
         <View style={styles.amountSection}>
-          <View style={styles.oweSection}>
+        <LinearGradient
+          colors={["#4ADE80", "#10B981"]}
+          style={styles.oweSection}
+          start={{ x: 0, y: 0 }}
+          end={{ x: 1, y: 0 }}
+        >
             <Text style={styles.amountTitle}>I'm owed</Text>
             <Text style={styles.amount}>${financialSummary.creditAmount.toFixed(2)}</Text>
-          </View>
+          </LinearGradient>
+
           <View style={styles.amountSubSection}>
             <View style={styles.paySection}>
               <Text style={styles.amountTitle}>Need to pay</Text>
@@ -161,9 +167,10 @@ export default function HomeScreen() {
           <FlatList
             data={groups}
             renderItem={renderRecentGroup}
-            keyExtractor={(item) => item.id}
+            keyExtractor={(item) => item._id}
             contentContainerStyle={styles.recentGroupList}
             showsVerticalScrollIndicator={false}
+            initialNumToRender={5}
           />
         </View>
       {/* </ScrollView> */}
@@ -233,11 +240,8 @@ const styles = StyleSheet.create({
   splitMatesContainer: {
     height: 160,
     width: "100%",
-    // borderWidth: 2,
-    borderRadius: 8,
     marginTop: 24,
     padding: 12,
-    backgroundColor: "#D9D9D9",
   },
   texts: {
     flexDirection: "row",
@@ -250,7 +254,7 @@ const styles = StyleSheet.create({
     borderRadius: 25,
   },
   splitmatesList: {
-    gap: 16,
+    gap: 22,
     marginTop: 12,
   },
   splitmateName: {

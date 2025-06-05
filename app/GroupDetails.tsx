@@ -157,9 +157,9 @@ const GroupDetails = () => {
       }
       }, [groupDetails, expenses, fairshare]);
     
-  console.log(balances);
-  console.log(creditors);
-  console.log(debtors);
+  // console.log(balances);
+  // console.log(creditors);
+  // console.log(debtors);
 
   useEffect(() => {
     if (balances.length > 0) {
@@ -193,7 +193,7 @@ const GroupDetails = () => {
   };
 
   const totalExpense = groupDetails.totalExpense;
-  console.log(`Group total expense: ${totalExpense}`);
+  // console.log(`Group total expense: ${totalExpense}`);
 
 const getIndividualExpense = (member: GroupMember) => {
     const totalExpense = expenses.reduce((sum, expense) => {
@@ -257,7 +257,7 @@ const getIndividualExpense = (member: GroupMember) => {
     return (
       <View>
         {settlements.map((settlement, index) => (
-          <View key={index} style={styles.settlementItem}>
+          <View key={settlement.from + settlement.to} style={styles.settlementItem}>
             <Text style={styles.settlementText}>
               <Text style={styles.debtorName}>
                 {settlement.from === user?.displayName ? "You" : settlement.from}
@@ -352,6 +352,7 @@ const getIndividualExpense = (member: GroupMember) => {
         <Text style={styles.sectionTitle}>Expenses</Text>
 
         {expenses.map((expense) => (
+          // console.log("Expense key check:", expense._id),
           <View key={expense._id} style={styles.expensesContainer}>
             <View style={styles.expenseIcon}>
               <Ionicons name="cart" size={24} color="black" />

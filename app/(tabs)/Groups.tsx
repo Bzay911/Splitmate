@@ -1,4 +1,6 @@
+import { useGroups } from "@/contexts/GroupsContext";
 import { Link, router } from "expo-router";
+import { onAuthStateChanged, User } from "firebase/auth";
 import React, { useEffect, useState } from "react";
 import {
   FlatList,
@@ -20,85 +22,21 @@ interface Group {
 }
 
 const Groups = () => {
-  const [groups, setGroups] = useState<Group[]>([]);
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const { groups, isLoading, error, refreshGroups } = useGroups();
+  const [user, setUser] = useState<User | null>(null);
 
   useEffect(() => {
-    async function getGroups() {
-      setIsLoading(true);
-      try {
-        // Get current user and token
-        const user = auth.currentUser;
-        if (!user) {
-          router.replace("/"); // Redirect to login if no user
-          return;
-        }
-
-        const token = await user.getIdToken();
-
-        // Make authenticated request
-        const response = await fetch("http://192.168.1.12:3000/api/groups", {
-          headers: {
-            Authorization: `Bearer ${token}`,
-            "Content-Type": "application/json",
-          }, 
-        });
-
-        if (!response.ok) {
-          throw new Error(`Failed to fetch groups (${response.status})`);
-        }
-
-        const data = await response.json();
-        setGroups(data.groups);
-      } catch (error: any) {
-        console.error("Error fetching groups:", error);
-        setError(error.message);
-
-        // Handle authentication errors
-        if (error.code === "auth/user-token-expired") {
-          router.replace("/"); // Redirect to login
-        }
-      } finally {
-        setIsLoading(false);
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      if (user) {
+        setUser(user);
+        refreshGroups(); // Initial fetch when user is authenticated
+      } else {
+        setUser(null);
+        router.push("/");
       }
-    }
-
-    getGroups();
-  }, []);
-
-  // Add a refresh function
-  const refreshGroups = async () => {
-    setIsLoading(true);
-    try {
-      const user = auth.currentUser;
-      if (!user) {
-        router.replace("/");
-        return;
-      }
-
-      const token = await user.getIdToken(true); // Force refresh token
-
-      const response = await fetch("http://192.168.1.12:3000/api/groups", {
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "application/json",
-        },
-      });
-
-      if (!response.ok) {
-        throw new Error(`Failed to fetch groups (${response.status})`);
-      }
-
-      const data = await response.json();
-      setGroups(data.groups);
-    } catch (error: any) {
-      console.error("Error refreshing groups:", error);
-      setError(error.message);
-    } finally {
-      setIsLoading(false);
-    }
-  };
+    });
+    return () => unsubscribe();
+  }, [refreshGroups]);
 
   const handleGroupPress = (group: Group) => {
     router.push({
