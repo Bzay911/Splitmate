@@ -1,18 +1,37 @@
+import { useFinancial } from "@/contexts/FinancialContext";
 import GroupsContext from "@/contexts/GroupsContext";
+import { auth } from "@/src/firebaseConfig";
 import { Ionicons } from "@expo/vector-icons";
-import { useContext } from "react";
+import { router } from "expo-router";
+import { onAuthStateChanged, User } from "firebase/auth";
+import { useContext, useEffect, useState } from "react";
 import {
   FlatList,
   Image,
   SafeAreaView,
-  ScrollView,
   StyleSheet,
   Text,
-  View,
+  View
 } from "react-native";
 import dummyProfile from "../../assets/images/dummyProfile.png";
 
 export default function HomeScreen() {
+  const { financialSummary, refreshFinancialSummary } = useFinancial();
+  const [user, setUser] = useState<User | null>(null);
+
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      if (user) {
+        setUser(user);
+        refreshFinancialSummary();
+      } else {
+        setUser(null);
+        router.push("/");
+      }
+    });
+    return () => unsubscribe();
+  }, [refreshFinancialSummary]);
+
   const { groups } = useContext(GroupsContext);
   // Dummy data for splitmates
   const Splitmates = [
@@ -102,16 +121,16 @@ export default function HomeScreen() {
         <View style={styles.amountSection}>
           <View style={styles.oweSection}>
             <Text style={styles.amountTitle}>I'm owed</Text>
-            <Text style={styles.amount}>$200</Text>
+            <Text style={styles.amount}>${financialSummary.creditAmount.toFixed(2)}</Text>
           </View>
           <View style={styles.amountSubSection}>
             <View style={styles.paySection}>
               <Text style={styles.amountTitle}>Need to pay</Text>
-              <Text style={styles.amount}>-$12</Text>
+              <Text style={styles.amount}>-${financialSummary.debtAmount.toFixed(2)}</Text>
             </View>
             <View style={styles.expenseSection}>
               <Text style={styles.amountTitle}>Total expenses</Text>
-              <Text style={styles.amount}>$1230</Text>
+              <Text style={styles.amount}>${financialSummary.totalExpenses.toFixed(2)}</Text>
             </View>
           </View>
         </View>

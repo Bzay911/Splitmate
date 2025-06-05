@@ -1,13 +1,15 @@
+import { useFinancial } from "@/contexts/FinancialContext";
+import { Ionicons } from '@expo/vector-icons';
 import { router, useLocalSearchParams } from 'expo-router';
 import React, { useState } from 'react';
-import { Alert, Image, SafeAreaView, StyleSheet, Text, TextInput, TouchableOpacity, View, Keyboard } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
+import { Alert, Keyboard, SafeAreaView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import { auth } from '../src/firebaseConfig';
 
 const AddExpense = () => {
   const [amount, setAmount] = useState('');
   const [description, setDescription] = useState('');
   const { groupId } = useLocalSearchParams();
+  const { refreshFinancialSummary } = useFinancial();
 
   const handleAddExpense = async () => {
   
@@ -49,6 +51,9 @@ const AddExpense = () => {
         }
         Alert.alert("Success", "Expense added successfully");
         router.back();
+        
+        // Immediately refresh the financial summary
+        await refreshFinancialSummary();
       }catch(error){
         console.error("Error adding expense:", error);
         Alert.alert("Error", "Failed to add expense");

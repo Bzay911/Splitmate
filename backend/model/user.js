@@ -1,6 +1,6 @@
 import mongoose from "mongoose";
-
-const userSchema = new mongoose.Schema({
+const { Schema } = mongoose;
+const userSchema = new Schema({
   firebaseUid: {
     type: String,
     required: true,
@@ -12,7 +12,8 @@ const userSchema = new mongoose.Schema({
     unique: true,
   },
   displayName: {
-    type: String || 'Anonymous',
+    type: String,
+    default: 'Anonymous',
     required: true,
   },
   createdAt: {
@@ -23,6 +24,18 @@ const userSchema = new mongoose.Schema({
     type: Date,
     default: Date.now,
   },
+  expenses: [{
+    type: Schema.Types.ObjectId,
+    ref: "Expense"
+  }],
+  creditAmount: {
+    type: Number,
+    default: 0
+  },
+  debtAmount: {
+    type: Number,
+    default: 0
+  }
 });
 
 userSchema.pre('save', function(next) {

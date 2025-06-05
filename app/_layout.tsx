@@ -1,3 +1,4 @@
+import { FinancialProvider } from "@/contexts/FinancialContext";
 import { GroupsProvider } from "@/contexts/GroupsContext";
 import { useColorScheme } from "@/hooks/useColorScheme";
 import {
@@ -23,76 +24,78 @@ export default function RootLayout() {
 
   return (
     <ThemeProvider value={colorScheme === "dark" ? DarkTheme : DefaultTheme}>
-      <GroupsProvider>
-        <Stack>
-          <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-          <Stack.Screen
-            name="CreateGroup"
-            options={{
-              headerShown: true,
-              title: "Create a Group",
-              headerBackTitle: "Cancel",
-              headerBackVisible: true,
-              // headerRight: () => (
-              //   <TouchableOpacity
-              //     onPress={() => {
-              //       // Handle create action here
-              //       console.log("Create pressed");
-              //     }}
-              //     style={{ marginRight: 16 }}
-              //   >
-              //     <Text
-              //       style={{
-              //         color: "#007AFF", // iOS blue color
-              //         fontSize: 16,
-              //         fontWeight: "600",
-              //       }}
-              //     >
-              //       Create
-              //     </Text>
-              //   </TouchableOpacity>
-              // ),
-            }}
-          />
-          <Stack.Screen name="+not-found" />
-          <Stack.Screen
-            name="GroupDetails"
-            options={{
-              headerShown: true,
-              title: "Group Details",
-              headerBackTitle: "Back",
-            }}
-          />
-          <Stack.Screen
-            name="GroupSettings"
-            options={{
-              headerShown: true,
-              title: "Group Settings",
-              headerBackTitle: "Back",
-            }}
-          />
-          <Stack.Screen
-            name="SignUp"
-            options={{
-              headerShown: false,
-            }}
-          />
-          <Stack.Screen
-            name="index"
-            options={{
-              headerShown: false,
-            }}
-          />
-          <Stack.Screen
-            name="AddExpense"
-            options={{
-              headerShown: true,
-              title: "Add Expense",
-              headerBackVisible: false,
-            }}
-          />
-        </Stack>
-      </GroupsProvider>
+      <FinancialProvider>
+        <GroupsProvider>
+          <Stack>
+            <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+            <Stack.Screen
+              name="CreateGroup"
+              options={{
+                headerShown: true,
+                title: "Create a Group",
+                headerBackTitle: "Cancel",
+                headerBackVisible: true,
+                // headerRight: () => (
+                //   <TouchableOpacity
+                //     onPress={() => {
+                //       // Handle create action here
+                //       console.log("Create pressed");
+                //     }}
+                //     style={{ marginRight: 16 }}
+                //   >
+                //     <Text
+                //       style={{
+                //         color: "#007AFF", // iOS blue color
+                //         fontSize: 16,
+                //         fontWeight: "600",
+                //       }}
+                //     >
+                //       Create
+                //     </Text>
+                //   </TouchableOpacity>
+                // ),
+              }}
+            />
+            <Stack.Screen name="+not-found" />
+            <Stack.Screen
+              name="GroupDetails"
+              options={{
+                headerShown: true,
+                title: "Group Details",
+                headerBackTitle: "Back",
+              }}
+            />
+            <Stack.Screen
+              name="GroupSettings"
+              options={{
+                headerShown: true,
+                title: "Group Settings",
+                headerBackTitle: "Back",
+              }}
+            />
+            <Stack.Screen
+              name="SignUp"
+              options={{
+                headerShown: false,
+              }}
+            />
+            <Stack.Screen
+              name="index"
+              options={{
+                headerShown: false,
+              }}
+            />
+            <Stack.Screen
+              name="AddExpense"
+              options={{
+                headerShown: true,
+                title: "Add Expense",
+                headerBackVisible: false,
+              }}
+            />
+          </Stack>
+        </GroupsProvider>
+      </FinancialProvider>
 
       <StatusBar style="auto" />
     </ThemeProvider>

@@ -183,17 +183,42 @@ app.post("/api/groups/:groupId/addExpense", async (req, res) => {
       return res.status(403).json({error: "User is not a member of the group"});
     }
 
+    // Calculate the split amount
+    const splitAmount = amount / group.members.length;
+
     // Creating the expense
     const expense = new Expense({
       groupID: groupId,
       paidBy: req.user._id,
       amount,
-      description
+      description,
+      splitBetween: group.members
     })
 
     await expense.save();
+
+    // Updating the total expense of the group
     group.totalExpense += amount;
     await group.save();
+
+    // Updating the payer's credit amount
+    await User.findByIdAndUpdate(req.user._id, {
+      $push: {expenses: expense._id},
+      $inc: {creditAmount: amount - splitAmount}
+    })
+
+    // Update other members debt amount
+    await User.updateMany(
+      {
+        _id: {
+          $in: group.members,
+          $ne: req.user._id
+        },
+      },
+      {
+        $inc: {debtAmount: splitAmount}
+      }
+    )
 
     // Populate the expense with paidBy user's details
     const populatedExpense = await Expense.findById(expense._id)
@@ -204,6 +229,33 @@ app.post("/api/groups/:groupId/addExpense", async (req, res) => {
   } catch (error) {
     console.error("Error adding expense:", error);
     res.status(500).json({error: "Failed to add expense"});
+  }
+})
+
+// Get user's financial summary
+app.get("/api/user/summary", async (req, res) => {
+  try{
+    const user =  await User.findById(req.user._id)
+    .populate({
+      path: 'expenses',
+      populate: {
+        path: 'groupID',
+        select: 'name'
+      }
+    });
+
+    const summary = {
+      totalExpenses: user.expenses.reduce((sum, expense) => sum + expense.amount, 0),
+      creditAmount: user.creditAmount,
+      debtAmount: user.debtAmount,
+      netBalance: user.creditAmount - user.debtAmount
+    }
+
+    res.json({summary});
+
+  } catch (error) {
+    console.error("Error fetching user summary:", error);
+    res.status(500).json({error: "Failed to fetch user summary"});
   }
 })
 
