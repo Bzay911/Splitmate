@@ -121,7 +121,7 @@ const GroupDetails = () => {
       try {
         const token = await user.getIdToken();
         const response = await fetch(
-          `http:/192.168.1.12:3000/api/groups/${groupId}/expenses`,
+          `http:/192.168.1.12:3000/api/expenses/groups/${groupId}/expenses`,
           {
             headers: {
               Authorization: `Bearer ${token}`,

@@ -7,7 +7,6 @@ const router = Router();
 // Apply authMiddleware to all routes in this router
 router.use(authMiddleware);
 
-// Routes (no need to specify authMiddleware for each route)
 router.get('/', groupController.getAllGroups);
 router.get('/:groupId', groupController.getGroupById);
 router.post('/', groupController.createGroup);

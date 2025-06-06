@@ -1,4 +1,5 @@
 import { User } from '../../model/user.js';
+import admin from 'firebase-admin';
 
 export const userController = {
   // Create new user

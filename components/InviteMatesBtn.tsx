@@ -2,6 +2,7 @@ import { View, Text, SafeAreaView, StyleSheet, TouchableOpacity, TextInput, Aler
 import React, { useState } from 'react'
 import { auth } from "../src/firebaseConfig";
 import { Ionicons } from '@expo/vector-icons';
+import { router } from 'expo-router';
 
 interface InviteMatesBtnProps {
     groupId: string;
@@ -25,7 +26,7 @@ const InviteMatesBtn: React.FC<InviteMatesBtnProps> = ({groupId}) => {
         const user = auth.currentUser;
         try{
           const token = await user?.getIdToken();
-          const response = await fetch(`http://192.168.1.12:3000/api/groups/${groupId}/invite`, {
+          const response = await fetch(`http://192.168.1.12:3000/api/groups/${groupId}/addMember`, {
             method: "POST",
             headers: {
               Authorization: `Bearer ${token}`,
@@ -44,6 +45,7 @@ const InviteMatesBtn: React.FC<InviteMatesBtnProps> = ({groupId}) => {
       
           Alert.alert("Invitation Sent", data.message || "Invitation has been sent to the user");
           setInviteeEmail("");
+          router.back();
         } catch (error) {
           console.error("Error inviting user:", error);
           Alert.alert("Error", "Failed to invite user");

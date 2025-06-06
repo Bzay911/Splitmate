@@ -44,6 +44,9 @@ const handleSignin = async (email: string, password: string) => {
       }
     });
 
+    // console.log("responseStatus", response.status);
+    // const responseText = await response.text();
+    // console.log("responseText", responseText);
     const data = await response.json();
 
     if (response.status === 404) {

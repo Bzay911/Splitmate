@@ -32,7 +32,7 @@ const AddExpense = () => {
         }
         const token = await user.getIdToken();
         const response = await fetch(
-            `http://192.168.1.12:3000/api/groups/${groupId}/addExpense`,
+            `http://192.168.1.12:3000/api/expenses/groups/${groupId}/expenses`,
             {
                 method: "POST",
                 headers: {

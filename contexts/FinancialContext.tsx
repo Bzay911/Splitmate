@@ -1,5 +1,5 @@
 import { auth } from "@/src/firebaseConfig";
-import { createContext, useCallback, useContext, useState } from 'react';
+import { createContext, useCallback, useContext, useState, ReactNode } from 'react';
 
 interface FinancialSummary {
   totalExpenses: number;
@@ -23,7 +23,7 @@ const FinancialContext = createContext<FinancialContextType>({
   refreshFinancialSummary: async () => {}
 });
 
-export function FinancialProvider({ children }) {
+export function FinancialProvider({ children }:{ children: ReactNode }) {
   const [financialSummary, setFinancialSummary] = useState<FinancialSummary>({
     totalExpenses: 0,
     creditAmount: 0,
@@ -37,7 +37,7 @@ export function FinancialProvider({ children }) {
       if (!user) return;
 
       const token = await user.getIdToken();
-      const response = await fetch("http://192.168.1.12:3000/api/user/summary", {
+      const response = await fetch("http://192.168.1.12:3000/api/auth/summary", {
         headers: {
           "Authorization": `Bearer ${token}`
         }
