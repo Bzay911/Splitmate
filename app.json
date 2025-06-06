@@ -33,6 +33,13 @@
           "resizeMode": "contain",
           "backgroundColor": "#ffffff"
         }
+      ],
+      [
+        "expo-camera",
+        {
+          "cameraPermission": "Allow Splitmate to access your camera",
+          "recordAudioAndroid": true
+        }
       ]
     ],
     "experiments": {

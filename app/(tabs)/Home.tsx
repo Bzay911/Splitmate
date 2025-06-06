@@ -2,6 +2,8 @@ import { useFinancial } from "@/contexts/FinancialContext";
 import GroupsContext from "@/contexts/GroupsContext";
 import { auth } from "@/src/firebaseConfig";
 import { Ionicons } from "@expo/vector-icons";
+import { CameraType, useCameraPermissions } from 'expo-camera';
+import { LinearGradient } from "expo-linear-gradient";
 import { router } from "expo-router";
 import { onAuthStateChanged, User } from "firebase/auth";
 import { useContext, useEffect, useState } from "react";
@@ -13,14 +15,14 @@ import {
   Text,
   View
 } from "react-native";
-import dummyProfile from "../../assets/images/dummyProfile.png";
-import { LinearGradient } from "expo-linear-gradient";
 
 export default function HomeScreen() {
   const { financialSummary, refreshFinancialSummary } = useFinancial();
   const [user, setUser] = useState<User | null>(null);
   const { groups, refreshGroups } = useContext(GroupsContext);
-
+  const [splitmates, setSplitmates] = useState([]);
+  const [permission, requestPermission] = useCameraPermissions();
+  const [facing, setFacing] = useState<CameraType>('back');
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
@@ -36,49 +38,38 @@ export default function HomeScreen() {
     return () => unsubscribe();
   }, [refreshFinancialSummary, refreshGroups]);
 
-  // Dummy data for splitmates
-  const Splitmates = [
-    {
-      id: "1",
-      name: "John Doe",
-      image: dummyProfile,
-    },
-    {
-      id: "2",
-      name: "Jane Smith",
-      image: dummyProfile,
-    },
-    {
-      id: "3",
-      name: "Alice Johnson",
-      image: dummyProfile,
-    },
-    {
-      id: "4",
-      name: "Bob Brown",
-      image: dummyProfile,
-    },
-    {
-      id: "5",
-      name: "Larry Wheels",
-      image: dummyProfile,
-    },
-    {
-      id: "6",
-      name: "Osma BinLaden",
-      image: dummyProfile,
-    },
-    {
-      id: "7",
-      name: "Tony Stark",
-      image: dummyProfile,
-    },
-    {
-      id: "8",
-      name: "Bruce Wayne",
-      image: dummyProfile,
-    },
-  ];
+  useEffect(() => {
+    const fetchSplitmates = async () =>{
+      if (!user) return;
+      try{
+        const token = await user.getIdToken();
+        const response = await fetch(`http://192.168.1.12:3000/api/auth/splitmates`, {
+          method: 'GET',
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        })
+
+        if (!response.ok) {
+          throw new Error(`Failed to fetch splitmates (${response.status})`);
+        }
+
+        const data = await response.json();
+        if (data.splitmates && data.splitmates.length > 0) {
+          // Transform the data to match your component's needs
+          const formattedSplitmates = data.splitmates.map(splitmate => ({
+            id: splitmate.id,
+            name: splitmate.name,
+            image: require('../../assets/images/dummyProfile.png') // Use default image for now
+          }));
+          setSplitmates(formattedSplitmates);
+        }
+      } catch (error) {
+        console.error("Error fetching splitmates:", error);
+      }
+    }
+    fetchSplitmates();
+  }, [user]);
 
   const renderSplitmate = ({ item }) => {
     return (
@@ -104,75 +95,95 @@ export default function HomeScreen() {
     );
   };
 
+  const handleScanClick = () => {
+    console.log("scan clicked");
+    router.push("/Camera");
+  }
+
   return (
     <SafeAreaView style={styles.mainContainer}>
-    
-        {/* Topbar */}
-        <View style={styles.topBar}>
-          <Text style={styles.title}>Home</Text>
+      {/* Topbar */}
+      <View style={styles.topBar}>
+        <Text style={styles.title}>Home</Text>
 
-          <View style={styles.rightTop}>
-            <Ionicons size={28} name="scan" style={styles.iconSpacing} />
-            <Ionicons size={28} name="notifications" />
-          </View>
+        <View style={styles.rightTop}>
+          <Ionicons size={28} name="scan" style={styles.iconSpacing} onPress={handleScanClick}/>
+          <Ionicons size={28} name="notifications" />
         </View>
+      </View>
 
-        {/* Owe section */}
-        <View style={styles.amountSection}>
+      {/* Owe section */}
+      <View style={styles.amountSection}>
         <LinearGradient
           colors={["#4ADE80", "#10B981"]}
           style={styles.oweSection}
           start={{ x: 0, y: 0 }}
           end={{ x: 1, y: 0 }}
         >
-            <Text style={styles.amountTitle}>I'm owed</Text>
-            <Text style={styles.amount}>${financialSummary.creditAmount.toFixed(2)}</Text>
+          <Text style={styles.amountTitle}>I'm owed</Text>
+          <Text style={styles.amount}>
+            ${financialSummary.creditAmount.toFixed(2)}
+          </Text>
+        </LinearGradient>
+
+        <View style={styles.amountSubSection}>
+          <LinearGradient
+            colors={["#FF6B6B", "#FE8888", "#FFA9A9"]}
+            start={{ x: 1, y: 0 }}
+            end={{ x: 0, y: 0 }}
+            style={styles.paySection}
+          >
+            <Text style={styles.amountTitle}>Need to pay</Text>
+            <Text style={styles.amount}>
+              -${financialSummary.debtAmount.toFixed(2)}
+            </Text>
           </LinearGradient>
+          <LinearGradient
+            colors={["#CFCFCF", "#D5D5D5", "#E0E0E0"]}
+            start={{ x: 1, y: 0 }}
+            end={{ x: 0, y: 0 }}
+            style={styles.expenseSection}
+          >
+            <Text style={styles.amountTitle}>Total expenses</Text>
+            <Text style={styles.amount}>
+              ${financialSummary.totalExpenses.toFixed(2)}
+            </Text>
+          </LinearGradient>
+        </View>
+      </View>
 
-          <View style={styles.amountSubSection}>
-            <View style={styles.paySection}>
-              <Text style={styles.amountTitle}>Need to pay</Text>
-              <Text style={styles.amount}>-${financialSummary.debtAmount.toFixed(2)}</Text>
-            </View>
-            <View style={styles.expenseSection}>
-              <Text style={styles.amountTitle}>Total expenses</Text>
-              <Text style={styles.amount}>${financialSummary.totalExpenses.toFixed(2)}</Text>
-            </View>
-          </View>
+      {/* Splitmates */}
+      <View style={styles.splitMatesContainer}>
+        <View style={styles.texts}>
+          <Text style={styles.eachTitle}>Your Splitmates</Text>
+          <Text>see all</Text>
         </View>
 
-        {/* Splitmates */}
-        <View style={styles.splitMatesContainer}>
-          <View style={styles.texts}>
-            <Text style={styles.eachTitle}>Your Splitmates</Text>
-            <Text>see all</Text>
-          </View>
+        <FlatList
+          data={splitmates}
+          renderItem={renderSplitmate}
+          keyExtractor={(item) => item.id}
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          contentContainerStyle={styles.splitmatesList}
+        />
+      </View>
 
-          <FlatList
-            data={Splitmates}
-            renderItem={renderSplitmate}
-            keyExtractor={(item) => item.id}
-            horizontal
-            showsHorizontalScrollIndicator={false}
-            contentContainerStyle={styles.splitmatesList}
-          />
+      {/* Recent Group Section */}
+      <View style={styles.recentGroupSection}>
+        <View style={styles.texts}>
+          <Text style={styles.eachTitle}>Recent Groups</Text>
+          <Text>see all</Text>
         </View>
-
-        {/* Recent Group Section */}
-        <View style={styles.recentGroupSection}>
-          <View style={styles.texts}>
-            <Text style={styles.eachTitle}>Recent Groups</Text>
-            <Text>see all</Text>
-          </View>
-          <FlatList
-            data={groups}
-            renderItem={renderRecentGroup}
-            keyExtractor={(item) => item._id}
-            contentContainerStyle={styles.recentGroupList}
-            showsVerticalScrollIndicator={false}
-            initialNumToRender={5}
-          />
-        </View>
+        <FlatList
+          data={groups}
+          renderItem={renderRecentGroup}
+          keyExtractor={(item) => item._id}
+          contentContainerStyle={styles.recentGroupList}
+          showsVerticalScrollIndicator={false}
+          initialNumToRender={5}
+        />
+      </View>
       {/* </ScrollView> */}
     </SafeAreaView>
   );
@@ -180,9 +191,8 @@ export default function HomeScreen() {
 
 const styles = StyleSheet.create({
   mainContainer: {
-    marginHorizontal: 15,
-    marginTop: 10,
     flex: 1,
+    backgroundColor: "#ffffff",
   },
   scrollView: {
     flex: 1,
@@ -191,6 +201,19 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "flex-end",
     justifyContent: "space-between",
+    paddingHorizontal: 15,
+    paddingTop: 15,
+  },
+  container: {
+    flex: 1,
+    justifyContent: 'center',
+  },
+  message: {
+    textAlign: 'center',
+    paddingBottom: 10,
+  },
+  camera: {
+    flex: 1,
   },
   title: {
     fontSize: 32,
@@ -202,40 +225,41 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   iconSpacing: {
-    marginRight: 10,
+    marginRight: 16,
   },
   amountSection: {
     height: 250,
     width: "100%",
-    // borderWidth: 2,
     borderRadius: 8,
     marginTop: 24,
   },
   oweSection: {
-    backgroundColor: "#9DF144",
     height: 100,
     margin: 12,
     borderRadius: 8,
     padding: 12,
+    justifyContent: "center",
   },
   amountSubSection: {
     flexDirection: "row",
     gap: 12,
+    width: "100%",
+    paddingHorizontal: 12,
   },
   paySection: {
-    backgroundColor: "#FE8888",
     height: 100,
-    width: 180,
-    marginLeft: 12,
     borderRadius: 8,
     padding: 12,
+    flex: 1,
+    justifyContent: "center",
   },
   expenseSection: {
-    backgroundColor: "#D5D5D5",
+    // backgroundColor: "#D5D5D5",
     height: 100,
-    width: 180,
+    flex: 1,
     borderRadius: 8,
     padding: 12,
+    justifyContent: "center",
   },
   splitMatesContainer: {
     height: 160,

@@ -157,10 +157,6 @@ const GroupDetails = () => {
       }
       }, [groupDetails, expenses, fairshare]);
     
-  // console.log(balances);
-  // console.log(creditors);
-  // console.log(debtors);
-
   useEffect(() => {
     if (balances.length > 0) {
       const whoGetsPayment = balances.filter(item => item.balance > 0).sort((a, b) => b.balance - a.balance);

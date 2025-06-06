@@ -5,22 +5,6 @@ import { SafeAreaView, StyleSheet, Text, TouchableOpacity, View } from 'react-na
 import { auth } from '../../src/firebaseConfig';
 import { onAuthStateChanged, User } from "firebase/auth";
 
-interface StatItemProps {
-  title: string;
-  value: string | number;
-  icon: keyof typeof MaterialIcons.glyphMap;
-}
-
-const StatItem = ({ title, value, icon }: StatItemProps) => (
-  <View style={styles.statItem}>
-    <View style={styles.statIconContainer}>
-      <MaterialIcons name={icon} size={24} color="#2563eb" />
-    </View>
-    <Text style={styles.statValue}>{value}</Text>
-    <Text style={styles.statTitle}>{title}</Text>
-  </View>
-);
-
 const Profile = () => {
   const router = useRouter();
   const [user, setUser] = useState<User | null>(null);
@@ -66,29 +50,6 @@ const Profile = () => {
         <TouchableOpacity style={styles.editButton}>
           <Text style={styles.editButtonText}>Edit</Text>
         </TouchableOpacity>
-      </View>
-
-      <View style={styles.divider} />
-
-      <View style={styles.section}>
-        <Text style={styles.sectionTitle}>Overview</Text>
-        <View style={styles.statsContainer}>
-          <StatItem 
-            title="Total Saved" 
-            value="$0.00"
-            icon="savings"
-          />
-          <StatItem 
-            title="Active Groups" 
-            value="0"
-            icon="group"
-          />
-          <StatItem 
-            title="Total Owed" 
-            value="$0.00"
-            icon="account-balance-wallet"
-          />
-        </View>
       </View>
 
       <View style={styles.divider} />
@@ -187,7 +148,7 @@ const styles = StyleSheet.create({
   divider: {
     height: 1,
     backgroundColor: '#e2e8f0',
-    marginVertical: 24,
+    marginVertical: 16,
   },
   section: {
     paddingHorizontal: 24,
@@ -198,10 +159,7 @@ const styles = StyleSheet.create({
     color: '#1e293b',
     marginBottom: 16,
   },
-  statsContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-  },
+
   statItem: {
     alignItems: 'center',
     flex: 1,

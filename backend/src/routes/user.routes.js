@@ -12,5 +12,6 @@ router.get('/login', userController.checkLogin);
 router.use(authMiddleware);
 router.get('/profile', userController.getProfile);
 router.get('/summary', userController.getFinancialSummary);
+router.get('/splitmates', userController.getSplitmates);
 
 export default router;

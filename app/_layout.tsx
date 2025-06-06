@@ -1,6 +1,7 @@
 import { FinancialProvider } from "@/contexts/FinancialContext";
 import { GroupsProvider } from "@/contexts/GroupsContext";
 import { useColorScheme } from "@/hooks/useColorScheme";
+import { Ionicons } from "@expo/vector-icons";
 import {
   DarkTheme,
   DefaultTheme,
@@ -9,6 +10,7 @@ import {
 import { useFonts } from "expo-font";
 import { Stack } from "expo-router";
 import { StatusBar } from "expo-status-bar";
+import { Text,TouchableOpacity } from "react-native";
 import "react-native-reanimated";
 
 export default function RootLayout() {
@@ -35,25 +37,6 @@ export default function RootLayout() {
                 title: "Create a Group",
                 headerBackTitle: "Cancel",
                 headerBackVisible: true,
-                // headerRight: () => (
-                //   <TouchableOpacity
-                //     onPress={() => {
-                //       // Handle create action here
-                //       console.log("Create pressed");
-                //     }}
-                //     style={{ marginRight: 16 }}
-                //   >
-                //     <Text
-                //       style={{
-                //         color: "#007AFF", // iOS blue color
-                //         fontSize: 16,
-                //         fontWeight: "600",
-                //       }}
-                //     >
-                //       Create
-                //     </Text>
-                //   </TouchableOpacity>
-                // ),
               }}
             />
             <Stack.Screen name="+not-found" />
@@ -70,6 +53,14 @@ export default function RootLayout() {
               options={{
                 headerShown: true,
                 title: "Group Settings",
+                headerBackTitle: "Back",
+              }}
+            />
+            <Stack.Screen
+              name="Camera"
+              options={{
+                headerShown: true,
+                title: "Scan Receipt",
                 headerBackTitle: "Back",
               }}
             />

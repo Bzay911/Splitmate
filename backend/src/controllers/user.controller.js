@@ -1,5 +1,6 @@
-import { User } from '../../model/user.js';
 import admin from 'firebase-admin';
+import { Group } from '../../model/group.js';
+import { User } from '../../model/user.js';
 
 export const userController = {
   // Create new user
@@ -41,6 +42,39 @@ export const userController = {
     } catch (error) {
       console.error("Error fetching user summary:", error);
       res.status(500).json({ error: "Failed to fetch user summary" });
+    }
+  },
+
+  async getSplitmates(req, res) {
+    try {
+      // Use the already attached req.user from auth middleware
+      const currentUser = req.user;
+      
+      // Find groups where the current user is a member
+      const groups = await Group.find({ members: currentUser._id })
+        .populate('members', 'displayName email')
+        .exec();
+
+      // Extract unique members
+      const allMembers = new Map();
+      
+      groups.forEach(group => {
+        group.members.forEach(member => {
+          if (!member._id.equals(currentUser._id)) {
+            allMembers.set(member._id.toString(), {
+              id: member._id,
+              name: member.displayName,
+              email: member.email
+            });
+          }
+        });
+      });
+      
+      const splitmates = Array.from(allMembers.values());
+      res.json({ splitmates });
+    } catch (error) {
+      console.error("Error fetching splitmates:", error);
+      res.status(500).json({ error: "Failed to fetch splitmates" });
     }
   },
 
