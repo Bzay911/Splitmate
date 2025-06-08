@@ -1,6 +1,6 @@
 import { Router } from 'express';
-import { userController } from '../controllers/user.controller.js';
 import { authMiddleware } from '../../middleware/auth.js';
+import { userController, upload } from '../controllers/user.controller.js';
 
 const router = Router();
 
@@ -13,5 +13,6 @@ router.use(authMiddleware);
 router.get('/profile', userController.getProfile);
 router.get('/summary', userController.getFinancialSummary);
 router.get('/splitmates', userController.getSplitmates);
+router.post('/upload-receipt',upload.single('receipt'), userController.uploadReceipt);
 
 export default router;
