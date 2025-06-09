@@ -1,3 +1,4 @@
+import { apiUrl } from "@/constants/ApiConfig";
 import { auth } from "@/src/firebaseConfig";
 import { createContext, ReactNode, useCallback, useContext, useState } from "react";
 
@@ -37,7 +38,7 @@ export const GroupsProvider = ({ children }: { children: ReactNode }) => {
       }
 
       const token = await user.getIdToken();
-      const response = await fetch("http://192.168.1.12:3000/api/groups", {
+      const response = await fetch(apiUrl("api/groups"), {
         headers: {
           Authorization: `Bearer ${token}`,
           "Content-Type": "application/json",

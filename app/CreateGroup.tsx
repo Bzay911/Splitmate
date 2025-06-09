@@ -1,13 +1,14 @@
+import { apiUrl } from "@/constants/ApiConfig";
 import { useGroups } from "@/contexts/GroupsContext";
 import { router } from "expo-router";
 import React, { useState } from "react";
 import {
-  Alert,
-  SafeAreaView,
-  StyleSheet,
-  Text,
-  TextInput,
-  TouchableOpacity
+    Alert,
+    SafeAreaView,
+    StyleSheet,
+    Text,
+    TextInput,
+    TouchableOpacity
 } from "react-native";
 import { auth } from "../src/firebaseConfig";
 
@@ -32,7 +33,7 @@ const CreateGroup = () => {
       }
       const token = await user.getIdToken();
 
-      const response = await fetch("http://192.168.1.12:3000/api/addGroup", {
+      const response = await fetch(apiUrl("api/groups"), {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

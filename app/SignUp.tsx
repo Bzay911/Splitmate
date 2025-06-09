@@ -4,16 +4,17 @@ import { router } from "expo-router";
 import { createUserWithEmailAndPassword, updateProfile } from "firebase/auth";
 import React from "react";
 import {
-  KeyboardAvoidingView,
-  Platform,
-  Pressable,
-  StyleSheet,
-  Text,
-  TextInput,
-  TextInputProps,
-  View
+    KeyboardAvoidingView,
+    Platform,
+    Pressable,
+    StyleSheet,
+    Text,
+    TextInput,
+    TextInputProps,
+    View
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { apiUrl } from "../constants/ApiConfig";
 import { auth } from "../src/firebaseConfig";
 
 interface InputFieldProps extends Omit<TextInputProps, 'style'> {
@@ -36,7 +37,7 @@ const handleSignUp = async (email: string, password: string, fullName: string) =
     });
 
     // 3. Create user in backend
-    const response = await fetch('http://192.168.1.12:3000/api/users', {
+    const response = await fetch(apiUrl('api/users'), {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

@@ -1,3 +1,4 @@
+import { apiUrl } from "@/constants/ApiConfig";
 import { useFinancial } from "@/contexts/FinancialContext";
 import GroupsContext from "@/contexts/GroupsContext";
 import { auth } from "@/src/firebaseConfig";
@@ -8,12 +9,12 @@ import { router } from "expo-router";
 import { onAuthStateChanged, User } from "firebase/auth";
 import { useContext, useEffect, useState } from "react";
 import {
-  FlatList,
-  Image,
-  SafeAreaView,
-  StyleSheet,
-  Text,
-  View
+    FlatList,
+    Image,
+    SafeAreaView,
+    StyleSheet,
+    Text,
+    View
 } from "react-native";
 
 export default function HomeScreen() {
@@ -43,7 +44,7 @@ export default function HomeScreen() {
       if (!user) return;
       try{
         const token = await user.getIdToken();
-        const response = await fetch(`http://192.168.1.12:3000/api/auth/splitmates`, {
+        const response = await fetch(apiUrl(`api/auth/splitmates`), {
           method: 'GET',
           headers: {
             'Authorization': `Bearer ${token}`

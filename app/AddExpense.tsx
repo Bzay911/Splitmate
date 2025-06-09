@@ -1,3 +1,4 @@
+import { apiUrl } from "@/constants/ApiConfig";
 import { useFinancial } from "@/contexts/FinancialContext";
 import { Ionicons } from '@expo/vector-icons';
 import { router, useLocalSearchParams } from 'expo-router';
@@ -32,7 +33,7 @@ const AddExpense = () => {
         }
         const token = await user.getIdToken();
         const response = await fetch(
-            `http://192.168.1.12:3000/api/expenses/groups/${groupId}/expenses`,
+            apiUrl(`api/expenses/groups/${groupId}/expenses`),
             {
                 method: "POST",
                 headers: {

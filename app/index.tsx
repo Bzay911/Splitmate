@@ -10,6 +10,7 @@ import {
   View
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { apiUrl } from "../constants/ApiConfig";
 import { auth } from "../src/firebaseConfig";
 
 const handleSignin = async (email: string, password: string) => {
@@ -36,32 +37,46 @@ const handleSignin = async (email: string, password: string) => {
     const userCredential = await signInWithEmailAndPassword(auth, email, password);
     const token = await userCredential.user.getIdToken();
 
-    // 2. Check if user exists in your backend
-    const response = await fetch('http://192.168.1.12:3000/api/auth/login', {
-      method: 'GET',  
-      headers: {
-        'Authorization': `Bearer ${token}`,
+    // 2. Check if user exists in your backend with timeout
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 10000); // 10 second timeout
+    
+    try {
+      const response = await fetch(apiUrl('api/auth/login'), {
+        method: 'GET',  
+        headers: {
+          'Authorization': `Bearer ${token}`,
+        },
+        signal: controller.signal
+      });
+      
+      clearTimeout(timeoutId);
+      
+      // console.log("responseStatus", response.status);
+      // const responseText = await response.text();
+      // console.log("responseText", responseText);
+      const data = await response.json();
+
+      if (response.status === 404) {
+        alert("Account not found. Please create an account first.");
+        router.push("/SignUp");
+        return null;
       }
-    });
 
-    // console.log("responseStatus", response.status);
-    // const responseText = await response.text();
-    // console.log("responseText", responseText);
-    const data = await response.json();
+      if (!response.ok) {
+        throw new Error(data.error || 'Failed to sign in');
+      }
 
-    if (response.status === 404) {
-      alert("Account not found. Please create an account first.");
-      router.push("/SignUp");
-      return null;
+      // console.log("User signed in successfully", userCredential.user);
+      router.push("/Home"); 
+      return userCredential.user;
+    } catch (error) {
+      console.log("error", error);
+      // if (error.name === 'AbortError') {
+      //   // throw new Error('Login request timed out. Please check your internet connection and try again.');
+      // }
+      throw error;
     }
-
-    if (!response.ok) {
-      throw new Error(data.error || 'Failed to sign in');
-    }
-
-    // console.log("User signed in successfully", userCredential.user);
-    router.push("/Home");
-    return userCredential.user;
 
   } catch (error: any) {
     console.error("Error signing in", error);

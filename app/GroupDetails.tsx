@@ -1,19 +1,20 @@
+import { apiUrl } from "@/constants/ApiConfig";
+import { auth } from "@/src/firebaseConfig";
 import { Ionicons } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
 import { router, useLocalSearchParams } from "expo-router";
 import { onAuthStateChanged, User } from "firebase/auth";
 import React, { useEffect, useState } from "react";
 import {
-  Image,
-  SafeAreaView,
-  ScrollView,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View,
+    Image,
+    SafeAreaView,
+    ScrollView,
+    StyleSheet,
+    Text,
+    TouchableOpacity,
+    View,
 } from "react-native";
 import { FloatingAction } from "react-native-floating-action";
-import { auth } from "../src/firebaseConfig";
 
 interface GroupMember {
   _id: string;
@@ -65,6 +66,7 @@ const GroupDetails = () => {
   const [creditors, setCreditors] = useState<Balance[]>([]);
   const [debtors, setDebtors] = useState<Balance[]>([]);
   const [user, setUser] = useState<User | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
     if (groupDetails) {
@@ -89,9 +91,10 @@ const GroupDetails = () => {
       if (!user) return;
       
       try {
+        setIsLoading(true);
         const token = await user.getIdToken();
         const response = await fetch(
-          `http://192.168.1.12:3000/api/groups/${groupId}`,
+          apiUrl(`api/groups/${groupId}`),
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -108,6 +111,8 @@ const GroupDetails = () => {
         setGroupDetails(data.group);
       } catch (error) {
         console.error("Error fetching group details:", error);
+      } finally {
+        setIsLoading(false);
       }
     };
 
@@ -121,7 +126,7 @@ const GroupDetails = () => {
       try {
         const token = await user.getIdToken();
         const response = await fetch(
-          `http:/192.168.1.12:3000/api/expenses/groups/${groupId}/expenses`,
+          apiUrl(`api/expenses/groups/${groupId}/expenses`),
           {
             headers: {
               Authorization: `Bearer ${token}`,

@@ -1,8 +1,8 @@
-import { View, Text, SafeAreaView, StyleSheet, TouchableOpacity, TextInput, Alert } from 'react-native'
-import React, { useState } from 'react'
-import { auth } from "../src/firebaseConfig";
-import { Ionicons } from '@expo/vector-icons';
+import { apiUrl } from "@/constants/ApiConfig";
 import { router } from 'expo-router';
+import React, { useState } from 'react';
+import { Alert, SafeAreaView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { auth } from "../src/firebaseConfig";
 
 interface InviteMatesBtnProps {
     groupId: string;
@@ -26,7 +26,7 @@ const InviteMatesBtn: React.FC<InviteMatesBtnProps> = ({groupId}) => {
         const user = auth.currentUser;
         try{
           const token = await user?.getIdToken();
-          const response = await fetch(`http://192.168.1.12:3000/api/groups/${groupId}/addMember`, {
+          const response = await fetch(apiUrl(`api/groups/${groupId}/addMember`), {
             method: "POST",
             headers: {
               Authorization: `Bearer ${token}`,

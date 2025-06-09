@@ -1,17 +1,18 @@
+import { apiUrl } from "@/constants/ApiConfig";
 import { auth } from "@/src/firebaseConfig";
 import { Ionicons } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
 import { router, useLocalSearchParams } from "expo-router";
 import React, { useEffect, useState } from "react";
 import {
-  ActivityIndicator,
-  Alert,
-  FlatList,
-  SafeAreaView,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View
+    ActivityIndicator,
+    Alert,
+    FlatList,
+    SafeAreaView,
+    StyleSheet,
+    Text,
+    TouchableOpacity,
+    View
 } from "react-native";
 import InviteMatesBtn from "../components/InviteMatesBtn";
 
@@ -51,7 +52,7 @@ const GroupSettings = () => {
 
       try {
         const response = await fetch(
-          `http://192.168.1.12:3000/api/groups/${groupId}`,
+          apiUrl(`api/groups/${groupId}`),
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -104,9 +105,16 @@ const GroupSettings = () => {
           onPress: async () => {
             setIsDeleting(true);
             try {
-              const response = await fetch(`http://192.168.1.12:3000/groups/${groupId}`, {
-                method: 'DELETE',
-              });
+              const response = await fetch(
+                apiUrl(`api/groups/${groupId}`),
+                {
+                  method: 'DELETE',
+                  headers: {
+                    'Authorization': `Bearer ${await user.getIdToken()}`,
+                    'Content-Type': 'application/json'
+                  }
+                }
+              );
 
               if (!response.ok) {
                 throw new Error('Failed to delete group');

@@ -1,8 +1,13 @@
+import { GoogleGenerativeAI } from '@google/generative-ai';
+import dotenv from 'dotenv';
 import admin from 'firebase-admin';
 import multer from 'multer';
 import sharp from 'sharp';
 import { Group } from '../../model/group.js';
 import { User } from '../../model/user.js';
+
+dotenv.config();
+const gemini_api_key = process.env.GEMINI_API_KEY;
 
 // Set up multer for file uploads
 const storage = multer.memoryStorage();
@@ -91,7 +96,7 @@ export const userController = {
   async uploadReceipt(req, res) {
     try {
       // Check if API key is properly set
-      if (!process.env.GEMINI_API_KEY) {
+      if (!gemini_api_key) {
         console.error('GEMINI_API_KEY is not defined in environment variables');
         return res.status(500).json({ success: false, error: 'API key configuration error' });
       }
@@ -113,93 +118,95 @@ export const userController = {
       // Convert to base64
       const base64Image = resizedImageBuffer.toString('base64');
       
-      // Call Gemini API for receipt scanning using fetch
-      const response = await fetch(
-        `https://generativelanguage.googleapis.com/v1/models/gemini-1.5-pro-vision:generateContent?key=${process.env.GEMINI_API_KEY}`,
-        {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            contents: [
-              {
-                parts: [
-                  {
-                    text: `
-                    You are a receipt scanning assistant. Extract the following information from this receipt image:
-                    - Store/Merchant name
-                    - Date of purchase
-                    - Total amount
-                    - Tax amount (if available)
-                    - List of items with prices
-                    - Payment method (if available)
-                    
-                    Format the response as a JSON object with these fields:
-                    {
-                      "merchant": "string",
-                      "date": "YYYY-MM-DD",
-                      "total": number,
-                      "tax": number,
-                      "items": [{"name": "string", "price": number}],
-                      "paymentMethod": "string"
-                    }
-                    
-                    Only return the JSON object, nothing else.
-                    `
-                  },
-                  {
-                    inline_data: {
-                      mime_type: req.file.mimetype,
-                      data: base64Image
-                    }
-                  }
-                ]
-              }
-            ],
-            generationConfig: {
-              temperature: 0.1,
-              topK: 32,
-              topP: 1,
-              maxOutputTokens: 4096,
-            }
-          })
-        }
-      );
-
-      // Check if the response is successful
-      if (!response.ok) {
-        throw new Error(`API request failed with status ${response.status}`);
-      }
-
-      const responseData = await response.json();
+      // Initialize Google AI client
+      const googleAI = new GoogleGenerativeAI(gemini_api_key);
+      const geminiConfig = {
+        temperature: 0.1,
+        topK: 32,
+        topP: 1,
+        maxOutputTokens: 4096,
+      };
       
-      // Extract and parse the text response
-      const rawText = responseData.candidates[0].content.parts[0].text;
-      
-      // Handle potential JSON extraction issues
-      let jsonStr = rawText;
-      if (rawText.includes('{') && rawText.includes('}')) {
-        jsonStr = rawText.substring(
-          rawText.indexOf('{'),
-          rawText.lastIndexOf('}') + 1
-        );
-      }
-      
-      const receiptData = JSON.parse(jsonStr);
-      
-      // Return the structured data
-      return res.json({ 
-        success: true,
-        data: receiptData
+      const geminiModel = googleAI.getGenerativeModel({
+        model: "gemini-1.5-flash",
+        config: geminiConfig
       });
+      
+      // Create prompt for Gemini
+      const promptConfig = [
+        {
+          text: `
+          You are a receipt scanning assistant. Extract the following information from this receipt image:
+          - Store/Merchant name
+          - Date of purchase
+          - Total amount
+          - List of items with prices
+          
+          Format the response as a JSON object with these fields:
+          {
+            "merchant": "string",
+            "date": "YYYY-MM-DD",
+            "total": number,
+            "items": [{"name": "string", "price": number}],
+          }
+          
+          Only return the JSON object, nothing else.
+          `
+        },
+        {
+          inline_data: {
+            mime_type: req.file.mimetype,
+            data: base64Image
+          }
+        }
+      ];
+
+      // Call Gemini API
+      const result = await geminiModel.generateContent({
+        contents: [{role: "user", parts: promptConfig}],
+      });
+      
+      const response = await result.response;
+      const responseText = response.text();
+      
+      console.log("Gemini API Raw Response:", responseText);
+      
+      // Extract JSON from response
+      let jsonData;
+      try {
+        // Try to extract JSON if it's wrapped in text
+        if (responseText.includes('{') && responseText.includes('}')) {
+          const jsonStr = responseText.substring(
+            responseText.indexOf('{'),
+            responseText.lastIndexOf('}') + 1
+          );
+          jsonData = JSON.parse(jsonStr);
+        } else {
+          // If response is already JSON
+          jsonData = JSON.parse(responseText);
+        }
+        
+        console.log("Structured Receipt Data:", JSON.stringify(jsonData, null, 2));
+        
+        // Return the structured data
+        return res.json({ 
+          success: true,
+          data: jsonData
+        });
+      } catch (jsonError) {
+        console.error("JSON parsing error:", jsonError);
+        return res.status(500).json({ 
+          success: false,
+          error: 'Failed to parse receipt data',
+          rawResponse: responseText
+        });
+      }
       
     } catch (error) {
       console.error('Receipt scanning detailed error:', {
         message: error.message,
         stack: error.stack,
-        requestFile: req.file ? 'File exists' : 'No file',
-        responseStatus: error.response?.status
+        requestFile: req.file ? 'File exists' : 'No file'
       });
       return res.status(500).json({ 
         success: false,

@@ -1,3 +1,4 @@
+import { apiUrl } from "@/constants/ApiConfig";
 import { CameraType, CameraView, useCameraPermissions } from 'expo-camera';
 import React, { useEffect, useRef, useState } from 'react';
 import { ActivityIndicator, Alert, Animated, Button, Dimensions, Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
@@ -50,8 +51,6 @@ export default function CameraScreen() {
         setIsScanning(false);
         scanAnim.stopAnimation();
 
-        // console.log("captured: ", uri);
-        
         // Create form data with the image
         const formData = new FormData();
         formData.append('receipt', {
@@ -70,13 +69,13 @@ export default function CameraScreen() {
         }
         const token = await user.getIdToken();
 
-        // Replace with your actual API endpoint
-        const response = await fetch('http://192.168.1.12:3000/api/auth/upload-receipt', {
+        // Upload to backend
+        const response = await fetch(apiUrl('api/auth/upload-receipt'), {
           method: 'POST',
           body: formData,
           headers: {
             'Content-Type': 'multipart/form-data',
-            'Authorization': `Bearer ${token}` // Uncomment if using auth
+            'Authorization': `Bearer ${token}`,
           },
         });
         
