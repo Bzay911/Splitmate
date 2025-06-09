@@ -3,6 +3,8 @@ import { CameraType, CameraView, useCameraPermissions } from 'expo-camera';
 import React, { useEffect, useRef, useState } from 'react';
 import { ActivityIndicator, Alert, Animated, Button, Dimensions, Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { auth } from "../src/firebaseConfig";
+import { router, useLocalSearchParams } from "expo-router";
+import { useFinancial } from "@/contexts/FinancialContext";
 
 export default function CameraScreen() {
   const [permission, requestPermission] = useCameraPermissions();
@@ -14,10 +16,15 @@ export default function CameraScreen() {
   const scanAnim = useRef(new Animated.Value(0)).current;
   const [isUploading, setIsUploading] = useState(false);
   const [receiptData, setReceiptData] = useState(null);
+  const { refreshFinancialSummary } = useFinancial();
   
+  const {groupId} = useLocalSearchParams<{groupId: string}>();
+
+  console.log(`groupId from camera: ${groupId}`);
+
   // Get screen dimensions
   const screenHeight = Dimensions.get('window').height;
-  const frameHeight = 700; // Match your frame height
+  const frameHeight = 700; 
 
   useEffect(() => {
     requestPermission();
@@ -41,64 +48,102 @@ export default function CameraScreen() {
     );
   }
 
-  const captureAndUpload = async () => {
+  const capture = () => {
     if (ref.current) {
-      try {
-        // Take the picture
-        const captured = await ref.current.takePictureAsync();
+      ref.current.takePictureAsync().then((captured) => {
         setUri(captured.uri);
         setIsPreview(true);
         setIsScanning(false);
         scanAnim.stopAnimation();
+      });
+    }
+  }
 
-        // Create form data with the image
-        const formData = new FormData();
-        formData.append('receipt', {
-          uri: captured.uri,
-          type: 'image/jpeg',
-          name: 'receipt.jpg',
-        });
-        
-        // Set uploading state
-        setIsUploading(true);
-        
+  const handleAddExpense = async (amount: string, description: string, date: string) => {
+      try{
         const user = auth.currentUser;
         if(!user){
-          Alert.alert("Error", "Please login to upload a receipt");
+          Alert.alert("Error", "Please login to add an expense");
+          router.replace("/");
           return;
         }
         const token = await user.getIdToken();
+        const response = await fetch(
+            apiUrl(`api/expenses/groups/${groupId}/expenses`),
+            {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": `Bearer ${token}`,
+                },
+                body: JSON.stringify({
+                    amount: parseFloat(amount),
+                    description,
+                }),
+            }
+        )
 
-        // Upload to backend
-        const response = await fetch(apiUrl('api/auth/upload-receipt'), {
-          method: 'POST',
-          body: formData,
-          headers: {
-            'Content-Type': 'multipart/form-data',
-            'Authorization': `Bearer ${token}`,
-          },
-        });
-        
-        if (!response.ok) {
-          throw new Error(`Server error: ${response.status}`);
+        if(!response.ok){
+          throw new Error(`Failed to add expense (${response.status})`);
         }
+        Alert.alert("Success", "Expense added successfully");
+        router.back();
         
-        const result = await response.json();
-        
-        if (result.success) {
-          console.log('Receipt data:', result.data);
-          setReceiptData(result.data);
-          Alert.alert('Success', 'Receipt scanned successfully!');
-        } else {
-          throw new Error(result.error || 'Failed to process receipt');
-        }
-        
-      } catch (error) {
-        console.error('Error capturing/uploading receipt:', error);
-        Alert.alert('Error', 'Failed to process receipt. Please try again.');
-      } finally {
-        setIsUploading(false);
+        // Immediately refresh the financial summary
+        await refreshFinancialSummary();
+      }catch(error){
+        console.error("Error adding expense:", error);
+        Alert.alert("Error", "Failed to add expense");
       }
+  };
+
+  const upload = async() => {
+    if(!uri){
+      Alert.alert("Error", "Please scan a receipt first");
+      return;
+    }
+    try{
+      const formData = new FormData();
+      formData.append('receipt', {
+        uri: uri,
+        type: 'image/jpeg',
+        name: 'receipt.jpg',
+      });
+      setIsUploading(true);
+  
+      const user = auth.currentUser;
+      if(!user){
+        Alert.alert("Error", "Please login to upload a receipt");
+        return;
+      }
+      const token = await user.getIdToken();
+  
+      const response = await fetch(apiUrl(`api/expenses/groups/${groupId}/scan-receipt`), {
+        method: 'POST',
+        body: formData,
+        headers: {
+          'Content-Type': 'multipart/form-data',
+          'Authorization': `Bearer ${token}`,
+        }
+      });
+  
+      if (!response.ok) {
+        throw new Error(`Server error: ${response.status}`);
+      }
+  
+      const result = await response.json();
+      if (result.success) {
+        console.log('Receipt data:', result.data);
+        setReceiptData(result.data);
+        Alert.alert('Success', 'Receipt scanned successfully!');
+      } else {
+        throw new Error(result.error || 'Failed to process receipt');
+      } 
+    } catch (error) {
+      console.error('Error capturing/uploading receipt:', error);
+      Alert.alert('Error', 'Failed to process receipt. Please try again.');
+    } finally {
+      setIsUploading(false);
     }
   }
 
@@ -122,7 +167,7 @@ export default function CameraScreen() {
 
     // Simulate scan delay, then take picture
     setTimeout(() => {
-      captureAndUpload();
+       capture();
     }, 2000);
   };
 
@@ -179,35 +224,38 @@ export default function CameraScreen() {
           <Image source={{ uri: uri }} style={styles.preview} />
           
           {receiptData ? (
+      
             <View style={styles.receiptDataContainer}>
-              <Text style={styles.receiptTitle}>Receipt Details</Text>
-              <Text style={styles.receiptText}>Merchant: {receiptData.merchant}</Text>
-              <Text style={styles.receiptText}>Date: {receiptData.date}</Text>
-              <Text style={styles.receiptText}>Total: ${receiptData.total.toFixed(2)}</Text>
               
-              {receiptData.items && (
-                <>
-                  <Text style={styles.receiptSubtitle}>Items:</Text>
-                  {receiptData.items.map((item, index) => (
-                    <Text key={index} style={styles.receiptItemText}>
-                      {item.name}: ${item.price.toFixed(2)}
-                    </Text>
-                  ))}
-                </>
-              )}
+              <Text style={styles.receiptTitle}>Receipt Details</Text>
+              <Text style={styles.receiptText}>Description: {receiptData.description}</Text>
+              <Text style={styles.receiptText}>Date of purchase: {receiptData.date}</Text>
+              <Text style={styles.receiptText}>Total amount: ${receiptData.total.toFixed(2)}</Text>
+              <View style={styles.buttonContainer}>
+                <TouchableOpacity style={styles.scanAgainButton} onPress={retakePhoto}>
+                  <Text style={styles.buttonText}>Scan Again</Text>
+                </TouchableOpacity>
+                <TouchableOpacity style={styles.useButton} onPress={() => handleAddExpense(receiptData?.total, receiptData?.description, receiptData?.date)}>
+                  <Text style={styles.buttonText}>Add Expense</Text>
+                </TouchableOpacity>
+
+              </View>
             </View>
+            
           ) : (
             <View style={styles.buttonRow}>
               <TouchableOpacity onPress={retakePhoto} style={styles.retakeButton}>
-                <Text>Retake</Text>
+                <Text style={styles.retakeText}>Retake</Text>
               </TouchableOpacity>
               {isUploading ? (
-                <View style={[styles.useButton, styles.disabledButton]}>
-                  <ActivityIndicator color="#fff" size="small" />
+                <View style={styles.proceedButton}>
+                  <ActivityIndicator size="small" color="#fff" />
                 </View>
               ) : (
-                <TouchableOpacity style={styles.useButton} disabled={true}>
-                  <Text style={styles.buttonText}>Processing...</Text>
+                <TouchableOpacity 
+                onPress={() => upload()} 
+                style={styles.proceedButton}>
+                  <Text style={styles.proceedText}>Proceed</Text>
                 </TouchableOpacity>
               )}
             </View>
@@ -294,6 +342,12 @@ const styles = StyleSheet.create({
     backgroundColor: "#000",
     width: '100%'
   },
+  buttonContainer: {
+    flexDirection: "row",
+    justifyContent: "space-around",
+    padding: 20,
+    width: '100%'
+  },
   retakeButton: {
     backgroundColor: "#eee",
     padding: 15,
@@ -303,6 +357,29 @@ const styles = StyleSheet.create({
     backgroundColor: "#4caf50",
     padding: 15,
     borderRadius: 8,
+    marginTop: 20,
+  },
+  proceedButton: {
+    backgroundColor: "#4caf50",
+    padding: 15,
+    borderRadius: 8,
+  },
+  proceedText: {
+    fontSize: 16,
+    color: "#fff",
+    fontWeight: "bold",
+  },
+  retakeText: {
+    fontSize: 16,
+    color: "#000",
+    fontWeight: "bold",
+  },
+  scanAgainButton: {
+    backgroundColor: "red",
+    padding: 15,
+    borderRadius: 8,
+    marginTop: 20,
+    alignItems: "center",
   },
   text: {
     color: 'black',

@@ -81,7 +81,7 @@ export default function RootLayout() {
               options={{
                 headerShown: true,
                 title: "Add Expense",
-                headerBackVisible: false,
+                // headerBackVisible: false,
               }}
             />
           </Stack>

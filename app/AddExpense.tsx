@@ -11,9 +11,9 @@ const AddExpense = () => {
   const [description, setDescription] = useState('');
   const { groupId } = useLocalSearchParams();
   const { refreshFinancialSummary } = useFinancial();
-
-  const handleAddExpense = async () => {
+  console.log(`groupId from expense: ${groupId}`);
   
+  const handleAddExpense = async () => {
     if (!amount.trim()) {
         Alert.alert("Error", "Please enter a bill amount");
         return;

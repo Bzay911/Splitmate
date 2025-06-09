@@ -6,13 +6,13 @@ import { router, useLocalSearchParams } from "expo-router";
 import { onAuthStateChanged, User } from "firebase/auth";
 import React, { useEffect, useState } from "react";
 import {
-    Image,
-    SafeAreaView,
-    ScrollView,
-    StyleSheet,
-    Text,
-    TouchableOpacity,
-    View,
+  Image,
+  SafeAreaView,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
 } from "react-native";
 import { FloatingAction } from "react-native-floating-action";
 
@@ -245,16 +245,25 @@ const getIndividualExpense = (member: GroupMember) => {
 
     return settlements;
   };
-    
-  const nonAdminMembers = groupDetails.members.filter(member => 
-    member.email !== groupDetails?.createdBy.email
-  );
-  const adminExpense = getIndividualExpense(groupDetails.createdBy);
+
+  const actions = [
+    {
+      text: "Scan Receipt",
+      icon: <Ionicons name="scan-outline" size={24} color="white" />,
+      name: "scanreceipt",
+      position: 1,
+    },
+    {
+      text: "Add Expense Manually",
+      icon: <Ionicons name="add" size={24} color="white" />,
+      name: "addexpense",
+      position: 2,
+    }
+  ]
 
   const renderSettlements = () => {
     const settlements = whoNeedsToPayWhom();
     if (settlements.length === 0) return null;
-
     return (
       <View>
         {settlements.map((settlement, index) => (
@@ -275,6 +284,7 @@ const getIndividualExpense = (member: GroupMember) => {
   };
 
   return (
+    
     <SafeAreaView style={styles.container}>
       <ScrollView
         style={styles.scrollView}
@@ -353,7 +363,6 @@ const getIndividualExpense = (member: GroupMember) => {
         <Text style={styles.sectionTitle}>Expenses</Text>
 
         {expenses.map((expense) => (
-          // console.log("Expense key check:", expense._id),
           <View key={expense._id} style={styles.expensesContainer}>
             <View style={styles.expenseIcon}>
               <Ionicons name="cart" size={24} color="black" />
@@ -377,15 +386,25 @@ const getIndividualExpense = (member: GroupMember) => {
       </ScrollView>
 
       <FloatingAction
+        actions={actions}
         color="#007AFF"
         floatingIcon={<Ionicons name="add" size={24} color="white" />}
-        onPressMain={() => {
-          router.push({
-            pathname: "/AddExpense",
-            params: {
-              groupId: groupDetails._id,
-            },
-          });
+        onPressItem={name => {
+          if (name === "scanreceipt") {
+            router.push({
+              pathname: "/Camera",
+              params: {
+                groupId: groupDetails._id,
+              },
+            })
+          } else if (name === "addexpense") {
+            router.push({
+              pathname: "/AddExpense",
+              params: {
+                groupId: groupDetails._id,
+              },
+            })
+          }
         }}
         showBackground={false}
         position="right"
