@@ -4,14 +4,16 @@ import { router } from "expo-router";
 import { createUserWithEmailAndPassword, updateProfile } from "firebase/auth";
 import React from "react";
 import {
-    KeyboardAvoidingView,
-    Platform,
-    Pressable,
-    StyleSheet,
-    Text,
-    TextInput,
-    TextInputProps,
-    View
+  Keyboard,
+  KeyboardAvoidingView,
+  Platform,
+  Pressable,
+  StyleSheet,
+  Text,
+  TextInput,
+  TextInputProps,
+  TouchableWithoutFeedback,
+  View
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { apiUrl } from "../constants/ApiConfig";
@@ -37,7 +39,7 @@ const handleSignUp = async (email: string, password: string, fullName: string) =
     });
 
     // 3. Create user in backend
-    const response = await fetch(apiUrl('api/users'), {
+    const response = await fetch(apiUrl('api/auth/'), {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -190,110 +192,112 @@ export default function SignUp() {
           </Text>
         </View>
 
-        <View style={styles.form}>
-          <InputField
-            label="Full Name"
-            icon="person-outline"
-            value={fullName}
-            onChangeText={setFullName}
-            placeholder="Enter your full name"
-            autoCapitalize="words"
-            autoComplete="name"
-            textContentType="name"
-            returnKeyType="next"
-          />
+        <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
+          <View style={styles.form}>
+            <InputField
+              label="Full Name"
+              icon="person-outline"
+              value={fullName}
+              onChangeText={setFullName}
+              placeholder="Enter your full name"
+              autoCapitalize="words"
+              autoComplete="name"
+              textContentType="name"
+              returnKeyType="next"
+            />
 
-          <InputField
-            label="Email"
-            icon="mail-outline"
-            value={email}
-            onChangeText={setEmail}
-            placeholder="Enter your email"
-            keyboardType="email-address"
-            autoCapitalize="none"
-            autoComplete="email"
-            textContentType="emailAddress"
-            returnKeyType="next"
-          />
+            <InputField
+              label="Email"
+              icon="mail-outline"
+              value={email}
+              onChangeText={setEmail}
+              placeholder="Enter your email"
+              keyboardType="email-address"
+              autoCapitalize="none"
+              autoComplete="email"
+              textContentType="emailAddress"
+              returnKeyType="next"
+            />
 
-          <InputField
-            label="Password"
-            icon="lock-outline"
-            value={password}
-            onChangeText={setPassword}
-            placeholder="Create a password"
-            secureTextEntry
-            autoCapitalize="none"
-            autoComplete="password-new"
-            textContentType="newPassword"
-            returnKeyType="next"
-          />
+            <InputField
+              label="Password"
+              icon="lock-outline"
+              value={password}
+              onChangeText={setPassword}
+              placeholder="Create a password"
+              secureTextEntry
+              autoCapitalize="none"
+              autoComplete="password-new"
+              textContentType="newPassword"
+              returnKeyType="next"
+            />
 
-          <InputField
-            label="Confirm Password"
-            icon="lock-outline"
-            value={confirmPassword}
-            onChangeText={setConfirmPassword}
-            placeholder="Confirm your password"
-            secureTextEntry
-            autoCapitalize="none"
-            autoComplete="password-new"
-            textContentType="newPassword"
-            returnKeyType="done"
-          />
+            <InputField
+              label="Confirm Password"
+              icon="lock-outline"
+              value={confirmPassword}
+              onChangeText={setConfirmPassword}
+              placeholder="Confirm your password"
+              secureTextEntry
+              autoCapitalize="none"
+              autoComplete="password-new"
+              textContentType="newPassword"
+              returnKeyType="done"
+            />
 
-          <View style={styles.termsContainer}>
-            <Pressable
-              onPress={() => setAgreedToTerms(!agreedToTerms)}
-              accessibilityRole="checkbox"
-              accessibilityState={{ checked: agreedToTerms }}
-              style={[styles.checkbox, agreedToTerms && styles.checkboxChecked]}
-            >
-              {agreedToTerms && <MaterialIcons name="check" size={16} color="#fff" />}
-            </Pressable>
-            <Text style={styles.termsText}>
-              I agree to the{" "}
-              <Text style={styles.termsLink}>
-                Terms of Service
+            <View style={styles.termsContainer}>
+              <Pressable
+                onPress={() => setAgreedToTerms(!agreedToTerms)}
+                accessibilityRole="checkbox"
+                accessibilityState={{ checked: agreedToTerms }}
+                style={[styles.checkbox, agreedToTerms && styles.checkboxChecked]}
+              >
+                {agreedToTerms && <MaterialIcons name="check" size={16} color="#fff" />}
+              </Pressable>
+              <Text style={styles.termsText}>
+                I agree to the{" "}
+                <Text style={styles.termsLink}>
+                  Terms of Service
+                </Text>
+                {" "}and{" "}
+                <Text style={styles.termsLink}>
+                  Privacy Policy
+                </Text>
               </Text>
-              {" "}and{" "}
-              <Text style={styles.termsLink}>
-                Privacy Policy
+            </View>
+
+            <Pressable
+              style={[
+                styles.createAccountButton,
+                (!agreedToTerms || isLoading) && styles.createAccountButtonDisabled,
+              ]}
+              accessibilityRole="button"
+              onPress={handleSubmit}
+              disabled={!agreedToTerms || isLoading}
+            >
+              <LinearGradient
+                colors={agreedToTerms ? ["#2563eb", "#1d4ed8"] : ["#93c5fd", "#60a5fa"]}
+                start={{ x: 0, y: 0 }}
+                end={{ x: 1, y: 1 }}
+                style={styles.gradient}
+              >
+                <Text style={styles.createAccountButtonText}>
+                  {isLoading ? "Creating Account..." : "Create Account"}
+                </Text>
+              </LinearGradient>
+            </Pressable>
+
+            <Text style={styles.signInText}>
+              Already have an account?{" "}
+              <Text 
+                style={styles.termsLink}
+                onPress={() => router.push("/")}
+              >
+                Login
               </Text>
             </Text>
           </View>
-
-          <Pressable
-            style={[
-              styles.createAccountButton,
-              (!agreedToTerms || isLoading) && styles.createAccountButtonDisabled,
-            ]}
-            accessibilityRole="button"
-            onPress={handleSubmit}
-            disabled={!agreedToTerms || isLoading}
-          >
-            <LinearGradient
-              colors={agreedToTerms ? ["#2563eb", "#1d4ed8"] : ["#93c5fd", "#60a5fa"]}
-              start={{ x: 0, y: 0 }}
-              end={{ x: 1, y: 1 }}
-              style={styles.gradient}
-            >
-              <Text style={styles.createAccountButtonText}>
-                {isLoading ? "Creating Account..." : "Create Account"}
-              </Text>
-            </LinearGradient>
-          </Pressable>
-
-          <Text style={styles.signInText}>
-            Already have an account?{" "}
-            <Text 
-              style={styles.termsLink}
-              onPress={() => router.push("/")}
-            >
-              Login
-            </Text>
-          </Text>
-        </View>
+        </TouchableWithoutFeedback>
       </KeyboardAvoidingView>
     </SafeAreaView>
   );

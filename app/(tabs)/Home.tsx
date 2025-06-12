@@ -1,12 +1,11 @@
 import { apiUrl } from "@/constants/ApiConfig";
+import { useAuth } from "@/contexts/AuthContext";
 import { useFinancial } from "@/contexts/FinancialContext";
 import GroupsContext from "@/contexts/GroupsContext";
-import { auth } from "@/src/firebaseConfig";
 import { Ionicons } from "@expo/vector-icons";
 import { CameraType, useCameraPermissions } from 'expo-camera';
 import { LinearGradient } from "expo-linear-gradient";
 import { router } from "expo-router";
-import { onAuthStateChanged, User } from "firebase/auth";
 import { useContext, useEffect, useState } from "react";
 import {
     FlatList,
@@ -19,25 +18,18 @@ import {
 
 export default function HomeScreen() {
   const { financialSummary, refreshFinancialSummary } = useFinancial();
-  const [user, setUser] = useState<User | null>(null);
+  const { user } = useAuth();
   const { groups, refreshGroups } = useContext(GroupsContext);
   const [splitmates, setSplitmates] = useState([]);
   const [permission, requestPermission] = useCameraPermissions();
   const [facing, setFacing] = useState<CameraType>('back');
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (user) => {
-      if (user) {
-        setUser(user);
-        refreshFinancialSummary();
-      } else {
-        setUser(null);
-        router.push("/");
-      }
-    });
-    refreshGroups();
-    return () => unsubscribe();
-  }, [refreshFinancialSummary, refreshGroups]);
+    if (user) {
+      refreshFinancialSummary();
+      refreshGroups();
+    }
+  }, [user, refreshFinancialSummary, refreshGroups]);
 
   useEffect(() => {
     const fetchSplitmates = async () =>{

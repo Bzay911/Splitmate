@@ -308,7 +308,7 @@ const getIndividualExpense = (member: GroupMember) => {
         >
           <View>
             <Text style={styles.billTitle}>Total Expense</Text>
-            <Text style={styles.billAmount}>${groupDetails.totalExpense}</Text>
+            <Text style={styles.billAmount}>${(groupDetails.totalExpense).toFixed(2)}</Text>
           </View>
 
           <View style={styles.verticalLine} />

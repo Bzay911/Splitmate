@@ -52,9 +52,6 @@ const handleSignin = async (email: string, password: string) => {
       
       clearTimeout(timeoutId);
       
-      // console.log("responseStatus", response.status);
-      // const responseText = await response.text();
-      // console.log("responseText", responseText);
       const data = await response.json();
 
       if (response.status === 404) {
@@ -67,14 +64,10 @@ const handleSignin = async (email: string, password: string) => {
         throw new Error(data.error || 'Failed to sign in');
       }
 
-      // console.log("User signed in successfully", userCredential.user);
       router.push("/Home"); 
       return userCredential.user;
     } catch (error) {
       console.log("error", error);
-      // if (error.name === 'AbortError') {
-      //   // throw new Error('Login request timed out. Please check your internet connection and try again.');
-      // }
       throw error;
     }
 
@@ -272,7 +265,6 @@ export function LoginScreen() {
           <Pressable
             style={styles.googleButton}
             accessibilityRole="button"
-            onPress={() => router.push("/Home")}
           >
             <FontAwesome name="google" size={20} color="#18181b" />
             <Text style={styles.googleText}>Continue with Google</Text>
@@ -292,6 +284,8 @@ export function LoginScreen() {
     </SafeAreaView>
   );
 }
+
+export default LoginScreen;
 
 const styles = StyleSheet.create({
   safeArea: {
@@ -453,5 +447,3 @@ const styles = StyleSheet.create({
     backgroundColor: "#93c5fd", // Lighter blue
   },
 });
-
-export default LoginScreen; 

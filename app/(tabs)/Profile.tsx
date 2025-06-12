@@ -9,17 +9,17 @@ const Profile = () => {
   const router = useRouter();
   const [user, setUser] = useState<User | null>(null);
 
-  useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (user) => {
-      if (user) {
-        setUser(user);
-      } else {
-        setUser(null);
-        router.push("/");
-      }
-    });
-    return () => unsubscribe();
-  }, []);
+  // useEffect(() => {
+  //   const unsubscribe = onAuthStateChanged(auth, (user) => {
+  //     if (user) {
+  //       setUser(user);
+  //     } else {
+  //       setUser(null);
+  //       router.push("/");
+  //     }
+  //   });
+  //   return () => unsubscribe();
+  // }, []);
 
   const handleSignOut = async () => {
     try {
