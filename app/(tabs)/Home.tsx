@@ -176,7 +176,7 @@ export default function HomeScreen() {
           <Text style={styles.eachTitle}>Recent Groups</Text>
           <Text>see all</Text>
         </View>
-          {groups.map((item) => (
+          {groups.slice(0, 3).map((item) => (
             <TouchableOpacity key={item._id} onPress={() => handleGroupPress(item)}>
     <View key={item._id} style={styles.renderRecentGroupSection}>
       <Image style={styles.groupImage} source={{ uri: item.image }} />
