@@ -59,7 +59,7 @@ const Groups = () => {
         <Image style={styles.groupImage} source={{ uri: item.image }} />
         <View style={styles.groupDetails}>
           <Text style={styles.groupName}>{item.name}</Text>
-          <Text>Total Expense: ${item.totalExpense}</Text>
+          <Text>Total Expense: ${item.totalExpense.toFixed(2)}</Text>
         </View>
       </TouchableOpacity>
     );

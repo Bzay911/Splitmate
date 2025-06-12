@@ -3,26 +3,39 @@ import { useAuth } from "@/contexts/AuthContext";
 import { useFinancial } from "@/contexts/FinancialContext";
 import GroupsContext from "@/contexts/GroupsContext";
 import { Ionicons } from "@expo/vector-icons";
-import { CameraType, useCameraPermissions } from 'expo-camera';
 import { LinearGradient } from "expo-linear-gradient";
 import { router } from "expo-router";
 import { useContext, useEffect, useState } from "react";
 import {
-    FlatList,
-    Image,
-    SafeAreaView,
-    StyleSheet,
-    Text,
-    View
+  FlatList,
+  Image,
+  SafeAreaView,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View
 } from "react-native";
+
+// Add these interfaces
+interface Splitmate {
+  id: string;
+  name: string;
+  image: any;
+}
+
+interface Group {
+  _id: string;
+  name: string;
+  image: string;
+  totalExpense: number;
+}
 
 export default function HomeScreen() {
   const { financialSummary, refreshFinancialSummary } = useFinancial();
   const { user } = useAuth();
   const { groups, refreshGroups } = useContext(GroupsContext);
-  const [splitmates, setSplitmates] = useState([]);
-  const [permission, requestPermission] = useCameraPermissions();
-  const [facing, setFacing] = useState<CameraType>('back');
+  const [splitmates, setSplitmates] = useState<Splitmate[]>([]);
 
   useEffect(() => {
     if (user) {
@@ -50,7 +63,7 @@ export default function HomeScreen() {
         const data = await response.json();
         if (data.splitmates && data.splitmates.length > 0) {
           // Transform the data to match your component's needs
-          const formattedSplitmates = data.splitmates.map(splitmate => ({
+          const formattedSplitmates = data.splitmates.map((splitmate: any) => ({
             id: splitmate.id,
             name: splitmate.name,
             image: require('../../assets/images/dummyProfile.png') // Use default image for now
@@ -64,7 +77,7 @@ export default function HomeScreen() {
     fetchSplitmates();
   }, [user]);
 
-  const renderSplitmate = ({ item }) => {
+  const renderSplitmate = ({ item }: { item: Splitmate }) => {
     return (
       <View>
         <Image style={styles.splitmateImage} source={item.image} />
@@ -76,32 +89,27 @@ export default function HomeScreen() {
     );
   };
 
-  const renderRecentGroup = ({ item }) => {
-    return (
-      <View style={styles.renderRecentGroupSection}>
-        <Image style={styles.groupImage} source={{ uri: item.image }} />
-        <View style={styles.groupDetails}>
-          <Text style={styles.groupName}> {item.name}</Text>
-          <Text>Total Expense: ${item.totalExpense}</Text>
-        </View>
-      </View>
-    );
+  const handleGroupPress = (group: Group) => {
+    router.push({
+      pathname: "/GroupDetails",
+      params: {
+        groupId: group._id,
+        groupName: group.name,
+        totalExpense: group.totalExpense,
+        image: group.image,
+      },
+    });
   };
-
-  const handleScanClick = () => {
-    console.log("scan clicked");
-    router.push("/Camera");
-  }
 
   return (
     <SafeAreaView style={styles.mainContainer}>
+      <ScrollView style={styles.scrollView}>
       {/* Topbar */}
       <View style={styles.topBar}>
         <Text style={styles.title}>Home</Text>
 
         <View style={styles.rightTop}>
-          <Ionicons size={28} name="scan" style={styles.iconSpacing} onPress={handleScanClick}/>
-          <Ionicons size={28} name="notifications" />
+          <Ionicons size={28} name="menu" />
         </View>
       </View>
 
@@ -168,16 +176,19 @@ export default function HomeScreen() {
           <Text style={styles.eachTitle}>Recent Groups</Text>
           <Text>see all</Text>
         </View>
-        <FlatList
-          data={groups}
-          renderItem={renderRecentGroup}
-          keyExtractor={(item) => item._id}
-          contentContainerStyle={styles.recentGroupList}
-          showsVerticalScrollIndicator={false}
-          initialNumToRender={5}
-        />
+          {groups.map((item) => (
+            <TouchableOpacity key={item._id} onPress={() => handleGroupPress(item)}>
+    <View key={item._id} style={styles.renderRecentGroupSection}>
+      <Image style={styles.groupImage} source={{ uri: item.image }} />
+      <View style={styles.groupDetails}>
+        <Text style={styles.groupName}>{item.name}</Text>
+        <Text>Total Expense: ${item.totalExpense.toFixed(2)}</Text>
       </View>
-      {/* </ScrollView> */}
+    </View>
+    </TouchableOpacity>
+  ))}
+      </View>
+      </ScrollView>
     </SafeAreaView>
   );
 }
@@ -247,7 +258,6 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
   expenseSection: {
-    // backgroundColor: "#D5D5D5",
     height: 100,
     flex: 1,
     borderRadius: 8,
@@ -279,12 +289,11 @@ const styles = StyleSheet.create({
     marginTop: 4,
   },
   recentGroupSection: {
-    height: 250,
     width: "100%",
-    // borderWidth: 2,
     borderRadius: 8,
     marginTop: 24,
     padding: 12,
+    paddingBottom: 30,
   },
   renderRecentGroupSection: {
     flexDirection: "row",
@@ -293,6 +302,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#D9D9D9",
     padding: 12,
     borderRadius: 8,
+    marginTop: 12,
   },
   groupImage: {
     width: 60,
