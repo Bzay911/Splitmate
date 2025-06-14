@@ -79,6 +79,19 @@ export const userController = {
     }
   },
 
+  // Update user profile
+  async updateProfile(req, res) {
+    try {
+      const { displayName, profilePicture } = req.body;
+      console.log(displayName, profilePicture);
+      const user = await User.findByIdAndUpdate(req.user._id, { displayName, profilePicture }, { new: true });
+      res.json({ user });
+    } catch (error) {
+      console.error("Error updating profile:", error);
+      res.status(500).json({ error: "Failed to update profile" });
+    }
+  },
+
   // Login check
   async checkLogin(req, res) {
     try {

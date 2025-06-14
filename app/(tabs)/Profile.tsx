@@ -2,32 +2,23 @@ import { MaterialIcons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import React, { useEffect, useState } from 'react';
 import { SafeAreaView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
-import { auth } from '../../src/firebaseConfig';
-import { onAuthStateChanged, User } from "firebase/auth";
+import { useAuth } from '@/contexts/AuthContext';
 
 const Profile = () => {
   const router = useRouter();
-  const [user, setUser] = useState<User | null>(null);
-
-  // useEffect(() => {
-  //   const unsubscribe = onAuthStateChanged(auth, (user) => {
-  //     if (user) {
-  //       setUser(user);
-  //     } else {
-  //       setUser(null);
-  //       router.push("/");
-  //     }
-  //   });
-  //   return () => unsubscribe();
-  // }, []);
+  const { user, logout } = useAuth();
 
   const handleSignOut = async () => {
     try {
-      await auth.signOut();
+      await logout();
       router.replace('/');
     } catch (error) {
       console.error('Error signing out:', error);
     }
+  };
+
+  const handleEditProfile = () => {
+    router.push('/EditProfile');
   };
 
   return (
@@ -47,7 +38,7 @@ const Profile = () => {
             <Text style={styles.userEmail} numberOfLines={1}>{user?.email || 'No email'}</Text>
           </View>
         </View>
-        <TouchableOpacity style={styles.editButton}>
+        <TouchableOpacity style={styles.editButton} onPress={handleEditProfile}>
           <Text style={styles.editButtonText}>Edit</Text>
         </TouchableOpacity>
       </View>
