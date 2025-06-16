@@ -2,6 +2,7 @@ import { apiUrl } from "@/constants/ApiConfig";
 import { useAuth } from "@/contexts/AuthContext";
 import { useFinancial } from "@/contexts/FinancialContext";
 import GroupsContext from "@/contexts/GroupsContext";
+import { auth } from "@/src/firebaseConfig";
 import { Ionicons } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
 import { router } from "expo-router";
@@ -45,16 +46,22 @@ export default function HomeScreen() {
   }, [user, refreshFinancialSummary, refreshGroups]);
 
   useEffect(() => {
-    const fetchSplitmates = async () =>{
+    const fetchSplitmates = async () => {
       if (!user) return;
-      try{
-        const token = await user.getIdToken();
+      
+      try {
+        const currentUser = auth.currentUser;
+        if (!currentUser) {
+          throw new Error('No authenticated user found');
+        }
+        
+        const token = await currentUser.getIdToken();
         const response = await fetch(apiUrl(`api/auth/splitmates`), {
           method: 'GET',
           headers: {
             'Authorization': `Bearer ${token}`
           }
-        })
+        });
 
         if (!response.ok) {
           throw new Error(`Failed to fetch splitmates (${response.status})`);
@@ -62,19 +69,24 @@ export default function HomeScreen() {
 
         const data = await response.json();
         if (data.splitmates && data.splitmates.length > 0) {
-          // Transform the data to match your component's needs
           const formattedSplitmates = data.splitmates.map((splitmate: any) => ({
             id: splitmate.id,
             name: splitmate.name,
-            image: require('../../assets/images/dummyProfile.png') // Use default image for now
+            image: require('../../assets/images/dummyProfile.png')
           }));
           setSplitmates(formattedSplitmates);
+        } else {
+          setSplitmates([]); // Set empty array if no splitmates
         }
       } catch (error) {
         console.error("Error fetching splitmates:", error);
+        setSplitmates([]); // Set empty array on error
       }
+    };
+
+    if (user) {
+      fetchSplitmates();
     }
-    fetchSplitmates();
   }, [user]);
 
   const renderSplitmate = ({ item }: { item: Splitmate }) => {
@@ -178,15 +190,15 @@ export default function HomeScreen() {
         </View>
           {groups.slice(0, 3).map((item) => (
             <TouchableOpacity key={item._id} onPress={() => handleGroupPress(item)}>
-    <View key={item._id} style={styles.renderRecentGroupSection}>
-      <Image style={styles.groupImage} source={{ uri: item.image }} />
-      <View style={styles.groupDetails}>
-        <Text style={styles.groupName}>{item.name}</Text>
-        <Text>Total Expense: ${item.totalExpense.toFixed(2)}</Text>
-      </View>
-    </View>
-    </TouchableOpacity>
-  ))}
+              <View style={styles.renderRecentGroupSection}>
+                <Image style={styles.groupImage} source={{ uri: item.image }} />
+                <View style={styles.groupDetails}>
+                  <Text style={styles.groupName}>{item.name}</Text>
+                  <Text style={styles.totalExpense}>Total Expense: ${item.totalExpense.toFixed(2)}</Text>
+                </View>
+              </View>
+            </TouchableOpacity>
+          ))}
       </View>
       </ScrollView>
     </SafeAreaView>
@@ -290,35 +302,35 @@ const styles = StyleSheet.create({
   },
   recentGroupSection: {
     width: "100%",
-    borderRadius: 8,
     marginTop: 24,
-    padding: 12,
+    paddingHorizontal: 24,
     paddingBottom: 30,
   },
   renderRecentGroupSection: {
     flexDirection: "row",
     alignItems: "center",
-    gap: 12,
-    backgroundColor: "#D9D9D9",
-    padding: 12,
-    borderRadius: 8,
-    marginTop: 12,
+    gap: 18,
+    paddingVertical: 16,
+    borderBottomWidth: 1,
+    borderBottomColor: '#e2e8f0',
   },
   groupImage: {
-    width: 60,
-    height: 60,
-    padding: 8,
-  },
-  recentGroupList: {
-    padding: 12,
-    gap: 12,
+    width: 50,
+    height: 50,
+    borderRadius: 25,
   },
   groupDetails: {
-    gap: 12,
+    flex: 1,
   },
   groupName: {
-    fontWeight: "600",
     fontSize: 16,
+    color: '#1e293b',
+    marginBottom: 4,
+    fontWeight: "500",
+  },
+  totalExpense: {
+    fontSize: 14,
+    color: '#64748b',
   },
   eachTitle: {
     fontWeight: "600",

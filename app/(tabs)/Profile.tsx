@@ -1,7 +1,7 @@
 import { MaterialIcons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import React, { useEffect, useState } from 'react';
-import { SafeAreaView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { SafeAreaView, StyleSheet, Text, TouchableOpacity, View, Image } from 'react-native';
 import { useAuth } from '@/contexts/AuthContext';
 
 const Profile = () => {
@@ -31,7 +31,7 @@ const Profile = () => {
       <View style={styles.profileSection}>
         <View style={styles.avatarContainer}>
           <View style={styles.avatar}>
-            <MaterialIcons name="person" size={40} color="#94a3b8" />
+            <Image source={{ uri: user?.photoURL || '' }} style={styles.avatarImage} />
           </View>
           <View style={styles.userInfo}>
             <Text style={styles.userName} numberOfLines={1}>{user?.displayName || 'User'}</Text>
@@ -80,6 +80,11 @@ const styles = StyleSheet.create({
     fontWeight: '700',
     color: '#1e293b',
     marginBottom: 8,
+  },
+  avatarImage: {
+    width: 80,
+    height: 80,
+    borderRadius: 40,
   },
   subtitle: {
     fontSize: 16,

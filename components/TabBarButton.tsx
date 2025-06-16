@@ -14,8 +14,8 @@ const iconMapping = {
     filled: 'people'
   },
   History: {
-    outline: 'reload-outline',
-    filled: 'reload'
+    outline: 'document-text-outline',
+    filled: 'document-text'
   },
   Profile: {
     outline: 'person-outline',
@@ -55,7 +55,7 @@ const TabBarButton = (props: TabBarButtonProps) => {
   const renderIcon = () => {
     const iconType = isFocused ? 'filled' : 'outline';
     const iconName = iconMapping[routeName][iconType];
-    return <Ionicons name={iconName as any} size={26} color={color} />;
+    return <Ionicons name={iconName as any} size={28} color={color} />;
   }
 
   return (
@@ -63,7 +63,7 @@ const TabBarButton = (props: TabBarButtonProps) => {
         <Animated.View style={animatedStyle}>   
 
       {renderIcon()}
-      {label && <Text style={{color, fontSize: 12}}>{label}</Text>}
+      {label && <Text style={{color, fontSize: 10}}>{label}</Text>}
         </Animated.View>
     </Pressable>
   )
@@ -74,7 +74,7 @@ const styles = StyleSheet.create({
         flex: 1,
         justifyContent: 'center',
         alignItems: 'center',
-        gap: 4
+        gap: 12,
     }
 })
 

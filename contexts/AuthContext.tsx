@@ -1,5 +1,5 @@
 import { auth } from "@/src/firebaseConfig";
-import { onAuthStateChanged, signOut, User } from "firebase/auth";
+import { onAuthStateChanged, signOut, updateProfile, User } from "firebase/auth";
 import { createContext, ReactNode, useContext, useEffect, useState } from "react";
 
 // Define what data and functions our context will provide
@@ -8,6 +8,8 @@ type AuthContextType = {
   isLoading: boolean;
   isAuthenticated: boolean;
   logout: () => Promise<void>;
+  refreshUser: () => Promise<void>;
+  updateUserProfile: (displayName: string, photoURL: string) => Promise<void>;
 };
 
 // Create context with default values
@@ -16,6 +18,8 @@ const AuthContext = createContext<AuthContextType>({
   isLoading: true,
   isAuthenticated: false,
   logout: async () => {},
+  refreshUser: async () => {},
+  updateUserProfile: async () => {},
 });
 
 // Provider component that wraps your app and makes auth object available
@@ -43,12 +47,50 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   };
 
+  // Refresh user data
+  const refreshUser = async () => {
+    try {
+      const currentUser = auth.currentUser;
+      if (currentUser) {
+        await currentUser.reload();
+        setUser({ ...currentUser });
+      }
+    } catch (error) {
+      console.error("Error refreshing user:", error);
+    }
+  };
+
+  // Update user profile
+  const updateUserProfile = async (displayName: string, photoURL: string) => {
+    try {
+      const currentUser = auth.currentUser;
+      if (currentUser) {
+        // Update Firebase profile
+        await updateProfile(currentUser, {
+          displayName,
+          photoURL
+        });
+        
+        // Update local state without reloading
+        setUser({
+          ...currentUser,
+          displayName,
+          photoURL
+        });
+      }
+    } catch (error) {
+      console.error("Error updating user profile:", error);
+    }
+  };
+
   // Value to be provided to consuming components
   const value = {
     user,
     isLoading,
     isAuthenticated: !!user,
-    logout
+    logout,
+    refreshUser,
+    updateUserProfile
   };
 
   return (

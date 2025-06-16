@@ -1,11 +1,12 @@
+import { apiUrl } from "@/constants/ApiConfig";
+import { useAuth } from "@/contexts/AuthContext";
+import { auth } from "@/src/firebaseConfig";
 import { Ionicons } from '@expo/vector-icons';
 import * as ImagePicker from 'expo-image-picker';
+import { useRouter } from 'expo-router';
 import React, { useState } from 'react';
 import { ActivityIndicator, Alert, Image, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { apiUrl } from "@/constants/ApiConfig";
-import { useAuth } from "@/contexts/AuthContext";
-import { useRouter } from 'expo-router';
 
 const EditProfile = () => {
   const router = useRouter();
@@ -13,7 +14,7 @@ const EditProfile = () => {
   const [profileImage, setProfileImage] = useState('https://via.placeholder.com/150');
   const [isLoading, setIsLoading] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
-  const { user } = useAuth();
+  const { user, updateUserProfile } = useAuth();
 
   const pickImage = async () => {
     try {
@@ -50,35 +51,46 @@ const EditProfile = () => {
   };
 
   const handleSave = async () => {
-    console.log(displayName);
-    
-    const token = await user?.getIdToken();
-
     if (!displayName.trim()) {
       Alert.alert('Error', 'Please enter a display name');
       return;
     }
-    try{
-      const response = await fetch(apiUrl(`api/auth/profile`),
-    {
-      method: 'PUT',
-      headers: {
-        'Authorization': `Bearer ${token}`,
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({ displayName, profilePicture: profileImage })
-    })
-    if (!response.ok) {
-      throw new Error(`Failed to update profile (${response.status})`);
-    }
-    Alert.alert('Success', 'Profile updated successfully!');
-  } catch (error) {
-    Alert.alert('Error', 'Failed to save profile. Please try again.');
-  } finally {
-    setIsSaving(false);
-  }
 
-  router.back();
+    setIsSaving(true);
+    try {
+      // Get the current Firebase user
+      const currentUser = auth.currentUser;
+      if (!currentUser) {
+        throw new Error('No authenticated user found');
+      }
+  
+      // Get the ID token from the current user
+      const token = await currentUser.getIdToken();
+
+      // Update backend profile
+      const response = await fetch(apiUrl(`api/auth/profile`), {
+        method: 'PUT',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ displayName, profilePicture: profileImage })
+      });
+
+      if (!response.ok) {
+        throw new Error(`Failed to update profile (${response.status})`);
+      }
+
+      // Update only the profile data, not the entire user
+      await updateUserProfile(displayName, profileImage);
+      
+      Alert.alert('Success', 'Profile updated successfully!');
+      router.back();
+    } catch (error) {
+      Alert.alert('Error', 'Failed to save profile. Please try again.');
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   return (

@@ -7,7 +7,6 @@ import { useColorScheme } from '@/hooks/useColorScheme';
 import { Ionicons } from '@expo/vector-icons';
 
 export default function TabLayout() {
-  const colorScheme = useColorScheme();
 
   return (
     <Tabs
@@ -20,29 +19,25 @@ export default function TabLayout() {
       <Tabs.Screen
         name="Home"
         options={{
-          title: '',
-          tabBarIcon: ({ color }) => <IconSymbol size={32} name="house.fill" color={color} />,
+          title: 'Home',
         }}
       />
       <Tabs.Screen
         name="Groups"
         options={{
-          title: '',
-          tabBarIcon: ({ color }) => <Ionicons size={32} name="people" color={color} />,
+          title: 'Groups',
         }}
       />
       <Tabs.Screen
         name="History"
         options={{
-          title: '',
-          tabBarIcon: ({ color }) => <Ionicons size={32} name="reload" color={color}/>,
+          title: 'Activity',
         }}
       />
       <Tabs.Screen
         name="Profile"
         options={{
-          title: '',
-          tabBarIcon: ({ color }) => <Ionicons size={32} name="person" color={color}/>,
+          title: 'Profile',
         }}
       />
     </Tabs>

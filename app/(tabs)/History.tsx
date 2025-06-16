@@ -91,6 +91,7 @@ const History = () => {
 const styles = StyleSheet.create({
   safeAreaView: {
     flex: 1,
+    backgroundColor: 'white',
   },
   topSection: {
     flexDirection: "row",

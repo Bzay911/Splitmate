@@ -59,7 +59,7 @@ const Groups = () => {
         <Image style={styles.groupImage} source={{ uri: item.image }} />
         <View style={styles.groupDetails}>
           <Text style={styles.groupName}>{item.name}</Text>
-          <Text>Total Expense: ${item.totalExpense.toFixed(2)}</Text>
+          <Text style={styles.totalExpense}>Total Expense: ${item.totalExpense.toFixed(2)}</Text>
         </View>
       </TouchableOpacity>
     );
@@ -112,44 +112,37 @@ const Groups = () => {
 const styles = StyleSheet.create({
   safeAreaView: {
     flex: 1,
-  },
-  recentGroupSection: {
-    height: 250,
-    width: "100%",
-    borderWidth: 2,
-    borderRadius: 8,
-    marginTop: 24,
-    padding: 12,
+    backgroundColor: 'white',
   },
   renderRecentGroupSection: {
     flexDirection: "row",
     alignItems: "center",
-    gap: 12,
-    backgroundColor: '#F9FAFB',
-    padding: 12,
-    borderRadius: 12,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 3 },
-    shadowOpacity: 0.1,
-    shadowRadius: 6,
-    elevation: 5, 
+    gap: 18,
+    paddingVertical: 16,
+    borderBottomWidth: 1,
+    borderBottomColor: '#e2e8f0',
   },
   groupImage: {
-    width: 60,
-    height: 60,
-    padding: 8,
+    width: 50,
+    height: 50,
+    borderRadius: 25,
   },
   recentGroupList: {
-    padding: 12,
-    gap: 12,
-    paddingBottom: 26,
+    paddingHorizontal: 24,
+    paddingBottom: 24,
   },
   groupDetails: {
-    gap: 12,
+    flex: 1,
   },
   groupName: {
-    fontWeight: "600",
     fontSize: 16,
+    color: '#1e293b',
+    marginBottom: 4,
+    fontWeight: "500",
+  },
+  totalExpense: {
+    fontSize: 14,
+    color: '#64748b',
   },
   topSection: {
     flexDirection: "row",

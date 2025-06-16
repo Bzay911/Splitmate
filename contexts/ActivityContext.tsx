@@ -1,5 +1,6 @@
 import { apiUrl } from "@/constants/ApiConfig";
 import { useAuth } from "@/contexts/AuthContext";
+import { auth } from "@/src/firebaseConfig";
 import { createContext, ReactNode, useCallback, useContext, useEffect, useState } from "react";
 
 // Define types
@@ -51,10 +52,16 @@ export function ActivityProvider({ children }: { children: ReactNode }) {
       setError(null);
       
       if (!user) {
-        throw new Error("User not authenticated");
+        setActivities([]);
+        return;
       }
       
-      const token = await user.getIdToken();
+      const currentUser = auth.currentUser;
+      if (!currentUser) {
+        throw new Error('No authenticated user found');
+      }
+      
+      const token = await currentUser.getIdToken();
       const response = await fetch(apiUrl("api/auth/activity"), {
         method: "GET",
         headers: {
@@ -63,11 +70,16 @@ export function ActivityProvider({ children }: { children: ReactNode }) {
         },
       });
       
+      if (!response.ok) {
+        throw new Error(`Failed to fetch activities (${response.status})`);
+      }
+      
       const data = await response.json();
-      setActivities(data.activities);
+      setActivities(data.activities || []);
     } catch (error) {
       console.error("Error fetching activities:", error);
       setError(error instanceof Error ? error.message : "Failed to fetch activities");
+      setActivities([]);
     } finally {
       setIsLoading(false);
     }
@@ -76,8 +88,10 @@ export function ActivityProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     if (user) {
       refreshActivities();
+    } else {
+      setActivities([]);
     }
-  }, [ user]);
+  }, [user, refreshActivities]);
 
   return (
     <ActivityContext.Provider 
