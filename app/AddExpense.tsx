@@ -5,12 +5,14 @@ import { router, useLocalSearchParams } from 'expo-router';
 import React, { useState } from 'react';
 import { Alert, Keyboard, SafeAreaView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import { auth } from '../src/firebaseConfig';
+import { useActivity } from '@/contexts/ActivityContext';
 
 const AddExpense = () => {
   const [amount, setAmount] = useState('');
   const [description, setDescription] = useState('');
   const { groupId } = useLocalSearchParams();
   const { refreshFinancialSummary } = useFinancial();
+  const { refreshActivities } = useActivity();
   console.log(`groupId from expense: ${groupId}`);
   
   const handleAddExpense = async () => {
@@ -55,6 +57,7 @@ const AddExpense = () => {
         
         // Immediately refresh the financial summary
         await refreshFinancialSummary();
+        await refreshActivities();
       }catch(error){
         console.error("Error adding expense:", error);
         Alert.alert("Error", "Failed to add expense");

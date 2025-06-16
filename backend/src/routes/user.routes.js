@@ -14,5 +14,6 @@ router.get('/profile', userController.getProfile);
 router.get('/summary', userController.getFinancialSummary);
 router.get('/splitmates', userController.getSplitmates);
 router.put('/profile', userController.updateProfile);
+router.get('/activity', userController.getActivity);
 
 export default router;

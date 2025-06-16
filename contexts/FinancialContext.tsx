@@ -35,6 +35,10 @@ export function FinancialProvider({ children }:{ children: ReactNode }) {
 
   const refreshFinancialSummary = useCallback(async () => {
     try {
+      if (!auth.currentUser) {
+        throw new Error("User not authenticated");
+      }
+      
       setIsLoading(true);
       const token = await auth.currentUser.getIdToken();
 

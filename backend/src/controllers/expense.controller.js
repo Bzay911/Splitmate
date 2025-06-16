@@ -5,6 +5,7 @@ import sharp from 'sharp';
 import { Expense } from '../../model/expenses.js';
 import { Group } from '../../model/group.js';
 import { User } from '../../model/user.js';
+import { Activity } from '../../model/activity.js';
 
 dotenv.config();
 const gemini_api_key = process.env.GEMINI_API_KEY;
@@ -78,6 +79,16 @@ export const expenseController = {
       });
 
       await expense.save();
+
+      // update activity
+      await Activity.create({
+        type: "expense_added",
+        actor: req.user._id,
+        group: groupId,
+        expense: expense._id,
+        message: `${req.user.displayName} added an expense "${description}" for $${amount} in ${group.name}`,
+      });
+
 
       // Use shared functions
       await updateGroupTotals(groupId, amount);

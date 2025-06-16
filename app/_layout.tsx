@@ -1,5 +1,6 @@
 import { AuthProvider, useAuth } from "@/contexts/AuthContext";
 import { FinancialProvider } from "@/contexts/FinancialContext";
+import { ActivityProvider } from "@/contexts/ActivityContext";
 import { GroupsProvider } from "@/contexts/GroupsContext";
 import { useColorScheme } from "@/hooks/useColorScheme";
 import {
@@ -111,9 +112,11 @@ export default function RootLayout() {
     <ThemeProvider value={colorScheme === "dark" ? DarkTheme : DefaultTheme}>
       <AuthProvider>
         <FinancialProvider>
-          <GroupsProvider>
-            <RootLayoutNav />
-          </GroupsProvider>
+          <ActivityProvider>
+            <GroupsProvider>
+              <RootLayoutNav />
+            </GroupsProvider>
+          </ActivityProvider>
         </FinancialProvider>
       </AuthProvider>
     </ThemeProvider>

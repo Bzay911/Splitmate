@@ -1,4 +1,5 @@
 import admin from 'firebase-admin';
+import { Activity } from '../../model/activity.js';
 import { Group } from '../../model/group.js';
 import { User } from '../../model/user.js';
 
@@ -92,6 +93,41 @@ export const userController = {
     }
   },
 
+
+  //get user activity
+  async getActivity(req, res) {
+    try {
+      const currentUser = req.user;
+
+      // Get all groups the user is a member of
+      const groups = await Group.find({ members: currentUser._id })
+        .populate('members', 'displayName');
+
+      // Get all member IDs
+      const memberIds = groups.reduce((ids, group) => {
+        group.members.forEach(member => {
+          ids.add(member._id.toString());
+        });
+        return ids;
+      }, new Set()); // We are creating a set because we want to avoid duplicates
+
+      // Get all activities for these members in one query
+      const activities = await Activity.find({
+        actor: { $in: Array.from(memberIds) }
+      })
+      .populate('actor', 'displayName')
+      .populate('group', 'name')
+      .populate('expense', 'amount description')
+      .sort({ timestamp: -1 }) // Sort by most recent
+      .exec();
+
+      res.json({ activities });
+    } catch (error) {
+      console.error("Error fetching activities:", error);
+      res.status(500).json({ error: "Failed to fetch activities" });
+    }
+  },
+  
   // Login check
   async checkLogin(req, res) {
     try {
