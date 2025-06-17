@@ -3,14 +3,14 @@ import { useGroups } from "@/contexts/GroupsContext";
 import { router } from "expo-router";
 import React, { useState } from "react";
 import {
-    Alert,
-    SafeAreaView,
-    StyleSheet,
-    Text,
-    TextInput,
-    TouchableOpacity
+  Alert,
+  SafeAreaView,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity
 } from "react-native";
-import { auth } from "../src/firebaseConfig";
+import { auth } from "../../src/firebaseConfig";
 
 
 const CreateGroup = () => {

@@ -1,10 +1,10 @@
 import { apiUrl } from "@/constants/ApiConfig";
+import { useFinancial } from "@/contexts/FinancialContext";
 import { CameraType, CameraView, useCameraPermissions } from 'expo-camera';
+import { router, useLocalSearchParams } from "expo-router";
 import React, { useEffect, useRef, useState } from 'react';
 import { ActivityIndicator, Alert, Animated, Button, Dimensions, Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
-import { auth } from "../src/firebaseConfig";
-import { router, useLocalSearchParams } from "expo-router";
-import { useFinancial } from "@/contexts/FinancialContext";
+import { auth } from "../../src/firebaseConfig";
 
 export default function CameraScreen() {
   const [permission, requestPermission] = useCameraPermissions();

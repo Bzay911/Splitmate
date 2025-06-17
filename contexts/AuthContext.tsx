@@ -1,6 +1,7 @@
 import { auth } from "@/src/firebaseConfig";
 import { onAuthStateChanged, signOut, updateProfile, User } from "firebase/auth";
 import { createContext, ReactNode, useContext, useEffect, useState } from "react";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 // Define what data and functions our context will provide
 type AuthContextType = {
@@ -29,8 +30,19 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   // Listen for authentication state changes when the component mounts
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (firebaseUser) => {
-      setUser(firebaseUser);
+    const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
+      if(firebaseUser) {
+        try{
+          const token = await firebaseUser.getIdToken(true);
+          await AsyncStorage.setItem('userToken', token);
+          setUser(firebaseUser);
+        } catch (error) {
+          console.error("Error getting ID token:", error);
+        }
+      } else {
+        await AsyncStorage.removeItem('userToken');
+        setUser(null);
+      }
       setIsLoading(false);
     });
 
@@ -42,6 +54,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const logout = async () => {
     try {
       await signOut(auth);
+      await AsyncStorage.removeItem('userToken');
     } catch (error) {
       console.error("Error signing out:", error);
     }

@@ -11,7 +11,7 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import { auth } from "../../src/firebaseConfig";
+import { auth } from "../../../src/firebaseConfig";
 
 interface Group {
   _id: string;
@@ -89,7 +89,7 @@ const Groups = () => {
       ) : groups.length === 0 ? (
         <View style={styles.noGroupsContainer}>
           <Image
-            source={require("../../assets/images/noGroups.png")}
+            source={require("../../../assets/images/noGroups.png")}
             style={styles.noGroups}
           />
           <Text style={styles.noGroupsText}>No groups joined</Text>

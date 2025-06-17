@@ -11,7 +11,7 @@ const Profile = () => {
   const handleSignOut = async () => {
     try {
       await logout();
-      router.replace('/');
+      // router.replace('/');
     } catch (error) {
       console.error('Error signing out:', error);
     }

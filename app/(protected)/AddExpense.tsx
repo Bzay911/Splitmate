@@ -1,11 +1,11 @@
 import { apiUrl } from "@/constants/ApiConfig";
+import { useActivity } from '@/contexts/ActivityContext';
 import { useFinancial } from "@/contexts/FinancialContext";
 import { Ionicons } from '@expo/vector-icons';
 import { router, useLocalSearchParams } from 'expo-router';
 import React, { useState } from 'react';
 import { Alert, Keyboard, SafeAreaView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
-import { auth } from '../src/firebaseConfig';
-import { useActivity } from '@/contexts/ActivityContext';
+import { auth } from '../../src/firebaseConfig';
 
 const AddExpense = () => {
   const [amount, setAmount] = useState('');

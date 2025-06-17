@@ -1,11 +1,11 @@
 import { Ionicons } from '@expo/vector-icons';
 import React, { useEffect } from 'react';
-import Animated,{ useAnimatedStyle, useSharedValue, withSpring, interpolate } from 'react-native-reanimated';
-import {Pressable, PressableProps, StyleSheet, Text } from 'react-native';
+import { Pressable, PressableProps, StyleSheet, Text } from 'react-native';
+import Animated, { interpolate, useAnimatedStyle, useSharedValue, withSpring } from 'react-native-reanimated';
 
 // Map route names to Ionicons names (outline and filled versions)
 const iconMapping = {
-  Home: {
+  index: {
     outline: 'home-outline',
     filled: 'home'
   },
@@ -53,6 +53,12 @@ const TabBarButton = (props: TabBarButtonProps) => {
         }
     })
   const renderIcon = () => {
+    // Check if route exists in mapping
+    if (!iconMapping[routeName]) {
+      console.warn(`No icon mapping for route: ${routeName}`);
+      return <Ionicons name="help-circle-outline" size={28} color={color} />;
+    }
+    
     const iconType = isFocused ? 'filled' : 'outline';
     const iconName = iconMapping[routeName][iconType];
     return <Ionicons name={iconName as any} size={28} color={color} />;

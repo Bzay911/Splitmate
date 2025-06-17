@@ -72,7 +72,7 @@ export default function HomeScreen() {
           const formattedSplitmates = data.splitmates.map((splitmate: any) => ({
             id: splitmate.id,
             name: splitmate.name,
-            image: require('../../assets/images/dummyProfile.png')
+            image: require('../../../assets/images/dummyProfile.png')
           }));
           setSplitmates(formattedSplitmates);
         } else {
@@ -121,7 +121,9 @@ export default function HomeScreen() {
         <Text style={styles.title}>Home</Text>
 
         <View style={styles.rightTop}>
-          <Ionicons size={28} name="menu" />
+          <TouchableOpacity onPress={() => router.push('/Profile')}>
+            <Image source={{ uri: user?.photoURL || '' }} style={styles.avatarImage} />
+          </TouchableOpacity>
         </View>
       </View>
 
@@ -227,6 +229,11 @@ const styles = StyleSheet.create({
   message: {
     textAlign: 'center',
     paddingBottom: 10,
+  },
+  avatarImage: {
+    width: 45,
+    height: 45,
+    borderRadius: 25,
   },
   camera: {
     flex: 1,

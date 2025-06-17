@@ -64,7 +64,7 @@ const handleSignin = async (email: string, password: string) => {
         throw new Error(data.error || 'Failed to sign in');
       }
 
-      router.push("/Home"); 
+      router.push("/(protected)/(tabs)"); 
       return userCredential.user;
     } catch (error) {
       console.log("error", error);
