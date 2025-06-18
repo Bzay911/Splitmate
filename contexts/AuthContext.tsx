@@ -1,7 +1,9 @@
 import { auth } from "@/src/firebaseConfig";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import { onAuthStateChanged, signOut, updateProfile, User } from "firebase/auth";
 import { createContext, ReactNode, useContext, useEffect, useState } from "react";
-import AsyncStorage from "@react-native-async-storage/async-storage";
+import { ActivityIndicator } from "react-native";
+import { router } from "expo-router";
 
 // Define what data and functions our context will provide
 type AuthContextType = {
@@ -31,6 +33,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   // Listen for authentication state changes when the component mounts
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
+      setIsLoading(true); // Set loading true when auth state changes
       if(firebaseUser) {
         try{
           const token = await firebaseUser.getIdToken(true);
@@ -38,6 +41,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           setUser(firebaseUser);
         } catch (error) {
           console.error("Error getting ID token:", error);
+          await AsyncStorage.removeItem('userToken');
+          setUser(null);
         }
       } else {
         await AsyncStorage.removeItem('userToken');
@@ -46,17 +51,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setIsLoading(false);
     });
 
-    // Cleanup subscription on unmount
     return () => unsubscribe();
   }, []);
 
   // Sign out
   const logout = async () => {
     try {
-      await signOut(auth);
       await AsyncStorage.removeItem('userToken');
+      await signOut(auth);
     } catch (error) {
       console.error("Error signing out:", error);
+      throw error;
     }
   };
 
@@ -100,11 +105,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const value = {
     user,
     isLoading,
-    isAuthenticated: !!user,
+    isAuthenticated: !!user && !isLoading, // Only consider authenticated when not loading
     logout,
     refreshUser,
     updateUserProfile
   };
+
+  // Don't render children while initial auth state is loading
+  if (isLoading) {
+    return <ActivityIndicator size="large" color="#0000ff" />;
+  }
 
   return (
     <AuthContext.Provider value={value}>

@@ -1,7 +1,8 @@
 import { AuthProvider, useAuth } from "@/contexts/AuthContext";
-import { Stack, useRouter, useSegments } from "expo-router";
-import React, { useEffect } from "react";
- 
+import { Stack } from "expo-router";
+import React from "react";
+import { ActivityIndicator, View } from "react-native";
+
 export default function Root(){
   return (
     <AuthProvider>
@@ -16,16 +17,22 @@ function RootNavigator(){
   console.log('isLoading', isLoading);
   console.log('isAuthenticated', isAuthenticated);
 
-  return(
-    <Stack screenOptions={{ headerShown: false }}>
-      <Stack.Protected guard={isAuthenticated} >
-        <Stack.Screen name="(protected)/(tabs)" options={{ headerShown: false }} />
-      </Stack.Protected>
+  if (isLoading) {
+    return (
+      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+        <ActivityIndicator size="large" color="#0891b2" />
+      </View>
+    );
+  }
 
-      <Stack.Protected guard={!isAuthenticated}>
-        <Stack.Screen name="index" options={{ headerShown: false }} />
-        <Stack.Screen name="SignIn" options={{ headerShown: false }} />
-      </Stack.Protected>
+  return isAuthenticated ? (
+    <Stack screenOptions={{ headerShown: false }}>
+      <Stack.Screen name="(protected)" options={{ headerShown: false }} />
     </Stack>
-  )
+  ) : (
+    <Stack screenOptions={{ headerShown: false }}>
+      <Stack.Screen name="SignIn" options={{ headerShown: false }} />
+      <Stack.Screen name="SignUp" options={{ headerShown: false }} />
+    </Stack>
+  );
 }

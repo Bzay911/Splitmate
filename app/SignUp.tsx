@@ -170,7 +170,7 @@ export default function SignUp() {
     try {
       const user = await handleSignUp(email, password, fullName);
       if (user) {
-        router.push("/Home");
+        router.replace("/(protected)/(tabs)");
       }
     } catch (error) {
       console.error("Error creating user", error);
@@ -291,7 +291,7 @@ export default function SignUp() {
               Already have an account?{" "}
               <Text 
                 style={styles.termsLink}
-                onPress={() => router.push("/")}
+                onPress={() => router.replace("/SignIn")}
               >
                 Login
               </Text>

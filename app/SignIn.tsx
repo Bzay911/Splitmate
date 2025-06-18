@@ -37,40 +37,28 @@ const handleSignin = async (email: string, password: string) => {
     const userCredential = await signInWithEmailAndPassword(auth, email, password);
     const token = await userCredential.user.getIdToken();
 
-    // 2. Check if user exists in your backend with timeout
-    const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 10000); // 10 second timeout
+    // 2. Check if user exists in your backend
+    const response = await fetch(apiUrl('api/auth/login'), {
+      method: 'GET',  
+      headers: {
+        'Authorization': `Bearer ${token}`,
+      }
+    });
     
-    try {
-      const response = await fetch(apiUrl('api/auth/login'), {
-        method: 'GET',  
-        headers: {
-          'Authorization': `Bearer ${token}`,
-        },
-        signal: controller.signal
-      });
-      
-      clearTimeout(timeoutId);
-      
-      const data = await response.json();
+    const data = await response.json();
 
-      if (response.status === 404) {
-        alert("Account not found. Please create an account first.");
-        router.push("/SignUp");
-        return null;
-      }
-
-      if (!response.ok) {
-        throw new Error(data.error || 'Failed to sign in');
-      }
-
-      router.push("/(protected)/(tabs)"); 
-      return userCredential.user;
-    } catch (error) {
-      console.log("error", error);
-      throw error;
+    if (response.status === 404) {
+      alert("Account not found. Please create an account first.");
+      router.replace("/SignUp");
+      return null;
     }
 
+    if (!response.ok) {
+      throw new Error(data.error || 'Failed to sign in');
+    }
+
+    router.replace("/(protected)/(tabs)");
+    return userCredential.user;
   } catch (error: any) {
     console.error("Error signing in", error);
     

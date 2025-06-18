@@ -1,8 +1,8 @@
+import { useAuth } from '@/contexts/AuthContext';
 import { MaterialIcons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
-import React, { useEffect, useState } from 'react';
-import { SafeAreaView, StyleSheet, Text, TouchableOpacity, View, Image } from 'react-native';
-import { useAuth } from '@/contexts/AuthContext';
+import React from 'react';
+import { Alert, Image, SafeAreaView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
 const Profile = () => {
   const router = useRouter();
@@ -11,9 +11,12 @@ const Profile = () => {
   const handleSignOut = async () => {
     try {
       await logout();
-      // router.replace('/');
     } catch (error) {
       console.error('Error signing out:', error);
+      Alert.alert(
+        "Error",
+        "Failed to sign out. Please try again."
+      );
     }
   };
 
