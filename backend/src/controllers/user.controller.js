@@ -52,9 +52,9 @@ export const userController = {
       // Use the already attached req.user from auth middleware
       const currentUser = req.user;
       
-      // Find groups where the current user is a member
+      // Find groups where the current user is a member and populate members with profilePicture
       const groups = await Group.find({ members: currentUser._id })
-        .populate('members', 'displayName email')
+        .populate('members', 'displayName email profilePicture')
         .exec();
 
       // Extract unique members
@@ -66,7 +66,8 @@ export const userController = {
             allMembers.set(member._id.toString(), {
               id: member._id,
               name: member.displayName,
-              email: member.email
+              email: member.email,
+              image: member.profilePicture || null // Return null if no profile picture
             });
           }
         });

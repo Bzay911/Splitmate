@@ -39,13 +39,14 @@ const Profile = () => {
       </View>
 
       <View style={styles.profileSection}>
-        <View style={styles.avatarContainer}>
-          <View style={styles.avatar}>
-            <Image source={{ uri: user?.photoURL || '' }} style={styles.avatarImage} />
-          </View>
+        <View style={styles.profileHeader}>
+          <Image 
+            source={user?.photoURL ? { uri: user.photoURL } : require('../../../assets/images/cat.png')} 
+            style={styles.avatarImage} 
+          />
           <View style={styles.userInfo}>
-            <Text style={styles.userName} numberOfLines={1}>{user?.displayName || 'User'}</Text>
-            <Text style={styles.userEmail} numberOfLines={1}>{user?.email || 'No email'}</Text>
+            <Text style={styles.userName}>{user?.displayName || 'User'}</Text>
+            <Text style={styles.userEmail}>{user?.email}</Text>
           </View>
         </View>
         <TouchableOpacity style={styles.editButton} onPress={handleEditProfile}>
@@ -107,24 +108,16 @@ const styles = StyleSheet.create({
     marginBottom: 24,
     width: '100%',
   },
-  avatarContainer: {
+  profileHeader: {
     flexDirection: 'row',
     alignItems: 'center',
     flex: 1,
     marginRight: 16,
   },
-  avatar: {
-    width: 80,
-    height: 80,
-    borderRadius: 40,
-    backgroundColor: '#f1f5f9',
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginRight: 16,
-  },
   userInfo: {
+    flexDirection: 'column',
+    marginLeft: 16,
     flex: 1,
-    marginRight: 16,
   },
   userName: {
     fontSize: 24,

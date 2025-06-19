@@ -1,7 +1,10 @@
 import { AuthProvider, useAuth } from "@/contexts/AuthContext";
 import { Stack } from "expo-router";
-import React from "react";
-import { ActivityIndicator, View } from "react-native";
+import * as SplashScreen from 'expo-splash-screen';
+import React, { useEffect } from "react";
+
+// Keep the splash screen visible while we fetch resources
+SplashScreen.preventAutoHideAsync();
 
 export default function Root(){
   return (
@@ -17,12 +20,16 @@ function RootNavigator(){
   console.log('isLoading', isLoading);
   console.log('isAuthenticated', isAuthenticated);
 
+  useEffect(() => {
+    if (!isLoading) {
+      // Hide splash screen when loading is complete
+      SplashScreen.hideAsync();
+    }
+  }, [isLoading]);
+
   if (isLoading) {
-    return (
-      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-        <ActivityIndicator size="large" color="#0891b2" />
-      </View>
-    );
+    // Keep splash screen visible while loading
+    return null;
   }
 
   return isAuthenticated ? (

@@ -5,17 +5,25 @@ import { Ionicons } from '@expo/vector-icons';
 import * as ImagePicker from 'expo-image-picker';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useRouter } from 'expo-router';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { ActivityIndicator, Alert, Image, KeyboardAvoidingView, Platform, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 const EditProfile = () => {
   const router = useRouter();
   const [displayName, setDisplayName] = useState('');
-  const [profileImage, setProfileImage] = useState('https://via.placeholder.com/150');
+  const [profileImage, setProfileImage] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const { user, updateUserProfile } = useAuth();
+
+  // Initialize with user data when component mounts
+  useEffect(() => {
+    if (user) {
+      setDisplayName(user.displayName || '');
+      setProfileImage(user.photoURL || '');
+    }
+  }, [user]);
 
   const pickImage = async () => {
     try {
@@ -113,7 +121,7 @@ const EditProfile = () => {
           <View style={styles.content}>
             <TouchableOpacity onPress={pickImage} style={styles.imageContainer}>
               <Image
-                source={{ uri: profileImage }}
+                source={profileImage ? { uri: profileImage } : require('../../assets/images/cat.png')}
                 style={styles.profileImage}
               />
               <View style={styles.editIconContainer}>

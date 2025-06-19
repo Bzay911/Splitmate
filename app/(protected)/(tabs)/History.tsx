@@ -98,6 +98,7 @@ const History = () => {
         <FlatList 
           data={activities}
           renderItem={renderActivity}
+          showsVerticalScrollIndicator={false}
           keyExtractor={(item) => item?._id || Math.random().toString()}
           refreshControl={
             <RefreshControl

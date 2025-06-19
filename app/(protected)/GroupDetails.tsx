@@ -1,10 +1,9 @@
 import { apiUrl } from "@/constants/ApiConfig";
-import { auth } from "@/src/firebaseConfig";
+import { useAuth } from "@/contexts/AuthContext";
 import { Ionicons } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
-import { router, useLocalSearchParams } from "expo-router";
-import { onAuthStateChanged, User } from "firebase/auth";
-import React, { useEffect, useState } from "react";
+import { router, useFocusEffect, useLocalSearchParams } from "expo-router";
+import React, { useCallback, useEffect, useState } from "react";
 import {
   Image,
   SafeAreaView,
@@ -65,8 +64,8 @@ const GroupDetails = () => {
   const [fairshare, setFairshare] = useState<number>(0);
   const [creditors, setCreditors] = useState<Balance[]>([]);
   const [debtors, setDebtors] = useState<Balance[]>([]);
-  const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const { user } = useAuth();
 
   useEffect(() => {
     if (groupDetails) {
@@ -74,80 +73,73 @@ const GroupDetails = () => {
     }
   }, [groupDetails]);
   
-  useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (user) => {
-      if (user) {
-        setUser(user);
-      } else {
-        setUser(null);
-        router.push("/");
-      }
-    });
-    return () => unsubscribe();
-  }, []);
 
-  useEffect(() => {
-    const fetchGroupDetails = async () => {
-      if (!user) return;
-      
-      try {
-        setIsLoading(true);
-        const token = await user.getIdToken();
-        const response = await fetch(
-          apiUrl(`api/groups/${groupId}`),
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-              "Content-Type": "application/json",
-            },
-          }
-        );
-
-        if (!response.ok) {
-          throw new Error(`Failed to fetch group (${response.status})`);
+  const fetchGroupDetails = useCallback(async () => {
+    if (!user) return;
+    
+    try {
+      setIsLoading(true);
+      const token = await user.getIdToken();
+      const response = await fetch(
+        apiUrl(`api/groups/${groupId}`),
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
         }
+      );
 
-        const data = await response.json();
-        setGroupDetails(data.group);
-      } catch (error) {
-        console.error("Error fetching group details:", error);
-      } finally {
-        setIsLoading(false);
+      if (!response.ok) {
+        throw new Error(`Failed to fetch group (${response.status})`);
       }
-    };
 
+      const data = await response.json();
+      setGroupDetails(data.group);
+    } catch (error) {
+      console.error("Error fetching group details:", error);
+    } finally {
+      setIsLoading(false);
+    }
+  }, [groupId, user]);
+
+  const fetchExpenses = useCallback(async () => {
+    if (!user) return;
+    
+    try {
+      const token = await user.getIdToken();
+      const response = await fetch(
+        apiUrl(`api/expenses/groups/${groupId}/expenses`),
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error(`Failed to fetch expenses (${response.status})`);
+      }
+
+      const data = await response.json();
+      setExpenses(data.expenses);
+    } catch (error) {
+      console.error("Error fetching expenses:", error);
+    }
+  }, [groupId, user]);
+
+
+  useEffect(() => {
     if (user) fetchGroupDetails();
-  }, [groupId, user]);
+  }, [fetchGroupDetails]);
 
-  useEffect(() => {
-    const fetchExpenses = async () => {
-      if (!user) return;
-      
-      try {
-        const token = await user.getIdToken();
-        const response = await fetch(
-          apiUrl(`api/expenses/groups/${groupId}/expenses`),
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-              "Content-Type": "application/json",
-            },
-          }
-        );
-
-        if (!response.ok) {
-          throw new Error(`Failed to fetch expenses (${response.status})`);
-        }
-
-        const data = await response.json();
-        setExpenses(data.expenses);
-      } catch (error) {
-        console.error("Error fetching expenses:", error);
-      }
-    };
-
-    if (user) fetchExpenses();
-  }, [groupId, user]);
+  // Refetch expenses every time screen comes into focus
+  useFocusEffect(
+    useCallback(() => {
+      fetchExpenses();
+    }, [fetchExpenses])
+  );
 
   useEffect(() => {
     if(groupDetails && expenses && fairshare) {
@@ -426,7 +418,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   scrollContent: {
-    paddingBottom: 100, // Add padding to prevent content from being hidden behind FAB
+    paddingBottom: 100,
   },
   noMembersContainer: {
     flex: 1,

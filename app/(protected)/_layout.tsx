@@ -2,8 +2,8 @@ import { ActivityProvider } from "@/contexts/ActivityContext";
 import { useAuth } from "@/contexts/AuthContext";
 import { FinancialProvider } from "@/contexts/FinancialContext";
 import { GroupsProvider } from "@/contexts/GroupsContext";
-import { ActivityIndicator } from "react-native";
 import { Redirect, Stack } from "expo-router";
+import { ActivityIndicator } from "react-native";
 
 export default function ProtectedLayout() {
   const { isAuthenticated, isLoading } = useAuth();

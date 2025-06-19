@@ -4,22 +4,39 @@
     "slug": "Splitmate",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/images/icon.png",
+    "icon": "./assets/images/appLogo.png",
     "scheme": "splitmate",
-    "userInterfaceStyle": "automatic",
+    "userInterfaceStyle": "dark",
     "newArchEnabled": true,
+    "splash": {
+      "image": "./assets/images/appLogo.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#1a1a1a"
+    },
     "extra": {
       "apiUrl": "http://192.168.1.11:3000"
     },
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "icon": "./assets/images/appLogo.png",
+      "splash": {
+        "image": "./assets/images/appLogo.png",
+        "resizeMode": "contain",
+        "backgroundColor": "#1a1a1a",
+        "tabletImage": "./assets/images/appLogo.png"
+      }
     },
     "android": {
       "adaptiveIcon": {
-        "foregroundImage": "./assets/images/adaptive-icon.png",
-        "backgroundColor": "#ffffff"
+        "foregroundImage": "./assets/images/appLogo.png",
+        "backgroundColor": "#1a1a1a"
       },
-      "edgeToEdgeEnabled": true
+      "edgeToEdgeEnabled": true,
+      "splash": {
+        "image": "./assets/images/appLogo.png",
+        "resizeMode": "contain",
+        "backgroundColor": "#1a1a1a"
+      }
     },
     "web": {
       "bundler": "metro",
@@ -31,10 +48,10 @@
       [
         "expo-splash-screen",
         {
-          "image": "./assets/images/splash-icon.png",
+          "image": "./assets/images/appLogo.png",
           "imageWidth": 200,
           "resizeMode": "contain",
-          "backgroundColor": "#ffffff"
+          "backgroundColor": "#1a1a1a"
         }
       ],
       [

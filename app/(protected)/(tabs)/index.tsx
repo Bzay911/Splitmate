@@ -36,6 +36,7 @@ export default function HomeScreen() {
   const { user } = useAuth();
   const { groups, refreshGroups } = useContext(GroupsContext);
   const [splitmates, setSplitmates] = useState<Splitmate[]>([]);
+  const [colors, setColors] = useState<[string, string]>([getRandomColor(), getRandomColor()]);
 
   useEffect(() => {
     if (user) {
@@ -71,7 +72,9 @@ export default function HomeScreen() {
           const formattedSplitmates = data.splitmates.map((splitmate: any) => ({
             id: splitmate.id,
             name: splitmate.name,
-            image: require('../../../assets/images/dummyProfile.png')
+            image: splitmate.image && splitmate.image.trim() && splitmate.image !== 'null'
+              ? { uri: splitmate.image } 
+              : require('../../../assets/images/cat.png')
           }));
           setSplitmates(formattedSplitmates);
         } else {
@@ -112,6 +115,19 @@ export default function HomeScreen() {
     });
   };
 
+  function getRandomColor() {
+    const letters = '0123456789ABCDEF';
+    let color = '#';
+    for (let i = 0; i < 6; i++) {
+      color += letters[Math.floor(Math.random() * 16)];
+    }
+    return color;
+  }
+
+  const randomizeGradient = () => {
+    setColors([getRandomColor(), getRandomColor()]);
+  };
+
   return (
      <LinearGradient
       colors={['#2a2a2a', '#1a1a1a', '#0f0f0f']}
@@ -119,8 +135,12 @@ export default function HomeScreen() {
       start={{ x: 0, y: 0 }}
       end={{ x: 0, y: 1 }}
     >
-      <SafeAreaView>
-      <ScrollView style={styles.scrollView}>
+      <SafeAreaView style={styles.safeArea}>
+      <ScrollView 
+        style={styles.scrollView}
+        contentContainerStyle={styles.scrollContent}
+        showsVerticalScrollIndicator={false}
+      >
       {/* Topbar */}
       <View style={styles.topBar}>
         <View style={styles.welcomeContainer}>
@@ -130,7 +150,10 @@ export default function HomeScreen() {
 
         <View style={styles.rightTop}>
           <TouchableOpacity onPress={() => router.push('/Profile')}>
-            <Image source={{ uri: user?.photoURL || '' }} style={styles.avatarImage} />
+            <Image 
+              source={user?.photoURL ? { uri: user.photoURL } : require('../../../assets/images/cat.png')} 
+              style={styles.avatarImage} 
+            />
           </TouchableOpacity>
         </View>
       </View>
@@ -143,17 +166,6 @@ export default function HomeScreen() {
             ${financialSummary.creditAmount.toFixed(2)}
           </Text>
         </View>
-        {/* <LinearGradient
-          colors={["#4ADE80", "#10B981"]}
-          style={styles.oweSection}
-          start={{ x: 0, y: 0 }}
-          end={{ x: 1, y: 0 }}
-        >
-          <Text style={styles.amountTitle}>I'm owed</Text>
-          <Text style={styles.amount}>
-            ${financialSummary.creditAmount.toFixed(2)}
-          </Text>
-        </LinearGradient> */}
 
         <View style={styles.amountSubSection}>
           <View style={styles.paySection}>
@@ -162,34 +174,12 @@ export default function HomeScreen() {
               -${financialSummary.debtAmount.toFixed(2)}
             </Text>
           </View>
-          {/* <LinearGradient
-            colors={["#FF6B6B", "#FE8888", "#FFA9A9"]}
-            start={{ x: 1, y: 0 }}
-            end={{ x: 0, y: 0 }}
-            style={styles.paySection}
-          >
-            <Text style={styles.amountTitle}>Need to pay</Text>
-            <Text style={styles.amount}>
-              -${financialSummary.debtAmount.toFixed(2)}
-            </Text>
-          </LinearGradient> */}
           <View style={styles.expenseSection}>
             <Text style={styles.amountTitle}>Total expenses</Text>
             <Text style={styles.amount}>
               ${financialSummary.totalExpenses.toFixed(2)}
             </Text>
           </View>
-          {/* <LinearGradient
-            colors={["#CFCFCF", "#D5D5D5", "#E0E0E0"]}
-            start={{ x: 1, y: 0 }}
-            end={{ x: 0, y: 0 }}
-            style={styles.expenseSection}
-          >
-            <Text style={styles.amountTitle}>Total expenses</Text>
-            <Text style={styles.amount}>
-              ${financialSummary.totalExpenses.toFixed(2)}
-            </Text>
-          </LinearGradient> */}
         </View>
       </View>
 
@@ -228,6 +218,13 @@ export default function HomeScreen() {
             </TouchableOpacity>
           ))}
       </View>
+
+
+      <LinearGradient colors={colors} style={styles.container}>
+        <TouchableOpacity onPress={randomizeGradient}>
+          <Text>Randomize Gradient</Text>
+        </TouchableOpacity>
+    </LinearGradient>
       </ScrollView>
     </SafeAreaView>
     </LinearGradient>
@@ -238,7 +235,20 @@ const styles = StyleSheet.create({
   mainContainer: {
     flex: 1,
   },
+  container: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    height: 100,
+    width: 100,
+  },
+  safeArea: {
+    flex: 1,
+  },
   scrollView: {
+  },
+  scrollContent: {
+    paddingBottom: 100,
   },
   topBar: {
     flexDirection: "row",
@@ -323,6 +333,7 @@ const styles = StyleSheet.create({
     width: "100%",
     marginTop: 12,
     padding: 12,
+    paddingBottom: 0,
   },
   texts: {
     flexDirection: "row",
