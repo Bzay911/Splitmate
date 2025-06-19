@@ -8,11 +8,38 @@ export const userController = {
   // Create new user
   async createUser(req, res) {
     try {
-      const { firebaseUid, email, displayName } = req.body;
+      let { firebaseUid, email, displayName } = req.body;
+  
+      // Normalize email to lowercase (optional but recommended)
+      email = email.toLowerCase();
+  
+      // Check if user already exists by firebaseUid or email
+      const existingUser = await User.findOne({
+        $or: [{ firebaseUid }, { email }]
+      });
+  
+      if (existingUser) {
+        return res.status(409).json({ message: "User already exists", user: existingUser });
+      }
+  
       const user = await User.create({ firebaseUid, email, displayName });
-      res.status(201).json({ message: "User created successfully", user });
+  
+      return res.status(201).json({ message: "User created successfully", user });
     } catch (error) {
-      res.status(500).json({ error: "Failed to create user" });
+      console.error("User creation failed:", error);
+      
+      // Handle duplicate key errors specifically
+      if (error.code === 11000) {
+        const field = Object.keys(error.keyPattern)[0];
+        const value = error.keyValue[field];
+        return res.status(409).json({ 
+          error: "User already exists", 
+          message: `A user with this ${field} already exists`,
+          detail: `${field}: ${value}`
+        });
+      }
+      
+      return res.status(500).json({ error: "Failed to create user", detail: error.message });
     }
   },
 

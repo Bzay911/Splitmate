@@ -16,14 +16,21 @@ export async function authMiddleware(req, res, next) {
         const token = authHeader.split('Bearer ')[1];
         const decodedToken = await admin.auth().verifyIdToken(token);
 
-        let user = await User.findOne({firebaseUid: decodedToken.uid});
-        if(!user){
-            user = await User.create({
+        // Use findOneAndUpdate with upsert to handle race conditions
+        const user = await User.findOneAndUpdate(
+            { firebaseUid: decodedToken.uid },
+            {
                 firebaseUid: decodedToken.uid,
                 email: decodedToken.email,
-                displayName: decodedToken.name,
-            });
-        }
+                displayName: decodedToken.name || 'Anonymous',
+            },
+            { 
+                upsert: true, 
+                new: true,
+                setDefaultsOnInsert: true 
+            }
+        );
+        
         req.user = user;
         next();
     }catch(error){

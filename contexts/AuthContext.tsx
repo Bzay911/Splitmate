@@ -70,7 +70,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       const currentUser = auth.currentUser;
       if (currentUser) {
         await currentUser.reload();
-        setUser({ ...currentUser });
+        setUser(auth.currentUser);
       }
     } catch (error) {
       console.error("Error refreshing user:", error);
@@ -82,18 +82,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     try {
       const currentUser = auth.currentUser;
       if (currentUser) {
-        // Update Firebase profile
-        await updateProfile(currentUser, {
-          displayName,
-          photoURL
-        });
-        
-        // Update local state without reloading
-        setUser({
-          ...currentUser,
-          displayName,
-          photoURL
-        });
+        await updateProfile(currentUser, { displayName, photoURL });
+        await currentUser.reload();
+        setUser(auth.currentUser);
       }
     } catch (error) {
       console.error("Error updating user profile:", error);

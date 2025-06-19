@@ -82,7 +82,7 @@ const GroupDetails = () => {
   }, [groupDetails]);
 
   const fetchGroupDetails = useCallback(async () => {
-    if (!user) return;
+    if (!user || typeof user.getIdToken !== "function") return;
 
     try {
       setIsLoading(true);
@@ -108,7 +108,7 @@ const GroupDetails = () => {
   }, [groupId, user]);
 
   const fetchExpenses = useCallback(async () => {
-    if (!user) return;
+    if (!user || typeof user.getIdToken !== "function") return;
 
     try {
       const token = await user.getIdToken();

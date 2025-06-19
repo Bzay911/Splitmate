@@ -101,11 +101,6 @@ const EditProfile = () => {
       setIsSaving(false);
     }
   };
-
-  const handleGoBack = () => {
-    router.back();
-  };
-
   return (
     <LinearGradient
       colors={['#2a2a2a', '#1a1a1a', '#0f0f0f']}

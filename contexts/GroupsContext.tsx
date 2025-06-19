@@ -1,6 +1,6 @@
 import { apiUrl } from "@/constants/ApiConfig";
-import { auth } from "@/src/firebaseConfig";
 import { createContext, ReactNode, useCallback, useContext, useState } from "react";
+import { useAuth } from "./AuthContext";
 
 interface Group {
   _id: string;
@@ -28,11 +28,11 @@ export const GroupsProvider = ({ children }: { children: ReactNode }) => {
   const [groups, setGroups] = useState<Group[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const { user } = useAuth();
 
   const refreshGroups = useCallback(async () => {
     setIsLoading(true);
     try {
-      const user = auth.currentUser;
       if (!user) {
         throw new Error("No user logged in");
       }

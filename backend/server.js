@@ -1,7 +1,6 @@
 import cors from "cors";
 import dotenv from "dotenv";
 import express from "express";
-import { authMiddleware } from "./middleware/auth.js";
 import { connectDB } from "./src/config/database.js";
 
 // Import routes
@@ -27,8 +26,6 @@ connectDB();
 // Public routes
 app.use("/api/auth", userRoutes);     
 
-// Protected routes
-app.use("/api", authMiddleware);      
 app.use("/api/groups", groupRoutes); 
 app.use("/api/expenses", expenseRoutes); 
 

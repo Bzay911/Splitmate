@@ -13,6 +13,7 @@ import {
   View,
 } from "react-native";
 import { auth } from "../../../src/firebaseConfig";
+import { useAuth } from "@/contexts/AuthContext";
 
 interface Group {
   _id: string;
@@ -25,37 +26,10 @@ interface Group {
 
 const Groups = () => {
   const { groups, isLoading, error, refreshGroups } = useGroups();
-  const [user, setUser] = useState<User | null>(null);
-  // const [colors, setColors] = useState<[string, string]>(["", ""]);
+  const { user } = useAuth();
 
-  useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (user) => {
-      if (user) {
-        setUser(user);
-        refreshGroups(); // Initial fetch when user is authenticated
-      } else {
-        setUser(null);
-        router.push("/");
-      }
-    });
-    return () => unsubscribe();
-  }, [refreshGroups]);
+ 
 
-  // function getRandomColor() {
-  //   const letters = '0123456789ABCDEF';
-  //   let color = '#';
-  //   for (let i = 0; i < 6; i++) {
-  //     color += letters[Math.floor(Math.random() * 16)];
-  //   }
-  //   return color;
-  // }
-  // const randomizeGradient = () => {
-  //   setColors([getRandomColor(), getRandomColor()]);
-  // };
-
-  // useEffect(() => {
-  //   randomizeGradient();
-  // },[])
 
   const handleGroupPress = (group: Group) => {
     router.push({
