@@ -5,7 +5,6 @@ import { LinearGradient } from "expo-linear-gradient";
 import { router, useFocusEffect, useLocalSearchParams } from "expo-router";
 import React, { useCallback, useEffect, useState } from "react";
 import {
-  Image,
   SafeAreaView,
   ScrollView,
   StyleSheet,
@@ -28,6 +27,7 @@ interface GroupDetails {
   totalExpense: number;
   members: GroupMember[];
   createdBy: GroupMember;
+  colors: [string, string];
 }
 
 interface Expense {
@@ -54,10 +54,10 @@ const formatDate = (date: Date) => {
 const calculateDividend = (totalExpense: number, totalMembers: number) => {
   const dividend = parseFloat((totalExpense / totalMembers).toFixed(2));
   return dividend;
-}
+};
 
 const GroupDetails = () => {
-  const { groupId, groupName, image } = useLocalSearchParams();
+  const { groupId, groupName, image, colors } = useLocalSearchParams();
   const [groupDetails, setGroupDetails] = useState<GroupDetails | null>(null);
   const [expenses, setExpenses] = useState<Expense[]>([]);
   const [balances, setBalances] = useState<Balance[]>([]);
@@ -67,28 +67,32 @@ const GroupDetails = () => {
   const [isLoading, setIsLoading] = useState(false);
   const { user } = useAuth();
 
+  const parsedColors =
+    typeof colors === "string" ? colors.split(",") : ["#6366f1", "#818cf8"];
+
   useEffect(() => {
     if (groupDetails) {
-      setFairshare(calculateDividend(groupDetails.totalExpense, groupDetails.members.length));
+      setFairshare(
+        calculateDividend(
+          groupDetails.totalExpense,
+          groupDetails.members.length
+        )
+      );
     }
   }, [groupDetails]);
-  
 
   const fetchGroupDetails = useCallback(async () => {
     if (!user) return;
-    
+
     try {
       setIsLoading(true);
       const token = await user.getIdToken();
-      const response = await fetch(
-        apiUrl(`api/groups/${groupId}`),
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-            "Content-Type": "application/json",
-          },
-        }
-      );
+      const response = await fetch(apiUrl(`api/groups/${groupId}`), {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+      });
 
       if (!response.ok) {
         throw new Error(`Failed to fetch group (${response.status})`);
@@ -105,7 +109,7 @@ const GroupDetails = () => {
 
   const fetchExpenses = useCallback(async () => {
     if (!user) return;
-    
+
     try {
       const token = await user.getIdToken();
       const response = await fetch(
@@ -129,7 +133,6 @@ const GroupDetails = () => {
     }
   }, [groupId, user]);
 
-
   useEffect(() => {
     if (user) fetchGroupDetails();
   }, [fetchGroupDetails]);
@@ -142,23 +145,27 @@ const GroupDetails = () => {
   );
 
   useEffect(() => {
-    if(groupDetails && expenses && fairshare) {
-        const newBalances = groupDetails.members.map(member => {
-          const balance = (getIndividualExpense(member) - fairshare);
-          return{
-            email: member.email,
-            balance: balance,
-          }
-        })
-        setBalances(newBalances);
-      }
-      }, [groupDetails, expenses, fairshare]);
-    
+    if (groupDetails && expenses && fairshare) {
+      const newBalances = groupDetails.members.map((member) => {
+        const balance = getIndividualExpense(member) - fairshare;
+        return {
+          email: member.email,
+          balance: balance,
+        };
+      });
+      setBalances(newBalances);
+    }
+  }, [groupDetails, expenses, fairshare]);
+
   useEffect(() => {
     if (balances.length > 0) {
-      const whoGetsPayment = balances.filter(item => item.balance > 0).sort((a, b) => b.balance - a.balance);
-      const whoNeedToPay = balances.filter(item => item.balance < 0).sort((a, b) => a.balance - b.balance);;
-      
+      const whoGetsPayment = balances
+        .filter((item) => item.balance > 0)
+        .sort((a, b) => b.balance - a.balance);
+      const whoNeedToPay = balances
+        .filter((item) => item.balance < 0)
+        .sort((a, b) => a.balance - b.balance);
+
       setCreditors(whoGetsPayment);
       setDebtors(whoNeedToPay);
     }
@@ -185,16 +192,15 @@ const GroupDetails = () => {
     }
   };
 
-
-const getIndividualExpense = (member: GroupMember) => {
+  const getIndividualExpense = (member: GroupMember) => {
     const totalExpense = expenses.reduce((sum, expense) => {
-        if (expense.paidBy._id === member._id) {
-            return sum + expense.amount;
-        }
-        return sum;
+      if (expense.paidBy._id === member._id) {
+        return sum + expense.amount;
+      }
+      return sum;
     }, 0);
     return totalExpense;
-  }
+  };
 
   const whoNeedsToPayWhom = () => {
     let i = 0;
@@ -221,7 +227,7 @@ const getIndividualExpense = (member: GroupMember) => {
           settlements.push({
             from: debtorMember.displayName,
             to: creditorMember.displayName,
-            amount: Number(transferAmount.toFixed(2))
+            amount: Number(transferAmount.toFixed(2)),
           });
         }
 
@@ -248,8 +254,8 @@ const getIndividualExpense = (member: GroupMember) => {
       icon: <Ionicons name="add" size={24} color="white" />,
       name: "addexpense",
       position: 2,
-    }
-  ]
+    },
+  ];
 
   const renderSettlements = () => {
     const settlements = whoNeedsToPayWhom();
@@ -257,12 +263,21 @@ const getIndividualExpense = (member: GroupMember) => {
     return (
       <View>
         {settlements.map((settlement, index) => (
-          <View key={settlement.from + settlement.to} style={styles.settlementItem}>
+          <View
+            key={settlement.from + settlement.to}
+            style={styles.settlementItem}
+          >
             <Text style={styles.settlementText}>
               <Text style={styles.debtorName}>
-                {settlement.from === user?.displayName ? "You" : settlement.from}
-              </Text> <Text style={styles.settlementText}>should pay{' '}</Text>
-              <Text style={styles.settlementAmount}>${settlement.amount}</Text> <Text style={styles.settlementText}>to{' '}</Text>
+                {settlement.from === user?.displayName
+                  ? "You"
+                  : settlement.from}
+              </Text>{" "}
+              <Text style={styles.settlementText}>should pay </Text>
+              <Text style={styles.settlementAmount}>
+                ${settlement.amount}
+              </Text>{" "}
+              <Text style={styles.settlementText}>to </Text>
               <Text style={styles.creditorName}>
                 {settlement.to === user?.displayName ? "You" : settlement.to}
               </Text>
@@ -275,7 +290,7 @@ const getIndividualExpense = (member: GroupMember) => {
 
   return (
     <LinearGradient
-      colors={['#2a2a2a', '#1a1a1a', '#0f0f0f']}
+      colors={["#2a2a2a", "#1a1a1a", "#0f0f0f"]}
       style={styles.container}
       start={{ x: 0, y: 0 }}
       end={{ x: 0, y: 1 }}
@@ -285,45 +300,54 @@ const getIndividualExpense = (member: GroupMember) => {
           showsVerticalScrollIndicator={false}
           contentContainerStyle={styles.scrollContent}
         >
-          <TouchableOpacity
-            style={styles.settingsBtn}
-            onPress={handleSettingsPress}
-          >
-            <Ionicons name="settings" size={24} color="white" />
-          </TouchableOpacity>
-          <View style={styles.header}>
-            <Image source={{ uri: image as string }} style={styles.groupImage} />
-            <Text style={styles.groupName}>{groupName}</Text>
-          </View>
           <LinearGradient
-            colors={["#4ADE80", "#10B981"]}
-            style={styles.oweSection}
-            start={{ x: 0, y: 0 }}
-            end={{ x: 1, y: 0 }}
+            colors={parsedColors as [string, string]}
+            style={styles.header}
           >
-            <View>
-              <Text style={styles.billTitle}>Total Expense</Text>
-              <Text style={styles.billAmount}>${(groupDetails.totalExpense).toFixed(2)}</Text>
-            </View>
+            <TouchableOpacity
+              style={styles.settingsBtn}
+              onPress={handleSettingsPress}
+            >
+            <Text style={styles.groupName}>{groupName}</Text>
+              <Ionicons name="settings" size={24} color="white" />
+            </TouchableOpacity>
 
-            <View style={styles.verticalLine} />
+            <View style={styles.oweSection}>
+              <View>
+                <Text style={styles.billTitle}>Total Expense</Text>
+                <Text style={styles.billAmount}>
+                  ${groupDetails.totalExpense.toFixed(2)}
+                </Text>
+              </View>
 
-            <View>
-              <Text style={styles.splitTitle}>Split Between</Text>
-              <Text style={styles.splitMembers}>
-                {groupDetails.members.length}
-              </Text>
+              <View style={styles.verticalLine} />
+
+              <View>
+                <Text style={styles.splitTitle}>Split Between</Text>
+                <Text style={styles.splitMembers}>
+                  {groupDetails.members.length}
+                </Text>
+              </View>
             </View>
           </LinearGradient>
 
           <View style={styles.dividendSection}>
-            {creditors.find(item => item.email === user?.email) ? (
+            {creditors.find((item) => item.email === user?.email) ? (
               <Text style={styles.ownerDividend}>
-                You are owed ${creditors.find(item => item.email === user?.email)?.balance.toFixed(2)} overall
+                You are owed $
+                {creditors
+                  .find((item) => item.email === user?.email)
+                  ?.balance.toFixed(2)}{" "}
+                overall
               </Text>
-            ) : debtors.find(item => item.email === user?.email) ? (
+            ) : debtors.find((item) => item.email === user?.email) ? (
               <Text style={styles.ownerOwe}>
-                You owe ${Math.abs(debtors.find(item => item.email === user?.email)?.balance || 0).toFixed(2)} overall
+                You owe $
+                {Math.abs(
+                  debtors.find((item) => item.email === user?.email)?.balance ||
+                    0
+                ).toFixed(2)}{" "}
+                overall
               </Text>
             ) : (
               <Text style={styles.settlementText}>You are all settled up!</Text>
@@ -385,21 +409,21 @@ const getIndividualExpense = (member: GroupMember) => {
         actions={actions}
         color="#fccc28"
         floatingIcon={<Ionicons name="add" size={24} color="black" />}
-        onPressItem={name => {
+        onPressItem={(name) => {
           if (name === "scanreceipt") {
             router.push({
               pathname: "/Camera",
               params: {
                 groupId: groupDetails._id,
               },
-            })
+            });
           } else if (name === "addexpense") {
             router.push({
               pathname: "/AddExpense",
               params: {
                 groupId: groupDetails._id,
               },
-            })
+            });
           }
         }}
         showBackground={false}
@@ -427,12 +451,16 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   settingsBtn: {
-    alignSelf: "flex-end",
-    margin: 12,
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    width: "100%",
   },
   header: {
     alignItems: "center",
     padding: 20,
+    borderRadius: 16,
+    margin: 16
   },
   groupImage: {
     width: 100,
@@ -447,13 +475,11 @@ const styles = StyleSheet.create({
     color: "white",
   },
   oweSection: {
-    height: 100,
-    margin: 12,
-    borderRadius: 16,
-    padding: 18,
     flexDirection: "row",
-    justifyContent: "space-around",
+    justifyContent: "space-between",
     alignItems: "center",
+    width: "100%",
+    marginTop: 50,
   },
   billTitle: {
     fontSize: 16,
@@ -600,16 +626,16 @@ const styles = StyleSheet.create({
     color: "white",
   },
   debtorName: {
-    fontWeight: '600',
-    color: '#EF4444',
+    fontWeight: "600",
+    color: "#EF4444",
   },
   creditorName: {
-    fontWeight: '600',
-    color: '#10B981',
+    fontWeight: "600",
+    color: "#10B981",
   },
   settlementAmount: {
-    fontWeight: '600',
-    color: 'white',
+    fontWeight: "600",
+    color: "white",
   },
 });
 

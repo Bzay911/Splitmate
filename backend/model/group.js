@@ -25,6 +25,10 @@ const GroupSchema = new Schema({
     type: Schema.Types.ObjectId,
     ref: "User"
   }],
+  colors: {
+    type: [String, String],
+    default: null
+  },
   
 }, {
   timestamps: true // Adds createdAt and updatedAt fields

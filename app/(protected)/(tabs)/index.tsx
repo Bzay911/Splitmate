@@ -3,6 +3,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { useFinancial } from "@/contexts/FinancialContext";
 import GroupsContext from "@/contexts/GroupsContext";
 import { auth } from "@/src/firebaseConfig";
+import { Ionicons } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
 import { router } from "expo-router";
 import { useContext, useEffect, useState } from "react";
@@ -29,6 +30,7 @@ interface Group {
   name: string;
   image: string;
   totalExpense: number;
+  colors?: [string, string];
 }
 
 export default function HomeScreen() {
@@ -36,7 +38,6 @@ export default function HomeScreen() {
   const { user } = useAuth();
   const { groups, refreshGroups } = useContext(GroupsContext);
   const [splitmates, setSplitmates] = useState<Splitmate[]>([]);
-  const [colors, setColors] = useState<[string, string]>([getRandomColor(), getRandomColor()]);
 
   useEffect(() => {
     if (user) {
@@ -113,19 +114,6 @@ export default function HomeScreen() {
         image: group.image,
       },
     });
-  };
-
-  function getRandomColor() {
-    const letters = '0123456789ABCDEF';
-    let color = '#';
-    for (let i = 0; i < 6; i++) {
-      color += letters[Math.floor(Math.random() * 16)];
-    }
-    return color;
-  }
-
-  const randomizeGradient = () => {
-    setColors([getRandomColor(), getRandomColor()]);
   };
 
   return (
@@ -209,7 +197,18 @@ export default function HomeScreen() {
           {groups.slice(0, 3).map((item) => (
             <TouchableOpacity key={item._id} onPress={() => handleGroupPress(item)}>
               <View style={styles.renderRecentGroupSection}>
-                <Image style={styles.groupImage} source={{ uri: item.image }} />
+              <LinearGradient
+          colors={item.colors ?? ['#6366f1', '#818cf8']}
+          style={{
+            height: 50,
+            width: 50,
+            borderRadius: 25,
+            justifyContent: 'center',
+            alignItems: 'center',
+          }}
+        >
+          <Ionicons name="people" size={24} color="white" />
+        </LinearGradient>
                 <View style={styles.groupDetails}>
                   <Text style={styles.groupName}>{item.name}</Text>
                   <Text style={styles.totalExpense}>Total Expense: ${item.totalExpense.toFixed(2)}</Text>
@@ -218,13 +217,6 @@ export default function HomeScreen() {
             </TouchableOpacity>
           ))}
       </View>
-
-
-      <LinearGradient colors={colors} style={styles.container}>
-        <TouchableOpacity onPress={randomizeGradient}>
-          <Text>Randomize Gradient</Text>
-        </TouchableOpacity>
-    </LinearGradient>
       </ScrollView>
     </SafeAreaView>
     </LinearGradient>

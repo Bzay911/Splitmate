@@ -3,7 +3,7 @@ import { useGroups } from "@/contexts/GroupsContext";
 import { Ionicons } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
 import { router } from "expo-router";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
     ActivityIndicator,
     Alert,
@@ -22,6 +22,21 @@ const CreateGroup = () => {
   const [groupName, setGroupName] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const { refreshGroups } = useGroups();
+  const [colors, setColors] = useState<[string, string]>([getRandomColor(), getRandomColor()]);
+
+  function getRandomColor() {
+    const letters = '0123456789ABCDEF';
+    let color = '#';
+    for (let i = 0; i < 6; i++) {
+      color += letters[Math.floor(Math.random() * 16)];
+    }
+    return color;
+  }
+
+  const randomizeGradient = () => {
+    setColors([getRandomColor(), getRandomColor()]);
+  };
+
 
   const handleCreate = async () => {
     // Validate group name
@@ -29,7 +44,7 @@ const CreateGroup = () => {
       Alert.alert("Error", "Please enter a group name");
       return;
     }
-    
+    randomizeGradient();
     setIsLoading(true);
     try {
       const user = auth.currentUser;
@@ -48,8 +63,7 @@ const CreateGroup = () => {
         },
         body: JSON.stringify({
           name: groupName,
-          image:
-            "https://www.ibcs.com/wp-content/uploads/2024/01/Projekt-bez-nazwy-15.png",
+          colors: colors,
         }),
       });
 
@@ -68,10 +82,6 @@ const CreateGroup = () => {
     } finally {
       setIsLoading(false);
     }
-  };
-
-  const handleGoBack = () => {
-    router.back();
   };
 
   return (

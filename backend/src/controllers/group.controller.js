@@ -10,7 +10,8 @@ async getAllGroups(req, res) {
         // Find groups where the current user is a member
         const groups = await Group.find({ members: req.user._id })
           .populate('members', 'displayName email')
-          .populate('createdBy', 'displayName email');
+          .populate('createdBy', 'displayName email')
+          .populate('colors', 'colors');
         res.json({ groups });
       } catch (error) {
         console.error("Error fetching groups:", error);
@@ -48,7 +49,8 @@ async createGroup(req, res){
         const group = new Group({
           name: req.body.name,
           image: req.body.image,
-          members: [req.user._id], // Add the creator as the first member
+          members: [req.user._id], 
+          colors: req.body.colors,
           createdBy: req.user._id,
           totalExpense: 0 // Initialize with 0
         });

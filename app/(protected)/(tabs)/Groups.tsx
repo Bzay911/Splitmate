@@ -1,10 +1,11 @@
 import { useGroups } from "@/contexts/GroupsContext";
+import { Ionicons } from "@expo/vector-icons";
+import { LinearGradient } from "expo-linear-gradient";
 import { Link, router } from "expo-router";
 import { onAuthStateChanged, User } from "firebase/auth";
 import React, { useEffect, useState } from "react";
 import {
   FlatList,
-  Image,
   SafeAreaView,
   StyleSheet,
   Text,
@@ -12,7 +13,6 @@ import {
   View,
 } from "react-native";
 import { auth } from "../../../src/firebaseConfig";
-import { LinearGradient } from "expo-linear-gradient";
 
 interface Group {
   _id: string;
@@ -20,11 +20,13 @@ interface Group {
   image: any;
   totalExpense: number;
   members: any[];
+  colors?: [string, string];
 }
 
 const Groups = () => {
   const { groups, isLoading, error, refreshGroups } = useGroups();
   const [user, setUser] = useState<User | null>(null);
+  // const [colors, setColors] = useState<[string, string]>(["", ""]);
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
@@ -39,6 +41,22 @@ const Groups = () => {
     return () => unsubscribe();
   }, [refreshGroups]);
 
+  // function getRandomColor() {
+  //   const letters = '0123456789ABCDEF';
+  //   let color = '#';
+  //   for (let i = 0; i < 6; i++) {
+  //     color += letters[Math.floor(Math.random() * 16)];
+  //   }
+  //   return color;
+  // }
+  // const randomizeGradient = () => {
+  //   setColors([getRandomColor(), getRandomColor()]);
+  // };
+
+  // useEffect(() => {
+  //   randomizeGradient();
+  // },[])
+
   const handleGroupPress = (group: Group) => {
     router.push({
       pathname: "/GroupDetails",
@@ -47,6 +65,7 @@ const Groups = () => {
         groupName: group.name,
         totalExpense: group.totalExpense,
         image: group.image,
+        colors: group.colors,
       },
     });
   };
@@ -57,7 +76,18 @@ const Groups = () => {
         style={styles.renderRecentGroupSection}
         onPress={() => handleGroupPress(item)}
       >
-        <Image style={styles.groupImage} source={{ uri: item.image }} />
+        <LinearGradient
+          colors={item.colors ?? ['#6366f1', '#818cf8']}
+          style={{
+            height: 50,
+            width: 50,
+            borderRadius: 25,
+            justifyContent: 'center',
+            alignItems: 'center',
+          }}
+        >
+          <Ionicons name="people" size={24} color="white" />
+        </LinearGradient>
         <View style={styles.groupDetails}>
           <Text style={styles.groupName}>{item.name}</Text>
           <Text style={styles.totalExpense}>Total Expense: ${item.totalExpense.toFixed(2)}</Text>
@@ -123,11 +153,6 @@ const styles = StyleSheet.create({
     alignItems: "center",
     gap: 18,
     paddingVertical: 16,
-  },
-  groupImage: {
-    width: 50,
-    height: 50,
-    borderRadius: 25,
   },
   recentGroupList: {
     paddingHorizontal: 24,
