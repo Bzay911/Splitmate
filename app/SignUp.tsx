@@ -96,7 +96,7 @@ function InputField({
     <View style={styles.inputContainer}>
       <Text style={styles.label}>{label}</Text>
       <View style={styles.inputWrapper}>
-        <MaterialIcons name={icon} size={20} color="#71717a" style={styles.inputIcon} />
+        <MaterialIcons name={icon} size={20} color="white" style={styles.inputIcon} />
         <TextInput
           style={styles.input}
           placeholder={placeholder}
@@ -180,6 +180,12 @@ export default function SignUp() {
   };
 
   return (
+    <LinearGradient
+    colors={['#2a2a2a', '#1a1a1a', '#0f0f0f']}
+    style={styles.safeArea}
+    start={{ x: 0, y: 0 }}
+    end={{ x: 0, y: 1 }}
+  >
     <SafeAreaView style={styles.safeArea} edges={["top"]}>
       <KeyboardAvoidingView 
         behavior={Platform.OS === "ios" ? "padding" : "height"}
@@ -276,7 +282,7 @@ export default function SignUp() {
               disabled={!agreedToTerms || isLoading}
             >
               <LinearGradient
-                colors={agreedToTerms ? ["#2563eb", "#1d4ed8"] : ["#93c5fd", "#60a5fa"]}
+                colors={agreedToTerms ? ["#fccc28", "#fccc28"] : ["#fccc28", "#fccc28"]}
                 start={{ x: 0, y: 0 }}
                 end={{ x: 1, y: 1 }}
                 style={styles.gradient}
@@ -300,13 +306,13 @@ export default function SignUp() {
         </TouchableWithoutFeedback>
       </KeyboardAvoidingView>
     </SafeAreaView>
+    </LinearGradient>
   );
 }
 
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: "#fff",
   },
   container: {
     flex: 1,
@@ -325,12 +331,12 @@ const styles = StyleSheet.create({
     fontWeight: "700",
     marginBottom: 8,
     textAlign: "center",
-    color: "#18181b",
+    color: "white",
   },
   subtitle: {
     fontSize: 16,
     textAlign: "center",
-    color: "#71717a",
+    color: "white",
   },
   inputContainer: {
     marginBottom: 20,
@@ -339,7 +345,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: "600",
     marginBottom: 8,
-    color: "#18181b",
+    color: "white",
   },
   inputWrapper: {
     flexDirection: "row",
@@ -347,7 +353,7 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     borderWidth: 1,
     borderColor: "#e4e4e7",
-    backgroundColor: "#f4f4f5",
+    backgroundColor: "#2a2a2a",
     shadowColor: "#000",
     shadowOffset: {
       width: 0,
@@ -365,7 +371,7 @@ const styles = StyleSheet.create({
     height: 52,
     paddingHorizontal: 16,
     fontSize: 16,
-    color: "#18181b",
+    color: "white",
   },
   termsContainer: {
     flexDirection: "row",
@@ -392,17 +398,17 @@ const styles = StyleSheet.create({
     elevation: 1,
   },
   checkboxChecked: {
-    backgroundColor: "#2563eb",
-    borderColor: "#2563eb",
+    backgroundColor: "#fccc28",
+    borderColor: "#fccc28",
   },
   termsText: {
     flex: 1,
     fontSize: 14,
     lineHeight: 20,
-    color: "#18181b",
+    color: "white",
   },
   termsLink: {
-    color: "#2563eb",
+    color: "#fccc28",
     fontWeight: "500",
   },
   createAccountButton: {

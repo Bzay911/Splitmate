@@ -170,7 +170,13 @@ const GroupSettings = () => {
   );
 
   return (
-    <SafeAreaView style={styles.container}>
+    <LinearGradient
+    colors={['#2a2a2a', '#1a1a1a', '#0f0f0f']}
+    style={styles.container}
+    start={{ x: 0, y: 0 }}
+    end={{ x: 0, y: 1 }}
+  >
+    <SafeAreaView>
       <View style={styles.header}>
         <Text style={styles.title}>{groupName}</Text>
         <Text style={styles.subtitle}>Group Members ({parsedMembers.length})</Text>
@@ -201,6 +207,7 @@ const GroupSettings = () => {
         </TouchableOpacity>
       </View>
     </SafeAreaView>
+    </LinearGradient>
   );
 };
 
@@ -216,10 +223,11 @@ const styles = StyleSheet.create({
     fontSize: 24,
     fontWeight: "bold",
     marginBottom: 8,
+    color: "white",
   },
   subtitle: {
     fontSize: 16,
-    color: "#666",
+    color: "white",
   },
   membersList: {
     padding: 16,
@@ -229,10 +237,12 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     alignItems: "center",
     padding: 16,
-    backgroundColor: "#f8f8f8",
+    backgroundColor: "#2a2a2a",
     borderRadius: 8,
     marginBottom: 12,
     position: "relative",
+    borderWidth: 1,
+    borderColor: "white",
   },
   memberInfo: {
     flex: 1,
@@ -241,18 +251,17 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: "500",
     marginBottom: 4,
+    color: "white",
   },
   memberPhone: {
     fontSize: 14,
-    color: "#666",
+    color: "white",
   },
   membersContainer: {
-    paddingLeft: 16,
+    padding: 8,
   },
   deleteSection: {
     padding: 16,
-    borderTopWidth: 1,
-    borderTopColor: '#eee',
   },
   deleteButton: {
     backgroundColor: '#ff3b30',

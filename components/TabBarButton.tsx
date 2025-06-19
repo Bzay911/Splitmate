@@ -1,25 +1,26 @@
-import { Ionicons } from '@expo/vector-icons';
 import React, { useEffect } from 'react';
 import { Pressable, PressableProps, StyleSheet, Text } from 'react-native';
 import Animated, { interpolate, useAnimatedStyle, useSharedValue, withSpring } from 'react-native-reanimated';
+import Icon from 'react-native-vector-icons/FontAwesome';
+import IconRegular from 'react-native-vector-icons/FontAwesome5';
 
 // Map route names to Ionicons names (outline and filled versions)
 const iconMapping = {
   index: {
-    outline: 'home-outline',
-    filled: 'home'
+    outline: 'th-large',
+    filled: 'th-large'
   },
   Groups: {
-    outline: 'people-outline',
-    filled: 'people'
+    outline: 'users',
+    filled: 'users'
   },
   History: {
-    outline: 'document-text-outline',
-    filled: 'document-text'
+    outline: 'history',
+    filled: 'history'
   },
   Profile: {
-    outline: 'person-outline',
-    filled: 'person'
+    outline: 'user-circle',
+    filled: 'user-circle'
   }
 };
 
@@ -56,12 +57,16 @@ const TabBarButton = (props: TabBarButtonProps) => {
     // Check if route exists in mapping
     if (!iconMapping[routeName]) {
       console.warn(`No icon mapping for route: ${routeName}`);
-      return <Ionicons name="help-circle-outline" size={28} color={color} />;
+      return <Icon name="question-circle" size={28} color={color} />;
     }
     
     const iconType = isFocused ? 'filled' : 'outline';
     const iconName = iconMapping[routeName][iconType];
-    return <Ionicons name={iconName as any} size={28} color={color} />;
+    
+    if (iconType === 'outline') {
+      return <IconRegular name={iconName} size={30} color={color} light />;
+    }
+    return <Icon name={iconName} size={30} color={color} />;
   }
 
   return (
@@ -69,7 +74,7 @@ const TabBarButton = (props: TabBarButtonProps) => {
         <Animated.View style={animatedStyle}>   
 
       {renderIcon()}
-      {label && <Text style={{color, fontSize: 10}}>{label}</Text>}
+      {label && <Text style={{color, fontSize: 10, marginTop: 4}}>{label}</Text>}
         </Animated.View>
     </Pressable>
   )
@@ -80,7 +85,6 @@ const styles = StyleSheet.create({
         flex: 1,
         justifyContent: 'center',
         alignItems: 'center',
-        gap: 12,
     }
 })
 

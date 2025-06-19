@@ -12,6 +12,7 @@ import {
   View,
 } from "react-native";
 import { auth } from "../../../src/firebaseConfig";
+import { LinearGradient } from "expo-linear-gradient";
 
 interface Group {
   _id: string;
@@ -66,6 +67,12 @@ const Groups = () => {
   };
 
   return (
+   <LinearGradient
+      colors={['#2a2a2a', '#1a1a1a', '#0f0f0f']}
+      style={styles.safeAreaView}
+      start={{ x: 0, y: 0 }}
+      end={{ x: 0, y: 1 }}
+    >
    <SafeAreaView style={styles.safeAreaView}>
       <View style={styles.topSection}>
         {/* <View style={{ width: 90 }} /> */}
@@ -88,10 +95,6 @@ const Groups = () => {
         </View>
       ) : groups.length === 0 ? (
         <View style={styles.noGroupsContainer}>
-          <Image
-            source={require("../../../assets/images/noGroups.png")}
-            style={styles.noGroups}
-          />
           <Text style={styles.noGroupsText}>No groups joined</Text>
         </View>
       ) : (
@@ -106,21 +109,20 @@ const Groups = () => {
         />
       )}
     </SafeAreaView>
+    </LinearGradient>
   );
 };
 
 const styles = StyleSheet.create({
   safeAreaView: {
     flex: 1,
-    backgroundColor: 'white',
+    // backgroundColor: 'white',
   },
   renderRecentGroupSection: {
     flexDirection: "row",
     alignItems: "center",
     gap: 18,
     paddingVertical: 16,
-    borderBottomWidth: 1,
-    borderBottomColor: '#e2e8f0',
   },
   groupImage: {
     width: 50,
@@ -136,7 +138,7 @@ const styles = StyleSheet.create({
   },
   groupName: {
     fontSize: 16,
-    color: '#1e293b',
+    color: 'white',
     marginBottom: 4,
     fontWeight: "500",
   },
@@ -152,13 +154,13 @@ const styles = StyleSheet.create({
     marginVertical: 16,
   },
   createBtn: {
-    color: "#007AFF",
+    color: "white",
     fontWeight: "500",
   },
   topBarTitle: {
     fontSize: 32,
     fontWeight: "700",
-    color: "#1e293b",
+    color: "white",
     marginBottom: 8,
   },
   noGroups: {
@@ -174,7 +176,7 @@ const styles = StyleSheet.create({
   noGroupsText: {
     fontSize: 18,
     fontWeight: "500",
-    color: "#666",
+    color: "#64748b",
     marginTop: 16,
   },
   centerContainer: {

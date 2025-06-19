@@ -1,5 +1,6 @@
 import { useAuth } from '@/contexts/AuthContext';
 import { MaterialIcons } from '@expo/vector-icons';
+import { LinearGradient } from 'expo-linear-gradient';
 import { useRouter } from 'expo-router';
 import React from 'react';
 import { Alert, Image, SafeAreaView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
@@ -25,7 +26,13 @@ const Profile = () => {
   };
 
   return (
-    <SafeAreaView style={styles.container}>
+    <LinearGradient
+    colors={['#2a2a2a', '#1a1a1a', '#0f0f0f']}
+    style={styles.container}
+    start={{ x: 0, y: 0 }}
+    end={{ x: 0, y: 1 }}
+  >
+    <SafeAreaView>
       <View style={styles.header}>
         <Text style={styles.title}>Profile</Text>
         <Text style={styles.subtitle}>Manage your account and preferences</Text>
@@ -46,8 +53,6 @@ const Profile = () => {
         </TouchableOpacity>
       </View>
 
-      <View style={styles.divider} />
-
       <View style={styles.section}>
         <Text style={styles.sectionTitle}>Settings</Text>
         <TouchableOpacity style={styles.settingItem}>
@@ -67,6 +72,7 @@ const Profile = () => {
         </TouchableOpacity>
       </View>
     </SafeAreaView>
+    </LinearGradient>
   );
 };
 
@@ -81,7 +87,7 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 32,
     fontWeight: '700',
-    color: '#1e293b',
+    color: 'white',
     marginBottom: 8,
   },
   avatarImage: {
@@ -91,7 +97,7 @@ const styles = StyleSheet.create({
   },
   subtitle: {
     fontSize: 16,
-    color: '#64748b',
+    color: 'white',
   },
   profileSection: {
     flexDirection: 'row',
@@ -123,31 +129,26 @@ const styles = StyleSheet.create({
   userName: {
     fontSize: 24,
     fontWeight: '600',
-    color: '#1e293b',
+    color: 'white',
     marginBottom: 4,
   },
   userEmail: {
     fontSize: 16,
-    color: '#64748b',
+    color: 'white',
   },
   editButton: {
     paddingHorizontal: 20,
     paddingVertical: 8,
     borderRadius: 8,
     borderWidth: 1,
-    borderColor: '#e2e8f0',
+    borderColor: 'white',
     minWidth: 80,
     alignItems: 'center',
   },
   editButtonText: {
     fontSize: 16,
     fontWeight: '500',
-    color: '#2563eb',
-  },
-  divider: {
-    height: 1,
-    backgroundColor: '#e2e8f0',
-    marginVertical: 16,
+    color: 'white', 
   },
   section: {
     paddingHorizontal: 24,
@@ -155,8 +156,8 @@ const styles = StyleSheet.create({
   sectionTitle: {
     fontSize: 20,
     fontWeight: '600',
-    color: '#1e293b',
-    marginBottom: 16,
+    color: 'white',
+    marginVertical: 16,
   },
 
   statItem: {
@@ -175,24 +176,22 @@ const styles = StyleSheet.create({
   statValue: {
     fontSize: 18,
     fontWeight: '600',
-    color: '#1e293b',
+    color: 'white',
     marginBottom: 4,
   },
   statTitle: {
     fontSize: 14,
-    color: '#64748b',
+    color: 'white',
   },
   settingItem: {
     flexDirection: 'row',
     alignItems: 'center',
     paddingVertical: 16,
-    borderBottomWidth: 1,
-    borderBottomColor: '#e2e8f0',
   },
   settingText: {
     flex: 1,
     fontSize: 16,
-    color: '#1e293b',
+    color: 'white',
     marginLeft: 16,
   },
 });

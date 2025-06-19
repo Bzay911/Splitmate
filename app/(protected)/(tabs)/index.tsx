@@ -3,7 +3,6 @@ import { useAuth } from "@/contexts/AuthContext";
 import { useFinancial } from "@/contexts/FinancialContext";
 import GroupsContext from "@/contexts/GroupsContext";
 import { auth } from "@/src/firebaseConfig";
-import { Ionicons } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
 import { router } from "expo-router";
 import { useContext, useEffect, useState } from "react";
@@ -114,11 +113,20 @@ export default function HomeScreen() {
   };
 
   return (
-    <SafeAreaView style={styles.mainContainer}>
+     <LinearGradient
+      colors={['#2a2a2a', '#1a1a1a', '#0f0f0f']}
+      style={styles.mainContainer}
+      start={{ x: 0, y: 0 }}
+      end={{ x: 0, y: 1 }}
+    >
+      <SafeAreaView>
       <ScrollView style={styles.scrollView}>
       {/* Topbar */}
       <View style={styles.topBar}>
-        <Text style={styles.title}>Home</Text>
+        <View style={styles.welcomeContainer}>
+          <Text style={styles.title}>Welcome back,</Text>
+          <Text style={styles.username}>{user?.displayName || 'User'}</Text>
+        </View>
 
         <View style={styles.rightTop}>
           <TouchableOpacity onPress={() => router.push('/Profile')}>
@@ -129,7 +137,13 @@ export default function HomeScreen() {
 
       {/* Owe section */}
       <View style={styles.amountSection}>
-        <LinearGradient
+        <View style={styles.oweSection}>
+          <Text style={styles.amountTitle}>I'm owed</Text>
+          <Text style={styles.amount}>
+            ${financialSummary.creditAmount.toFixed(2)}
+          </Text>
+        </View>
+        {/* <LinearGradient
           colors={["#4ADE80", "#10B981"]}
           style={styles.oweSection}
           start={{ x: 0, y: 0 }}
@@ -139,10 +153,16 @@ export default function HomeScreen() {
           <Text style={styles.amount}>
             ${financialSummary.creditAmount.toFixed(2)}
           </Text>
-        </LinearGradient>
+        </LinearGradient> */}
 
         <View style={styles.amountSubSection}>
-          <LinearGradient
+          <View style={styles.paySection}>
+            <Text style={styles.amountTitle}>Need to pay</Text>
+            <Text style={styles.amount}>
+              -${financialSummary.debtAmount.toFixed(2)}
+            </Text>
+          </View>
+          {/* <LinearGradient
             colors={["#FF6B6B", "#FE8888", "#FFA9A9"]}
             start={{ x: 1, y: 0 }}
             end={{ x: 0, y: 0 }}
@@ -152,8 +172,14 @@ export default function HomeScreen() {
             <Text style={styles.amount}>
               -${financialSummary.debtAmount.toFixed(2)}
             </Text>
-          </LinearGradient>
-          <LinearGradient
+          </LinearGradient> */}
+          <View style={styles.expenseSection}>
+            <Text style={styles.amountTitle}>Total expenses</Text>
+            <Text style={styles.amount}>
+              ${financialSummary.totalExpenses.toFixed(2)}
+            </Text>
+          </View>
+          {/* <LinearGradient
             colors={["#CFCFCF", "#D5D5D5", "#E0E0E0"]}
             start={{ x: 1, y: 0 }}
             end={{ x: 0, y: 0 }}
@@ -163,7 +189,7 @@ export default function HomeScreen() {
             <Text style={styles.amount}>
               ${financialSummary.totalExpenses.toFixed(2)}
             </Text>
-          </LinearGradient>
+          </LinearGradient> */}
         </View>
       </View>
 
@@ -171,7 +197,7 @@ export default function HomeScreen() {
       <View style={styles.splitMatesContainer}>
         <View style={styles.texts}>
           <Text style={styles.eachTitle}>Your Splitmates</Text>
-          <Text>see all</Text>
+          <Text style={styles.seeAll}>see all</Text>
         </View>
 
         <FlatList
@@ -188,7 +214,7 @@ export default function HomeScreen() {
       <View style={styles.recentGroupSection}>
         <View style={styles.texts}>
           <Text style={styles.eachTitle}>Recent Groups</Text>
-          <Text>see all</Text>
+          <Text style={styles.seeAll}>see all</Text>
         </View>
           {groups.slice(0, 3).map((item) => (
             <TouchableOpacity key={item._id} onPress={() => handleGroupPress(item)}>
@@ -204,16 +230,15 @@ export default function HomeScreen() {
       </View>
       </ScrollView>
     </SafeAreaView>
+    </LinearGradient>
   );
 }
 
 const styles = StyleSheet.create({
   mainContainer: {
     flex: 1,
-    backgroundColor: "#ffffff",
   },
   scrollView: {
-    flex: 1,
   },
   topBar: {
     flexDirection: "row",
@@ -238,10 +263,17 @@ const styles = StyleSheet.create({
   camera: {
     flex: 1,
   },
-  title: {
-    fontSize: 32,
+  welcomeContainer: {
+    flex: 1,
+  },
+  username: {
+    fontSize: 28,
     fontWeight: "700",
-    color: "#1e293b",
+    color: "white",
+  },
+  title: {
+    fontSize: 22,
+    color: "white",
   },
   rightTop: {
     flexDirection: "row",
@@ -254,7 +286,7 @@ const styles = StyleSheet.create({
     height: 250,
     width: "100%",
     borderRadius: 8,
-    marginTop: 24,
+    marginTop: 12,
   },
   oweSection: {
     height: 100,
@@ -262,6 +294,7 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     padding: 12,
     justifyContent: "center",
+    backgroundColor: "#fccc28",
   },
   amountSubSection: {
     flexDirection: "row",
@@ -275,6 +308,7 @@ const styles = StyleSheet.create({
     padding: 12,
     flex: 1,
     justifyContent: "center",
+    backgroundColor: "#fccc28",
   },
   expenseSection: {
     height: 100,
@@ -282,11 +316,12 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     padding: 12,
     justifyContent: "center",
+    backgroundColor: "#fccc28",
   },
   splitMatesContainer: {
     height: 160,
     width: "100%",
-    marginTop: 24,
+    marginTop: 12,
     padding: 12,
   },
   texts: {
@@ -306,11 +341,12 @@ const styles = StyleSheet.create({
   splitmateName: {
     textAlign: "center",
     marginTop: 4,
+    color: 'white',
   },
   recentGroupSection: {
     width: "100%",
-    marginTop: 24,
-    paddingHorizontal: 24,
+    marginTop: 12,
+    paddingHorizontal: 12,
     paddingBottom: 30,
   },
   renderRecentGroupSection: {
@@ -318,8 +354,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     gap: 18,
     paddingVertical: 16,
-    borderBottomWidth: 1,
-    borderBottomColor: '#e2e8f0',
+    
   },
   groupImage: {
     width: 50,
@@ -331,29 +366,36 @@ const styles = StyleSheet.create({
   },
   groupName: {
     fontSize: 16,
-    color: '#1e293b',
+    color: 'white',
     marginBottom: 4,
     fontWeight: "500",
   },
   totalExpense: {
     fontSize: 14,
-    color: '#64748b',
+    color: '#94a3b8',
   },
   eachTitle: {
     fontWeight: "600",
     fontSize: 16,
+    color: 'white',
   },
   amountTitle: {
     fontWeight: "600",
     fontSize: 16,
     marginBottom: 4,
+    // color: "white"
   },
   amount: {
     fontWeight: "600",
     fontSize: 35,
+    // color: "white"
   },
   recentGroupHeader: {
     padding: 12,
     marginTop: 24,
+  },
+  seeAll: {
+    color: 'white',
+    fontSize: 14,
   },
 });

@@ -193,8 +193,6 @@ const GroupDetails = () => {
     }
   };
 
-  const totalExpense = groupDetails.totalExpense;
-  // console.log(`Group total expense: ${totalExpense}`);
 
 const getIndividualExpense = (member: GroupMember) => {
     const totalExpense = expenses.reduce((sum, expense) => {
@@ -271,8 +269,8 @@ const getIndividualExpense = (member: GroupMember) => {
             <Text style={styles.settlementText}>
               <Text style={styles.debtorName}>
                 {settlement.from === user?.displayName ? "You" : settlement.from}
-              </Text> should pay{' '}
-              <Text style={styles.settlementAmount}>${settlement.amount}</Text> to{' '}
+              </Text> <Text style={styles.settlementText}>should pay{' '}</Text>
+              <Text style={styles.settlementAmount}>${settlement.amount}</Text> <Text style={styles.settlementText}>to{' '}</Text>
               <Text style={styles.creditorName}>
                 {settlement.to === user?.displayName ? "You" : settlement.to}
               </Text>
@@ -284,111 +282,117 @@ const getIndividualExpense = (member: GroupMember) => {
   };
 
   return (
-    
-    <SafeAreaView style={styles.container}>
-      <ScrollView
-        style={styles.scrollView}
-        showsVerticalScrollIndicator={false}
-      >
-        <TouchableOpacity
-          style={styles.settingsBtn}
-          onPress={handleSettingsPress}
+    <LinearGradient
+      colors={['#2a2a2a', '#1a1a1a', '#0f0f0f']}
+      style={styles.container}
+      start={{ x: 0, y: 0 }}
+      end={{ x: 0, y: 1 }}
+    >
+      <SafeAreaView style={styles.safeArea}>
+        <ScrollView
+          showsVerticalScrollIndicator={false}
+          contentContainerStyle={styles.scrollContent}
         >
-          <Ionicons name="settings" size={24} color="black" />
-        </TouchableOpacity>
-        <View style={styles.header}>
-          <Image source={{ uri: image as string }} style={styles.groupImage} />
-          <Text style={styles.groupName}>{groupName}</Text>
-        </View>
-        <LinearGradient
-          colors={["#4ADE80", "#10B981"]}
-          style={styles.oweSection}
-          start={{ x: 0, y: 0 }}
-          end={{ x: 1, y: 0 }}
-        >
-          <View>
-            <Text style={styles.billTitle}>Total Expense</Text>
-            <Text style={styles.billAmount}>${(groupDetails.totalExpense).toFixed(2)}</Text>
-          </View>
-
-          <View style={styles.verticalLine} />
-
-          <View>
-            <Text style={styles.splitTitle}>Split Between</Text>
-            <Text style={styles.splitMembers}>
-              {groupDetails.members.length}
-            </Text>
-          </View>
-        </LinearGradient>
-
-        <View style={styles.dividendSection}>
-          {creditors.find(item => item.email === user?.email) ? (
-            <Text style={styles.ownerDividend}>
-              You are owed ${creditors.find(item => item.email === user?.email)?.balance.toFixed(2)} overall
-            </Text>
-          ) : debtors.find(item => item.email === user?.email) ? (
-            <Text style={styles.ownerOwe}>
-              You owe ${Math.abs(debtors.find(item => item.email === user?.email)?.balance || 0).toFixed(2)} overall
-            </Text>
-          ) : (
-            <Text style={styles.settlementText}>You are all settled up!</Text>
-          )}
-          {renderSettlements()}
-        </View>
-
-        <View style={styles.buttonContainer}>
-          <TouchableOpacity style={styles.buttonWrapper}>
-            <LinearGradient
-              colors={["#EF4444", "#EC4899"]}
-              style={styles.settleupBtn}
-              start={{ x: 0, y: 0 }}
-              end={{ x: 1, y: 0 }}
-            >
-              <Text style={styles.buttonText}>Settle up</Text>
-            </LinearGradient>
+          <TouchableOpacity
+            style={styles.settingsBtn}
+            onPress={handleSettingsPress}
+          >
+            <Ionicons name="settings" size={24} color="white" />
           </TouchableOpacity>
-
-          <TouchableOpacity style={styles.buttonWrapper}>
-            <LinearGradient
-              colors={["#FB923C", "#EAB308"]}
-              style={styles.exportBtn}
-              start={{ x: 0, y: 0 }}
-              end={{ x: 1, y: 0 }}
-            >
-              <Text style={styles.buttonText}>Export</Text>
-            </LinearGradient>
-          </TouchableOpacity>
-        </View>
-
-        <Text style={styles.sectionTitle}>Expenses</Text>
-
-        {expenses.map((expense) => (
-          <View key={expense._id} style={styles.expensesContainer}>
-            <View style={styles.expenseIcon}>
-              <Ionicons name="cart" size={24} color="black" />
+          <View style={styles.header}>
+            <Image source={{ uri: image as string }} style={styles.groupImage} />
+            <Text style={styles.groupName}>{groupName}</Text>
+          </View>
+          <LinearGradient
+            colors={["#4ADE80", "#10B981"]}
+            style={styles.oweSection}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 0 }}
+          >
+            <View>
+              <Text style={styles.billTitle}>Total Expense</Text>
+              <Text style={styles.billAmount}>${(groupDetails.totalExpense).toFixed(2)}</Text>
             </View>
 
-            <View style={styles.dateContainer}>
-              <Text style={styles.dateText}>{formatDate(expense.date)}</Text>
-            </View>
+            <View style={styles.verticalLine} />
 
-            <View style={styles.expenses}>
-              <Text style={styles.expenseDescription}>
-                {expense.description}
-              </Text>
-              <Text style={styles.expenseAmount}>
-                {expense?.paidBy?.displayName || "Anonymous"} added{" "}
-                <Text style={styles.addedTotalCost}>${expense.amount}</Text>
+            <View>
+              <Text style={styles.splitTitle}>Split Between</Text>
+              <Text style={styles.splitMembers}>
+                {groupDetails.members.length}
               </Text>
             </View>
+          </LinearGradient>
+
+          <View style={styles.dividendSection}>
+            {creditors.find(item => item.email === user?.email) ? (
+              <Text style={styles.ownerDividend}>
+                You are owed ${creditors.find(item => item.email === user?.email)?.balance.toFixed(2)} overall
+              </Text>
+            ) : debtors.find(item => item.email === user?.email) ? (
+              <Text style={styles.ownerOwe}>
+                You owe ${Math.abs(debtors.find(item => item.email === user?.email)?.balance || 0).toFixed(2)} overall
+              </Text>
+            ) : (
+              <Text style={styles.settlementText}>You are all settled up!</Text>
+            )}
+            {renderSettlements()}
           </View>
-        ))}
-      </ScrollView>
+
+          <View style={styles.buttonContainer}>
+            <TouchableOpacity style={styles.buttonWrapper}>
+              <LinearGradient
+                colors={["#EF4444", "#EC4899"]}
+                style={styles.settleupBtn}
+                start={{ x: 0, y: 0 }}
+                end={{ x: 1, y: 0 }}
+              >
+                <Text style={styles.buttonText}>Settle up</Text>
+              </LinearGradient>
+            </TouchableOpacity>
+
+            <TouchableOpacity style={styles.buttonWrapper}>
+              <LinearGradient
+                colors={["#FB923C", "#EAB308"]}
+                style={styles.exportBtn}
+                start={{ x: 0, y: 0 }}
+                end={{ x: 1, y: 0 }}
+              >
+                <Text style={styles.buttonText}>Export</Text>
+              </LinearGradient>
+            </TouchableOpacity>
+          </View>
+
+          <Text style={styles.sectionTitle}>Expenses</Text>
+
+          {expenses.map((expense) => (
+            <View key={expense._id} style={styles.expensesContainer}>
+              <View style={styles.expenseIcon}>
+                <Ionicons name="cart" size={24} color="black" />
+              </View>
+
+              <View style={styles.dateContainer}>
+                <Text style={styles.dateText}>{formatDate(expense.date)}</Text>
+              </View>
+
+              <View style={styles.expenses}>
+                <Text style={styles.expenseDescription}>
+                  {expense.description}
+                </Text>
+                <Text style={styles.expenseAmount}>
+                  {expense?.paidBy?.displayName || "Anonymous"} added{" "}
+                  <Text style={styles.addedTotalCost}>${expense.amount}</Text>
+                </Text>
+              </View>
+            </View>
+          ))}
+        </ScrollView>
+      </SafeAreaView>
 
       <FloatingAction
         actions={actions}
-        color="#007AFF"
-        floatingIcon={<Ionicons name="add" size={24} color="white" />}
+        color="#fccc28"
+        floatingIcon={<Ionicons name="add" size={24} color="black" />}
         onPressItem={name => {
           if (name === "scanreceipt") {
             router.push({
@@ -408,20 +412,21 @@ const getIndividualExpense = (member: GroupMember) => {
         }}
         showBackground={false}
         position="right"
-        distanceToEdge={16}
+        distanceToEdge={20}
       />
-    </SafeAreaView>
+    </LinearGradient>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#fff",
   },
-  scrollView: {
+  safeArea: {
     flex: 1,
-    backgroundColor: "#fff",
+  },
+  scrollContent: {
+    paddingBottom: 100, // Add padding to prevent content from being hidden behind FAB
   },
   noMembersContainer: {
     flex: 1,
@@ -447,10 +452,7 @@ const styles = StyleSheet.create({
     fontSize: 24,
     fontWeight: "bold",
     marginBottom: 8,
-  },
-  totalExpense: {
-    fontSize: 18,
-    color: "#666",
+    color: "white",
   },
   oweSection: {
     height: 100,
@@ -488,7 +490,7 @@ const styles = StyleSheet.create({
   dividendSection: {
     margin: 12,
     padding: 16,
-    backgroundColor: "white",
+    backgroundColor: "#2a2a2a",
     borderRadius: 16,
     shadowColor: "#000",
     shadowOffset: {
@@ -510,39 +512,6 @@ const styles = StyleSheet.create({
     fontWeight: "600",
     color: "#EF4444",
     marginBottom: 16,
-  },
-  memberOwesContainer: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    marginBottom: 12,
-  },
-  memberInfo: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 12,
-  },
-  memberAvatar: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    backgroundColor: "#f3f4f6",
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  memberName: {
-    fontSize: 16,
-    fontWeight: "500",
-  },
-  positiveAmount: {
-    fontSize: 16,
-    fontWeight: "600",
-    color: "#16A34A",
-  },
-  negativeAmount: {
-    fontSize: 16,
-    fontWeight: "600",
-    color: "#EF4444",
   },
   buttonContainer: {
     flexDirection: "row",
@@ -586,22 +555,6 @@ const styles = StyleSheet.create({
     padding: 16,
     marginTop: 20,
   },
-  emailInput: {
-    borderWidth: 1,
-    borderColor: "#ddd",
-    borderRadius: 8,
-    padding: 12,
-    marginBottom: 16,
-    fontSize: 16,
-  },
-  inviteBtnDisabled: {
-    opacity: 0.7,
-  },
-  memberItem: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    padding: 12,
-  },
   sectionTitle: {
     fontSize: 20,
     fontWeight: "bold",
@@ -609,6 +562,7 @@ const styles = StyleSheet.create({
     marginLeft: 12,
     paddingLeft: 16,
     paddingTop: 16,
+    color: "white",
   },
   expensesContainer: {
     margin: 12,
@@ -621,15 +575,17 @@ const styles = StyleSheet.create({
     backgroundColor: "#f3f4f6",
     justifyContent: "center",
     alignItems: "center",
+    borderRadius: 4,
   },
   expenses: {
     flexDirection: "column",
   },
   expenseAmount: {
     fontSize: 14,
-    color: "gray",
+    color: "#64748b",
   },
   expenseDescription: {
+    color: "white",
     fontSize: 18,
   },
   addedTotalCost: {
@@ -641,7 +597,7 @@ const styles = StyleSheet.create({
   },
   dateText: {
     fontSize: 14,
-    color: "#666",
+    color: "white",
   },
   settlementItem: {
     marginBottom: 8,
@@ -649,9 +605,7 @@ const styles = StyleSheet.create({
   },
   settlementText: {
     fontSize: 16,
-    fontWeight: "600",
-    color: "#4B5563",
-    marginBottom: 8,
+    color: "white",
   },
   debtorName: {
     fontWeight: '600',
@@ -663,7 +617,7 @@ const styles = StyleSheet.create({
   },
   settlementAmount: {
     fontWeight: '600',
-    color: '#374151',
+    color: 'white',
   },
 });
 

@@ -3,7 +3,6 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { onAuthStateChanged, signOut, updateProfile, User } from "firebase/auth";
 import { createContext, ReactNode, useContext, useEffect, useState } from "react";
 import { ActivityIndicator } from "react-native";
-import { router } from "expo-router";
 
 // Define what data and functions our context will provide
 type AuthContextType = {

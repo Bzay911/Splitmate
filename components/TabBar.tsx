@@ -1,12 +1,20 @@
+import { BottomTabBarProps } from '@react-navigation/bottom-tabs';
+import { LinearGradient } from "expo-linear-gradient";
 import React from "react";
-import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { StyleSheet } from "react-native";
 import TabBarButton from "./TabBarButton";
 
-const TabBar = ({ state, descriptors, navigation }) => {
-  const primaryColor = "#0891b2";
+const TabBar = ({ state, descriptors, navigation }: BottomTabBarProps) => {
+  const primaryColor = "#fccc28";
   const greyColor = "#737373";
   return (
-    <View style={styles.tabbar}>
+    // <View style={styles.tabbar}>
+    <LinearGradient
+    colors={['#2a2a2a', '#1a1a1a', '#0f0f0f']}
+    style={styles.tabbar}
+    start={{ x: 0, y: 0 }}
+    end={{ x: 0, y: 1 }}
+  >
       {state.routes.map((route, index) => {
         const { options } = descriptors[route.key];
         const label =
@@ -44,7 +52,8 @@ const TabBar = ({ state, descriptors, navigation }) => {
           />
         );
       })}
-    </View>
+    </LinearGradient>
+    // </View>
   );
 };
 
@@ -55,15 +64,17 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    backgroundColor: "white",
     marginHorizontal: 20,
-    paddingVertical: 15,
-    borderRadius: 25,
+    paddingVertical: 10,
+    borderRadius: 20,
     borderCurve: "continuous",
-    shadowColor: "black",
-    shadowOffset: { width: 0, height: 10 },
-    shadowRadius: 10,
-    shadowOpacity: 0.1,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 4 },
+    shadowRadius: 12,
+    shadowOpacity: 0.3,
+    elevation: 8,
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.1)',
   },
 });
 

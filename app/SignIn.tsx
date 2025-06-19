@@ -12,6 +12,7 @@ import {
 import { SafeAreaView } from "react-native-safe-area-context";
 import { apiUrl } from "../constants/ApiConfig";
 import { auth } from "../src/firebaseConfig";
+import { LinearGradient } from "expo-linear-gradient";
 
 const handleSignin = async (email: string, password: string) => {
   try {
@@ -57,7 +58,7 @@ const handleSignin = async (email: string, password: string) => {
       throw new Error(data.error || 'Failed to sign in');
     }
 
-    router.replace("/(protected)/(tabs)");
+    // router.replace("/(protected)/(tabs)");
     return userCredential.user;
   } catch (error: any) {
     console.error("Error signing in", error);
@@ -115,7 +116,7 @@ function InputField({
     <View style={styles.inputContainer}>
       <Text style={styles.label}>{label}</Text>
       <View style={styles.inputWrapper}>
-        <MaterialIcons name={icon} size={20} color="#71717a" style={styles.inputIcon} />
+        <MaterialIcons name={icon} size={20} color="white" style={styles.inputIcon} />
         <TextInput
           style={styles.input}
           placeholder={placeholder}
@@ -181,6 +182,12 @@ export function LoginScreen() {
   };
 
   return (
+    <LinearGradient
+    colors={['#2a2a2a', '#1a1a1a', '#0f0f0f']}
+    style={styles.safeArea}
+    start={{ x: 0, y: 0 }}
+    end={{ x: 0, y: 1 }}
+  >
     <SafeAreaView style={styles.safeArea} edges={["top"]}>
       <View style={styles.container}>
         <View style={styles.header}>
@@ -270,6 +277,7 @@ export function LoginScreen() {
         </View>
       </View>
     </SafeAreaView>
+    </LinearGradient>
   );
 }
 
@@ -278,7 +286,6 @@ export default LoginScreen;
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: "#fff",
   },
   container: {
     flex: 1,
@@ -297,12 +304,12 @@ const styles = StyleSheet.create({
     fontWeight: "700",
     marginBottom: 8,
     textAlign: "center",
-    color: "#18181b",
+    color: "white",
   },
   subtitle: {
     fontSize: 16,
     textAlign: "center",
-    color: "#71717a",
+    color: "white",
   },
   inputContainer: {
     marginBottom: 20,
@@ -311,7 +318,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: "600",
     marginBottom: 8,
-    color: "#18181b",
+    color: "white",
   },
   inputWrapper: {
     flexDirection: "row",
@@ -319,7 +326,7 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     borderWidth: 1,
     borderColor: "#e4e4e7",
-    backgroundColor: "#f4f4f5",
+    backgroundColor: "#2a2a2a",
     shadowColor: "#000",
     shadowOffset: {
       width: 0,
@@ -337,14 +344,14 @@ const styles = StyleSheet.create({
     height: 52,
     paddingHorizontal: 16,
     fontSize: 16,
-    color: "#18181b",
+    color: "white",
   },
   forgotPasswordContainer: {
     alignItems: "flex-end",
     marginBottom: 24,
   },
   forgotLink: {
-    color: "#2563eb",
+    color: "#fccc28",
     fontSize: 14,
     fontWeight: "500",
   },
@@ -352,7 +359,7 @@ const styles = StyleSheet.create({
     width: "100%",
     height: 52,
     borderRadius: 12,
-    backgroundColor: "#2563eb",
+    backgroundColor: "#fccc28",
     alignItems: "center",
     justifyContent: "center",
     marginBottom: 24,
@@ -395,7 +402,6 @@ const styles = StyleSheet.create({
     width: "100%",
     height: 52,
     borderRadius: 12,
-    borderWidth: 1,
     borderColor: "#e4e4e7",
     backgroundColor: "#fff",
     marginBottom: 16,
@@ -420,7 +426,7 @@ const styles = StyleSheet.create({
     color: "#71717a",
   },
   link: {
-    color: "#2563eb",
+    color: "#fccc28",
     fontWeight: "500",
   },
   errorText: {

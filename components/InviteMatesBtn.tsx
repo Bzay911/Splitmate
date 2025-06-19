@@ -60,7 +60,8 @@ const InviteMatesBtn: React.FC<InviteMatesBtnProps> = ({groupId}) => {
     <Text style={styles.sectionTitle}>Invite Members</Text>
     <TextInput
       style={styles.emailInput}
-      placeholder="Enter email address"
+      placeholder="someone@gmail.com"
+      placeholderTextColor="#64748b"
       value={inviteeEmail}
       onChangeText={setInviteeEmail}
       keyboardType="email-address"
@@ -94,15 +95,15 @@ const styles = StyleSheet.create({
       },
       inviteSection: {
         padding: 16,
-        marginTop: 20,
       },
       emailInput: {
         borderWidth: 1,
-        borderColor: '#ddd',
+        borderColor: 'white',
         borderRadius: 8,
         padding: 12,
         marginBottom: 16,
         fontSize: 16,
+        color: "white",
       },
       inviteBtnDisabled: {
         opacity: 0.7,
@@ -122,6 +123,7 @@ const styles = StyleSheet.create({
         fontSize: 20,
         fontWeight: "bold",
         marginBottom: 12,
+        color: "white",
       },
 })
 export default InviteMatesBtn
