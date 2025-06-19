@@ -14,7 +14,6 @@ const AddExpense = () => {
   const { groupId } = useLocalSearchParams();
   const { refreshFinancialSummary } = useFinancial();
   const { refreshActivities } = useActivity();
-  console.log(`groupId from expense: ${groupId}`);
   
   const handleAddExpense = async () => {
     if (!amount.trim()) {

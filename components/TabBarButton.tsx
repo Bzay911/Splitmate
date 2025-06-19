@@ -15,8 +15,8 @@ const iconMapping = {
     filled: 'users'
   },
   History: {
-    outline: 'history',
-    filled: 'history'
+    outline: 'bar-chart-o',
+    filled: 'bar-chart-o'
   },
   Profile: {
     outline: 'user-circle',
@@ -64,9 +64,9 @@ const TabBarButton = (props: TabBarButtonProps) => {
     const iconName = iconMapping[routeName][iconType];
     
     if (iconType === 'outline') {
-      return <IconRegular name={iconName} size={30} color={color} light />;
+      return <Icon name={iconName} size={25} color={color}  />;
     }
-    return <Icon name={iconName} size={30} color={color} />;
+    return <Icon name={iconName} size={25} color={color} />;
   }
 
   return (

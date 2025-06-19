@@ -1,5 +1,6 @@
 import { apiUrl } from "@/constants/ApiConfig";
 import { useAuth } from "@/contexts/AuthContext";
+import { useGroups } from "@/contexts/GroupsContext";
 import { Ionicons } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
 import { router, useFocusEffect, useLocalSearchParams } from "expo-router";
@@ -66,9 +67,23 @@ const GroupDetails = () => {
   const [debtors, setDebtors] = useState<Balance[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const { user } = useAuth();
+  const { groups } = useGroups();
 
   const parsedColors =
     typeof colors === "string" ? colors.split(",") : ["#6366f1", "#818cf8"];
+
+  // Refresh group details when groups context updates (e.g., after inviting someone)
+  useEffect(() => {
+    if (groups.length > 0 && groupId) {
+      const currentGroup = groups.find(g => g._id === groupId);
+      if (currentGroup && groupDetails) {
+        // If the member count has changed, refresh the details
+        if (currentGroup.members.length !== groupDetails.members.length) {
+          fetchGroupDetails();
+        }
+      }
+    }
+  }, [groups, groupId, groupDetails]);
 
   useEffect(() => {
     if (groupDetails) {
@@ -137,12 +152,24 @@ const GroupDetails = () => {
     if (user) fetchGroupDetails();
   }, [fetchGroupDetails]);
 
-  // Refetch expenses every time screen comes into focus
+  // Refetch data every time screen comes into focus
   useFocusEffect(
     useCallback(() => {
-      fetchExpenses();
+      if (user) {
+        fetchExpenses();
+      }
     }, [fetchExpenses])
   );
+
+  const getIndividualExpense = useCallback((member: GroupMember) => {
+    const totalExpense = expenses.reduce((sum, expense) => {
+      if (expense.paidBy._id === member._id) {
+        return sum + expense.amount;
+      }
+      return sum;
+    }, 0);
+    return totalExpense;
+  }, [expenses]);
 
   useEffect(() => {
     if (groupDetails && expenses && fairshare) {
@@ -155,7 +182,7 @@ const GroupDetails = () => {
       });
       setBalances(newBalances);
     }
-  }, [groupDetails, expenses, fairshare]);
+  }, [groupDetails, expenses, fairshare, getIndividualExpense]);
 
   useEffect(() => {
     if (balances.length > 0) {
@@ -174,7 +201,13 @@ const GroupDetails = () => {
   if (!groupDetails) {
     return (
       <SafeAreaView style={styles.container}>
-        <Text style={styles.errorText}>Group not found</Text>
+        {isLoading ? (
+          <View style={styles.loadingContainer}>
+            <Text style={styles.loadingText}>Loading group details...</Text>
+          </View>
+        ) : (
+          <Text style={styles.errorText}>Group not found</Text>
+        )}
       </SafeAreaView>
     );
   }
@@ -190,16 +223,6 @@ const GroupDetails = () => {
         },
       });
     }
-  };
-
-  const getIndividualExpense = (member: GroupMember) => {
-    const totalExpense = expenses.reduce((sum, expense) => {
-      if (expense.paidBy._id === member._id) {
-        return sum + expense.amount;
-      }
-      return sum;
-    }, 0);
-    return totalExpense;
   };
 
   const whoNeedsToPayWhom = () => {
@@ -324,9 +347,16 @@ const GroupDetails = () => {
 
               <View>
                 <Text style={styles.splitTitle}>Split Between</Text>
-                <Text style={styles.splitMembers}>
-                  {groupDetails.members.length}
-                </Text>
+                <View style={styles.splitMembersContainer}>
+                  <Text style={styles.splitMembers}>
+                    {groupDetails.members.length}
+                  </Text>
+                  {isLoading && (
+                    <View style={styles.refreshIndicator}>
+                      <Text style={styles.refreshText}>↻</Text>
+                    </View>
+                  )}
+                </View>
               </View>
             </View>
           </LinearGradient>
@@ -494,6 +524,10 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: "white",
   },
+  splitMembersContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+  },
   splitMembers: {
     fontSize: 32,
     fontWeight: "bold",
@@ -635,6 +669,23 @@ const styles = StyleSheet.create({
   },
   settlementAmount: {
     fontWeight: "600",
+    color: "white",
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  loadingText: {
+    color: "white",
+    fontSize: 16,
+    fontWeight: "bold",
+  },
+  refreshIndicator: {
+    marginLeft: 8,
+  },
+  refreshText: {
+    fontSize: 16,
     color: "white",
   },
 });
