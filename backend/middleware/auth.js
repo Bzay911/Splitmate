@@ -2,7 +2,6 @@ import admin from "firebase-admin";
 import { User } from "../model/user.js";
 import serviceAccount from "../serviceAccountKey.json" assert { type: "json" };
 
-// const serviceAccount = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT);
 admin.initializeApp({
     credential: admin.credential.cert(serviceAccount)
 });
@@ -16,7 +15,6 @@ export async function authMiddleware(req, res, next) {
         const token = authHeader.split('Bearer ')[1];
         const decodedToken = await admin.auth().verifyIdToken(token);
 
-        // Use findOneAndUpdate with upsert to handle race conditions
         const user = await User.findOneAndUpdate(
             { firebaseUid: decodedToken.uid },
             {

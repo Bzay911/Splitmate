@@ -4,11 +4,10 @@ import { userController } from '../controllers/user.controller.js';
 
 const router = Router();
 
-// Public routes
-router.post('/', userController.createUser);
+// Public routes (no authentication required)
 router.get('/login', userController.checkLogin);
 
-// Protected routes
+// Protected routes (authentication required)
 router.use(authMiddleware);
 router.get('/profile', userController.getProfile);
 router.get('/summary', userController.getFinancialSummary);

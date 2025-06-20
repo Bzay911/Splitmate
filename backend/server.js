@@ -25,7 +25,6 @@ connectDB();
 
 // Public routes
 app.use("/api/auth", userRoutes);     
-
 app.use("/api/groups", groupRoutes); 
 app.use("/api/expenses", expenseRoutes); 
 

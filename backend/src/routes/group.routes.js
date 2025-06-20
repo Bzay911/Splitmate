@@ -4,9 +4,7 @@ import { authMiddleware } from '../../middleware/auth.js';
 
 const router = Router();
 
-// Apply authMiddleware to all routes in this router
 router.use(authMiddleware);
-
 router.get('/', groupController.getAllGroups);
 router.get('/:groupId', groupController.getGroupById);
 router.post('/', groupController.createGroup);

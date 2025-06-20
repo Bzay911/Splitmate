@@ -16,7 +16,6 @@ import {
   View
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { apiUrl } from "../constants/ApiConfig";
 import { auth } from "../src/firebaseConfig";
 
 interface InputFieldProps extends Omit<TextInputProps, 'style'> {
@@ -37,24 +36,6 @@ const handleSignUp = async (email: string, password: string, fullName: string) =
     await updateProfile(user, {
       displayName: fullName
     });
-
-    // 3. Create user in backend
-    const response = await fetch(apiUrl('api/auth/'), {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        firebaseUid: user.uid,
-        email: user.email,
-        displayName: fullName,
-      }),
-    });
-
-    if (!response.ok) {
-      const errorData = await response.json();
-      throw new Error(errorData.error || 'Failed to create user profile');
-    }
 
     return user;
   } catch (error: any) {
