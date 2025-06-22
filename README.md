@@ -13,19 +13,18 @@ A modern, full-stack mobile application built with React Native and Expo for spl
 - **Smart Splitting**: Automatically split expenses among group members
 - **Balance Tracking**: View who owes what at a glance
 - **Financial Dashboard**: Complete overview of your financial status
+- **Easy Bill Upload**: Easy bill upload by just scanning your receipt using mobile cam
 
 ### 📊 Financial Features
 - Real-time balance calculations
 - Credit/Debt tracking
-- Expense history and analytics
-- Settlement suggestions
-- Multi-currency support ready
+- Expense history
 
 ### 👥 Social Features
 - Add friends as "Splitmates"
 - Group-based expense sharing
 - Profile management with custom avatars
-- Activity history and notifications
+- Activity history
 
 ### 📱 Mobile Experience
 - Beautiful, modern UI with dark theme
@@ -209,43 +208,7 @@ npx expo start --web     # Web browser
 - Input validation and sanitization
 - Secure token storage
 - CORS configuration
-
-## 📦 Build & Deployment
-
-### Building for Production
-```bash
-# Create production build
-npx expo build
-
-# For iOS
-npx expo build:ios
-
-# For Android
-npx expo build:android
-```
-
-### Backend Deployment
-The backend can be deployed to services like:
-- Heroku
-- DigitalOcean
-- AWS EC2
-- Railway
-- Render
-
-Make sure to:
-1. Set production environment variables
-2. Configure MongoDB Atlas for cloud database
-3. Update API URLs in the mobile app
-4. Set up proper CORS policies
-
-## 🤝 Contributing
-
-1. Fork the repository
-2. Create a feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit your changes (`git commit -m 'Add some amazing feature'`)
-4. Push to the branch (`git push origin feature/amazing-feature`)
-5. Open a Pull Request
-
+  
 ### Development Guidelines
 - Follow TypeScript best practices
 - Use functional components with hooks
@@ -274,49 +237,3 @@ Make sure to:
 - `POST /api/expenses` - Add new expense
 - `PUT /api/expenses/:id` - Update expense
 - `DELETE /api/expenses/:id` - Delete expense
-
-## 🐛 Troubleshooting
-
-### Common Issues
-1. **Metro bundler issues**: Clear cache with `npx expo start --clear`
-2. **iOS build fails**: Ensure Xcode is updated and simulators are available
-3. **Android build fails**: Check Android SDK and emulator setup
-4. **Backend connection issues**: Verify API URL configuration and server status
-5. **Authentication issues**: Check JWT secret and token validation
-
-### Debug Mode
-Enable debug mode for detailed logging:
-```bash
-npx expo start --dev-client
-```
-
-## 📄 License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
-## 👥 Team
-
-- **Development**: Full-stack mobile application
-- **Design**: Modern UI/UX with React Native
-- **Backend**: RESTful API with Express.js and MongoDB
-
-## 🔮 Future Enhancements
-
-- [ ] Push notifications for expense updates
-- [ ] Receipt OCR for automatic expense entry
-- [ ] Multiple currency support
-- [ ] Expense categories and tags
-- [ ] Data export functionality
-- [ ] Social login integration
-- [ ] Offline mode support
-- [ ] Advanced analytics and reporting
-- [ ] Payment integration (Venmo, PayPal, etc.)
-- [ ] Group expense templates
-
-## 📞 Support
-
-For support, email [your-email@domain.com] or create an issue in the repository.
-
----
-
-**Built with ❤️ using React Native, Expo, and Node.js**
