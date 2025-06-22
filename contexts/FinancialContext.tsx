@@ -1,6 +1,6 @@
 import { apiUrl } from "@/constants/ApiConfig";
-import { auth } from "@/src/firebaseConfig";
 import { createContext, ReactNode, useCallback, useContext, useState } from 'react';
+import { useAuth } from "./AuthContext";
 
 interface FinancialSummary {
   totalExpenses: number;
@@ -32,16 +32,15 @@ export function FinancialProvider({ children }:{ children: ReactNode }) {
     netBalance: 0
   });
   const [isLoading, setIsLoading] = useState(false);
+  const {user, token} = useAuth();
 
-  const refreshFinancialSummary = useCallback(async () => {
+  const refreshFinancialSummary =async () => {
     try {
-      if (!auth.currentUser) {
+      if (!user) {
         throw new Error("User not authenticated");
       }
       
       setIsLoading(true);
-      const token = await auth.currentUser.getIdToken();
-
       const response = await fetch(apiUrl("api/auth/summary"), {
         method: "GET",
         headers: {
@@ -49,13 +48,14 @@ export function FinancialProvider({ children }:{ children: ReactNode }) {
         }
       });
       const data = await response.json();
+      
       setFinancialSummary(data.summary);
     } catch (error) {
       console.error("Error fetching financial summary:", error);
     } finally {
       setIsLoading(false);
     }
-  }, []);
+  };
 
   return (
     <FinancialContext.Provider value={{ financialSummary, refreshFinancialSummary }}>

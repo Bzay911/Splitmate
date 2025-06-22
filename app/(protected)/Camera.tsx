@@ -1,10 +1,10 @@
 import { apiUrl } from "@/constants/ApiConfig";
+import { useAuth } from "@/contexts/AuthContext";
 import { useFinancial } from "@/contexts/FinancialContext";
 import { CameraType, CameraView, useCameraPermissions } from 'expo-camera';
 import { router, useLocalSearchParams } from "expo-router";
 import React, { useEffect, useRef, useState } from 'react';
 import { ActivityIndicator, Alert, Animated, Button, Dimensions, Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
-import { auth } from "../../src/firebaseConfig";
 
 export default function CameraScreen() {
   const [permission, requestPermission] = useCameraPermissions();
@@ -61,13 +61,12 @@ export default function CameraScreen() {
 
   const handleAddExpense = async (amount: string, description: string, date: string) => {
       try{
-        const user = auth.currentUser;
+        const {user, token} = useAuth();
         if(!user){
           Alert.alert("Error", "Please login to add an expense");
           router.replace("/");
           return;
         }
-        const token = await user.getIdToken();
         const response = await fetch(
             apiUrl(`api/expenses/groups/${groupId}/expenses`),
             {

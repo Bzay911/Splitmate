@@ -1,10 +1,10 @@
 import { apiUrl } from "@/constants/ApiConfig";
+import { useAuth } from "@/contexts/AuthContext";
 import { useGroups } from "@/contexts/GroupsContext";
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import React, { useState } from 'react';
 import { Alert, SafeAreaView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
-import { auth } from "../src/firebaseConfig";
 
 interface InviteMatesBtnProps {
     groupId: string;
@@ -19,6 +19,7 @@ const InviteMatesBtn: React.FC<InviteMatesBtnProps> = ({groupId}) => {
       const [inviteeEmail, setInviteeEmail] = useState("");
       const [isInviting, setIsInviting] = useState(false);
       const {refreshGroups} = useGroups();
+      const {user, token} = useAuth();
       
       const showInviteInfo = () => {
         Alert.alert(
@@ -34,9 +35,7 @@ const InviteMatesBtn: React.FC<InviteMatesBtnProps> = ({groupId}) => {
           return;
         }
         setIsInviting(true);
-        const user = auth.currentUser;
         try{
-          const token = await user?.getIdToken();
           const response = await fetch(apiUrl(`api/groups/${groupId}/addMember`), {
             method: "POST",
             headers: {

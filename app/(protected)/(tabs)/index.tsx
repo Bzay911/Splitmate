@@ -2,7 +2,6 @@ import { apiUrl } from "@/constants/ApiConfig";
 import { useAuth } from "@/contexts/AuthContext";
 import { useFinancial } from "@/contexts/FinancialContext";
 import GroupsContext from "@/contexts/GroupsContext";
-import { auth } from "@/src/firebaseConfig";
 import { Ionicons } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
 import { router } from "expo-router";
@@ -35,28 +34,29 @@ interface Group {
 
 export default function HomeScreen() {
   const { financialSummary, refreshFinancialSummary } = useFinancial();
-  const { user } = useAuth();
+  const { user, token } = useAuth();
   const { groups, refreshGroups } = useContext(GroupsContext);
   const [splitmates, setSplitmates] = useState<Splitmate[]>([]);
 
+  console.log("user", user);
+
   useEffect(() => {
-    if (user) {
-      refreshFinancialSummary();
-      refreshGroups();
-    }
-  }, [user, refreshFinancialSummary, refreshGroups]);
+    const fetchData = async () => {
+      await refreshFinancialSummary();
+      await refreshGroups();
+    };
+    fetchData();
+  }, []);
 
   useEffect(() => {
     const fetchSplitmates = async () => {
       if (!user) return;
       
       try {
-        const currentUser = auth.currentUser;
-        if (!currentUser) {
+        if (!user) {
           throw new Error('No authenticated user found');
         }
         
-        const token = await currentUser.getIdToken();
         const response = await fetch(apiUrl(`api/auth/splitmates`), {
           method: 'GET',
           headers: {
@@ -151,7 +151,7 @@ export default function HomeScreen() {
         <View style={styles.oweSection}>
           <Text style={styles.amountTitle}>I'm owed</Text>
           <Text style={styles.amount}>
-            ${financialSummary.creditAmount.toFixed(2)}
+            ${financialSummary?.creditAmount.toFixed(2)}
           </Text>
         </View>
 
@@ -159,13 +159,13 @@ export default function HomeScreen() {
           <View style={styles.paySection}>
             <Text style={styles.amountTitle}>Need to pay</Text>
             <Text style={styles.amount}>
-              -${financialSummary.debtAmount.toFixed(2)}
+              -${financialSummary?.debtAmount.toFixed(2)}
             </Text>
           </View>
           <View style={styles.expenseSection}>
             <Text style={styles.amountTitle}>Total expenses</Text>
             <Text style={styles.amount}>
-              ${financialSummary.totalExpenses.toFixed(2)}
+              ${financialSummary?.totalExpenses.toFixed(2)}
             </Text>
           </View>
         </View>
@@ -248,10 +248,6 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     paddingHorizontal: 15,
     paddingTop: 15,
-  },
-  container: {
-    flex: 1,
-    justifyContent: 'center',
   },
   message: {
     textAlign: 'center',

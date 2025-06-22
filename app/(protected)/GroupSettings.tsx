@@ -1,5 +1,4 @@
 import { apiUrl } from "@/constants/ApiConfig";
-import { auth } from "@/src/firebaseConfig";
 import { Ionicons } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
 import { router, useLocalSearchParams } from "expo-router";
@@ -15,6 +14,7 @@ import {
   View
 } from "react-native";
 import InviteMatesBtn from "../../components/InviteMatesBtn";
+import { useAuth } from "@/contexts/AuthContext";
 
 interface GroupMember {
   _id: string;
@@ -39,7 +39,7 @@ const GroupSettings = () => {
   const parsedMembers: GroupMember[] = JSON.parse(members as string);
   const [isAdmin, setIsAdmin] = useState(false);
   const [groupDetails, setGroupDetails] = useState<GroupDetails | null>(null);
-  const user = auth.currentUser;
+  const {user, token} = useAuth();
   
   useEffect(() => {
     // Fetching group details
@@ -48,7 +48,6 @@ const GroupSettings = () => {
         router.push("/");
         return;
       }
-      const token = await user.getIdToken();
 
       try {
         const response = await fetch(
@@ -110,7 +109,7 @@ const GroupSettings = () => {
                 {
                   method: 'DELETE',
                   headers: {
-                    'Authorization': `Bearer ${await user.getIdToken()}`,
+                    'Authorization': `Bearer ${token}`,
                     'Content-Type': 'application/json'
                   }
                 }

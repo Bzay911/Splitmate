@@ -1,10 +1,37 @@
-import admin from 'firebase-admin';
+import bcrypt from 'bcryptjs';
+import dotenv from 'dotenv';
+import jwt from 'jsonwebtoken';
 import { Activity } from '../../model/activity.js';
 import { Group } from '../../model/group.js';
 import { User } from '../../model/user.js';
 
+dotenv.config();
+const JWT_SECRET = process.env.JWT_SECRET;
+
 
 export const userController = {
+  // Create user
+  async createUser(req, res) {
+    const { email, password, displayName } = req.body;
+    try {
+      // Check if user already exists by email
+      const existingUser = await User.findOne({ email });
+      if (existingUser) {
+        return res.status(409).json({ error: 'User already exists', user: existingUser });
+      }
+      const hashed = await bcrypt.hash(password, 10);
+      const user = new User({ email, password: hashed, displayName });
+      await user.save();
+
+      const token = jwt.sign({ id: user._id, email: user.email }, JWT_SECRET, { expiresIn: '1h' });
+
+      res.status(201).json({ token, user: {email: user.email, displayName: user.displayName} });
+    } catch (error) {
+      console.error('Error creating user:', error);
+      res.status(500).json({ message: 'Failed to create user' });
+    }
+  },
+
   // Get user profile
   async getProfile(req, res) {
     res.json({ user: req.user });
@@ -120,31 +147,54 @@ export const userController = {
   // Login check
   async checkLogin(req, res) {
     try {
-      // Get token from authorization header
-      const authHeader = req.headers.authorization;
-      if (!authHeader?.startsWith("Bearer ")) {
-        return res.status(401).json({ error: "No token provided" });
-      }
-
-      const token = authHeader.split("Bearer ")[1];
-
-      // Verify Firebase token
-      const decodedToken = await admin.auth().verifyIdToken(token);
-
       // Find user in your database
-      const user = await User.findOne({ firebaseUid: decodedToken.uid });
-
+      const user = await User.findOne({ email: req.body.email });
       if (!user) {
         return res.status(404).json({
           error: "User not found",
           message: "Please create an account first",
         });
       }
+      const userId = user._id;
+      const token = jwt.sign({ id: userId, email: user.email }, JWT_SECRET, { expiresIn: '1h' });
+      const userData = {
+        id: user._id,
+        email: user.email,
+        displayName: user.displayName,
+        profilePicture: user.profilePicture,
+      }
 
-      res.json({ user });
+      console.log("userData", userData);
+      console.log("token", token);
+
+      res.json({ user: userData, token });
     } catch (error) {
       console.error("Login error:", error);
       res.status(401).json({ error: "Authentication failed" });
+    }
+  },
+
+  // Validate token
+  async validateToken(req, res) {
+    try {
+      // req.user is already set by the auth middleware
+      const userData = {
+        id: req.user._id,
+        email: req.user.email,
+        displayName: req.user.displayName,
+        profilePicture: req.user.profilePicture,
+      };
+
+      res.json({ 
+        valid: true, 
+        user: userData 
+      });
+    } catch (error) {
+      console.error("Token validation error:", error);
+      res.status(401).json({ 
+        valid: false, 
+        error: "Invalid token" 
+      });
     }
   }
 };

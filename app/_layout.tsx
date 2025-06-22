@@ -1,45 +1,45 @@
-import { AuthProvider, useAuth } from "@/contexts/AuthContext";
-import { Stack } from "expo-router";
-import * as SplashScreen from 'expo-splash-screen';
-import React, { useEffect } from "react";
+import { Slot, useRouter } from 'expo-router';
+import { useEffect, useState } from 'react';
+import { ActivityIndicator, View } from 'react-native';
+import { AuthProvider, useAuth } from '../contexts/AuthContext';
 
-// Keep the splash screen visible while we fetch resources
-SplashScreen.preventAutoHideAsync();
+function LayoutController() {
+  const { token, loading } = useAuth();
+  const router = useRouter();
+  const [isMounted, setIsMounted] = useState(false);
 
-export default function Root(){
-  return (
-    <AuthProvider>
-      <RootNavigator />
-    </AuthProvider>
-  );
-}
-
-function RootNavigator(){
-  const { isAuthenticated, isLoading } = useAuth();
-
-  console.log('isLoading', isLoading);
-  console.log('isAuthenticated', isAuthenticated);
+  // Ensure component is mounted before navigation
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
 
   useEffect(() => {
-    if (!isLoading) {
-      // Hide splash screen when loading is complete
-      SplashScreen.hideAsync();
-    }
-  }, [isLoading]);
+    if (!isMounted || loading) return; // Wait for mount and auth to load
 
-  if (isLoading) {
-    // Keep splash screen visible while loading
-    return null;
+    if (!token) {
+      // Not authenticated -> go to SignIn
+      router.replace('/SignIn');
+    } else {
+      // Authenticated -> go to protected area
+      router.replace('/(protected)/(tabs)');
+    }
+  }, [isMounted, loading, token]);
+
+  if (!isMounted || loading) {
+    return (
+      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+        <ActivityIndicator size="large" />
+      </View>
+    );
   }
 
-  return isAuthenticated ? (
-    <Stack screenOptions={{ headerShown: false }}>
-      <Stack.Screen name="(protected)" options={{ headerShown: false }} />
-    </Stack>
-  ) : (
-    <Stack screenOptions={{ headerShown: false }}>
-      <Stack.Screen name="SignIn" options={{ headerShown: false }} />
-      <Stack.Screen name="SignUp" options={{ headerShown: false }} />
-    </Stack>
+  return <Slot />;
+}
+
+export default function RootLayout() {
+  return (
+    <AuthProvider>
+      <LayoutController />
+    </AuthProvider>
   );
 }

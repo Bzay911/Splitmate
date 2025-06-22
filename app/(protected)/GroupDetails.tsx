@@ -66,7 +66,7 @@ const GroupDetails = () => {
   const [creditors, setCreditors] = useState<Balance[]>([]);
   const [debtors, setDebtors] = useState<Balance[]>([]);
   const [isLoading, setIsLoading] = useState(false);
-  const { user } = useAuth();
+  const { user, token } = useAuth();
   const { groups } = useGroups();
 
   const parsedColors =
@@ -97,11 +97,10 @@ const GroupDetails = () => {
   }, [groupDetails]);
 
   const fetchGroupDetails = useCallback(async () => {
-    if (!user || typeof user.getIdToken !== "function") return;
+    if (!user) return;
 
     try {
       setIsLoading(true);
-      const token = await user.getIdToken();
       const response = await fetch(apiUrl(`api/groups/${groupId}`), {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -123,10 +122,9 @@ const GroupDetails = () => {
   }, [groupId, user]);
 
   const fetchExpenses = useCallback(async () => {
-    if (!user || typeof user.getIdToken !== "function") return;
+    if (!user) return;
 
     try {
-      const token = await user.getIdToken();
       const response = await fetch(
         apiUrl(`api/expenses/groups/${groupId}/expenses`),
         {

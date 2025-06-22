@@ -1,4 +1,5 @@
 import { apiUrl } from "@/constants/ApiConfig";
+import { useAuth } from "@/contexts/AuthContext";
 import { useGroups } from "@/contexts/GroupsContext";
 import { Ionicons } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
@@ -16,13 +17,13 @@ import {
     TouchableOpacity,
     View
 } from "react-native";
-import { auth } from "../../src/firebaseConfig";
 
 const CreateGroup = () => {
   const [groupName, setGroupName] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const { refreshGroups } = useGroups();
   const [colors, setColors] = useState<[string, string]>([getRandomColor(), getRandomColor()]);
+  const {user, token} = useAuth();
 
   function getRandomColor() {
     const letters = '0123456789ABCDEF';
@@ -47,13 +48,11 @@ const CreateGroup = () => {
     randomizeGradient();
     setIsLoading(true);
     try {
-      const user = auth.currentUser;
       if(!user){
         Alert.alert("Error", "Please login to create a group");
         router.replace("/");
         return;
       }
-      const token = await user.getIdToken();
 
       const response = await fetch(apiUrl("api/groups"), {
         method: "POST",

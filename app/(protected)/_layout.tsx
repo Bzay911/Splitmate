@@ -6,14 +6,14 @@ import { Redirect, Stack } from "expo-router";
 import { ActivityIndicator } from "react-native";
 
 export default function ProtectedLayout() {
-  const { isAuthenticated, isLoading } = useAuth();
+  const { token, loading } = useAuth();
 
   // Don't redirect while loading
-  if (isLoading) {
+  if (loading) {
     return <ActivityIndicator size="large" color="#0000ff" />;
   }
 
-  if (!isAuthenticated) {
+  if (!token) {
     return <Redirect href="/SignIn" />;
   }
 
@@ -35,3 +35,5 @@ export default function ProtectedLayout() {
     </FinancialProvider>
   );
 }
+
+

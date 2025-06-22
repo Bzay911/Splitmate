@@ -1,6 +1,6 @@
 import { FontAwesome, MaterialIcons } from "@expo/vector-icons";
+import { LinearGradient } from "expo-linear-gradient";
 import { router } from "expo-router";
-import { signInWithEmailAndPassword } from "firebase/auth";
 import React from "react";
 import {
   Pressable,
@@ -11,125 +11,7 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { apiUrl } from "../constants/ApiConfig";
-import { auth } from "../src/firebaseConfig";
-import { LinearGradient } from "expo-linear-gradient";
-
-const handleSignin = async (email: string, password: string) => {
-  try {
-    // Input validation
-    if (!email.trim()) {
-      alert("Please enter your email address");
-      return null;
-    }
-
-    // Email format validation
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(email)) {
-      alert("Please enter a valid email address");
-      return null;
-    }
-
-    if (!password) {
-      alert("Please enter your password");
-      return null;
-    }
-
-    // 1. Authenticate with Firebase
-    const userCredential = await signInWithEmailAndPassword(auth, email, password);
-    const token = await userCredential.user.getIdToken();
-
-    // 2. Check if user exists in your backend
-    const response = await fetch(apiUrl('api/auth/login'), {
-      method: 'GET',  
-      headers: {
-        'Authorization': `Bearer ${token}`,
-      }
-    });
-    
-    const data = await response.json();
-
-    if (response.status === 404) {
-      alert("Account not found. Please create an account first.");
-      router.replace("/SignUp");
-      return null;
-    }
-
-    if (!response.ok) {
-      throw new Error(data.error || 'Failed to sign in');
-    }
-
-    // router.replace("/(protected)/(tabs)");
-    return userCredential.user;
-  } catch (error: any) {
-    console.error("Error signing in", error);
-    
-    // Firebase Auth specific errors
-    switch (error.code) {
-      case 'auth/user-not-found':
-        alert("No account found with this email. Please sign up first.");
-        break;
-      case 'auth/wrong-password':
-        alert("Incorrect password. Please try again.");
-        break;
-      case 'auth/invalid-email':
-        alert("Please enter a valid email address.");
-        break;
-      case 'auth/user-disabled':
-        alert("This account has been disabled. Please contact support.");
-        break;
-      case 'auth/too-many-requests':
-        alert("Too many failed attempts. Please try again later.");
-        break;
-      case 'auth/invalid-credential':
-        alert("Invalid email or password. Please try again.");
-        break;
-      default:
-        alert(error.message || "Error signing in. Please try again.");
-    }
-    return null;
-  }
-};
-
-interface InputFieldProps {
-  label: string;
-  icon: keyof typeof MaterialIcons.glyphMap;
-  value: string;
-  onChangeText: (text: string) => void;
-  placeholder: string;
-  secureTextEntry?: boolean;
-  autoCapitalize?: "none" | "sentences" | "words" | "characters";
-  keyboardType?: "default" | "email-address";
-  returnKeyType?: "next" | "done";
-  autoComplete?: "email" | "password" | "off";
-  textContentType?: "emailAddress" | "password" | "none";
-}
-
-function InputField({
-  label,
-  icon,
-  value,
-  onChangeText,
-  placeholder,
-  ...props
-}: InputFieldProps) {
-  return (
-    <View style={styles.inputContainer}>
-      <Text style={styles.label}>{label}</Text>
-      <View style={styles.inputWrapper}>
-        <MaterialIcons name={icon} size={20} color="white" style={styles.inputIcon} />
-        <TextInput
-          style={styles.input}
-          placeholder={placeholder}
-          placeholderTextColor="#a1a1aa"
-          value={value}
-          onChangeText={onChangeText}
-          autoCorrect={false}
-          {...props}
-        />
-      </View>
-    </View>
-  );
-}
+import { useAuth } from "../contexts/AuthContext";
 
 export function LoginScreen() {
   const [email, setEmail] = React.useState("");
@@ -137,6 +19,46 @@ export function LoginScreen() {
   const [isLoading, setIsLoading] = React.useState(false);
   const [emailError, setEmailError] = React.useState("");
   const [passwordError, setPasswordError] = React.useState("");
+  
+  const { login } = useAuth();
+
+  const handleSignin = async (email: string, password: string) => {
+    try {
+      // Input validation
+      if (!email.trim()) {
+        alert("Please enter your email address");
+        return null;
+      }
+
+      // Email format validation
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailRegex.test(email)) {
+        alert("Please enter a valid email address");
+        return null;
+      }
+
+      if (!password) {
+        alert("Please enter your password");
+        return null;
+      }
+
+      const response = await fetch(apiUrl('api/auth/login'), {
+        method: 'POST',  
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email, password }),
+      });
+      const data = await response.json();
+      console.log("data", data);
+      console.log("data.user", data.user);
+      console.log("data.token", data.token);
+      login(data.token, data.user);
+      // return data.user;
+    } catch (error: any) {
+      console.error("Error signing in", error);
+    }
+  };
 
   // Validate form
   const validateForm = () => {
@@ -278,6 +200,47 @@ export function LoginScreen() {
       </View>
     </SafeAreaView>
     </LinearGradient>
+  );
+}
+
+interface InputFieldProps {
+  label: string;
+  icon: keyof typeof MaterialIcons.glyphMap;
+  value: string;
+  onChangeText: (text: string) => void;
+  placeholder: string;
+  secureTextEntry?: boolean;
+  autoCapitalize?: "none" | "sentences" | "words" | "characters";
+  keyboardType?: "default" | "email-address";
+  returnKeyType?: "next" | "done";
+  autoComplete?: "email" | "password" | "off";
+  textContentType?: "emailAddress" | "password" | "none";
+}
+
+function InputField({
+  label,
+  icon,
+  value,
+  onChangeText,
+  placeholder,
+  ...props
+}: InputFieldProps) {
+  return (
+    <View style={styles.inputContainer}>
+      <Text style={styles.label}>{label}</Text>
+      <View style={styles.inputWrapper}>
+        <MaterialIcons name={icon} size={20} color="white" style={styles.inputIcon} />
+        <TextInput
+          style={styles.input}
+          placeholder={placeholder}
+          placeholderTextColor="#a1a1aa"
+          value={value}
+          onChangeText={onChangeText}
+          autoCorrect={false}
+          {...props}
+        />
+      </View>
+    </View>
   );
 }
 

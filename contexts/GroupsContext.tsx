@@ -28,7 +28,7 @@ export const GroupsProvider = ({ children }: { children: ReactNode }) => {
   const [groups, setGroups] = useState<Group[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const { user } = useAuth();
+  const { user, token } = useAuth();
 
   const refreshGroups = useCallback(async () => {
     setIsLoading(true);
@@ -36,8 +36,7 @@ export const GroupsProvider = ({ children }: { children: ReactNode }) => {
       if (!user) {
         throw new Error("No user logged in");
       }
-
-      const token = await user.getIdToken();
+      console.log("token", token);
       const response = await fetch(apiUrl("api/groups"), {
         headers: {
           Authorization: `Bearer ${token}`,

@@ -2,7 +2,6 @@ import { useGroups } from "@/contexts/GroupsContext";
 import { Ionicons } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
 import { Link, router } from "expo-router";
-import { onAuthStateChanged, User } from "firebase/auth";
 import React, { useEffect, useState } from "react";
 import {
   FlatList,
@@ -12,8 +11,6 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import { auth } from "../../../src/firebaseConfig";
-import { useAuth } from "@/contexts/AuthContext";
 
 interface Group {
   _id: string;
@@ -26,11 +23,6 @@ interface Group {
 
 const Groups = () => {
   const { groups, isLoading, error, refreshGroups } = useGroups();
-  const { user } = useAuth();
-
- 
-
-
   const handleGroupPress = (group: Group) => {
     router.push({
       pathname: "/GroupDetails",

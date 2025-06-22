@@ -5,7 +5,11 @@ import { userController } from '../controllers/user.controller.js';
 const router = Router();
 
 // Public routes (no authentication required)
-router.get('/login', userController.checkLogin);
+router.post('/login', userController.checkLogin);
+router.post('/signup', userController.createUser);
+
+// Token validation route
+router.get('/auth/validate', authMiddleware, userController.validateToken);
 
 // Protected routes (authentication required)
 router.use(authMiddleware);

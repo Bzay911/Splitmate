@@ -1,38 +1,27 @@
-import admin from "firebase-admin";
+import jwt from 'jsonwebtoken';
 import { User } from "../model/user.js";
-import serviceAccount from "../serviceAccountKey.json" assert { type: "json" };
 
-admin.initializeApp({
-    credential: admin.credential.cert(serviceAccount)
-});
+const JWT_SECRET = process.env.JWT_SECRET; 
 
 export async function authMiddleware(req, res, next) {
-    try{
+    try {
         const authHeader = req.headers.authorization;
-        if(!authHeader?.startsWith("Bearer ")){
-            return res.status(401).json({error: 'Unauthorized - No token provided'});
+        if (!authHeader?.startsWith("Bearer ")) {
+            return res.status(401).json({ error: 'Unauthorized - No token provided' });
         }
         const token = authHeader.split('Bearer ')[1];
-        const decodedToken = await admin.auth().verifyIdToken(token);
 
-        const user = await User.findOneAndUpdate(
-            { firebaseUid: decodedToken.uid },
-            {
-                firebaseUid: decodedToken.uid,
-                email: decodedToken.email,
-                displayName: decodedToken.name || 'Anonymous',
-            },
-            { 
-                upsert: true, 
-                new: true,
-                setDefaultsOnInsert: true 
-            }
-        );
+        // Decode JWT token to get user id and email
+        const decodedToken = jwt.verify(token, JWT_SECRET);
         
+        const user = await User.findOne({ _id: decodedToken.id });
+        if (!user) {
+            return res.status(404).json({ error: 'User not found. Please sign up first.' });
+        }
         req.user = user;
         next();
-    }catch(error){
+    } catch (error) {
         console.error('Authentication error:', error);
-        return res.status(401).json({error: 'Unauthorized - Invalid token'});
+        return res.status(401).json({ error: 'Unauthorized - Invalid token' });
     }
 }

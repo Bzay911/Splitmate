@@ -1,6 +1,5 @@
 import { apiUrl } from "@/constants/ApiConfig";
 import { useAuth } from "@/contexts/AuthContext";
-import { auth } from "@/src/firebaseConfig";
 import { createContext, ReactNode, useCallback, useContext, useEffect, useState } from "react";
 
 // Define types
@@ -44,7 +43,7 @@ export function ActivityProvider({ children }: { children: ReactNode }) {
   const [activities, setActivities] = useState<Activity[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const {user} = useAuth();
+  const {user, token} = useAuth();
 
   const refreshActivities = useCallback(async () => {
     try {
@@ -56,12 +55,10 @@ export function ActivityProvider({ children }: { children: ReactNode }) {
         return;
       }
       
-      const currentUser = auth.currentUser;
-      if (!currentUser) {
+      if (!user) {
         throw new Error('No authenticated user found');
       }
       
-      const token = await currentUser.getIdToken();
       const response = await fetch(apiUrl("api/auth/activity"), {
         method: "GET",
         headers: {
