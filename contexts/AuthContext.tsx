@@ -47,7 +47,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
           setToken(storedToken);
           
           // Validate the token with your backend
-          const response = await fetch(apiUrl('auth/validate'), {
+          const response = await fetch(apiUrl('api/auth/validate'), {
             method: 'GET',
             headers: {
               'Authorization': `Bearer ${storedToken}`,
@@ -56,10 +56,12 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
           });
 
           if (response.ok) {
+            console.log("response from validate token", response);
             const userData = await response.json();
             setUser(userData.user);
           } else {
             // Token is invalid, clear it
+            console.log("token is invalid, clearing it");
             await logout();
           }
         }

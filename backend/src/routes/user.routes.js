@@ -8,11 +8,10 @@ const router = Router();
 router.post('/login', userController.checkLogin);
 router.post('/signup', userController.createUser);
 
-// Token validation route
-router.get('/auth/validate', authMiddleware, userController.validateToken);
 
 // Protected routes (authentication required)
 router.use(authMiddleware);
+router.get('/validate', userController.validateToken);
 router.get('/profile', userController.getProfile);
 router.get('/summary', userController.getFinancialSummary);
 router.get('/splitmates', userController.getSplitmates);

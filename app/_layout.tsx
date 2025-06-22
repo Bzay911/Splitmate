@@ -17,10 +17,8 @@ function LayoutController() {
     if (!isMounted || loading) return; // Wait for mount and auth to load
 
     if (!token) {
-      // Not authenticated -> go to SignIn
       router.replace('/SignIn');
     } else {
-      // Authenticated -> go to protected area
       router.replace('/(protected)/(tabs)');
     }
   }, [isMounted, loading, token]);

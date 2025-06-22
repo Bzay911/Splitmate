@@ -155,6 +155,13 @@ export const userController = {
           message: "Please create an account first",
         });
       }
+      const passwordMatch = await bcrypt.compare(req.body.password, user.password);
+      if (!passwordMatch) {
+        return res.status(401).json({
+          error: "Invalid password",
+          message: "Please enter the correct password",
+        });
+      }
       const userId = user._id;
       const token = jwt.sign({ id: userId, email: user.email }, JWT_SECRET, { expiresIn: '1h' });
       const userData = {
@@ -175,12 +182,18 @@ export const userController = {
   },
 
   // Validate token
-  async validateToken(req, res) {
+  async  validateToken(req, res) {
     try {
-      // req.user is already set by the auth middleware
+      const user = await User.findById(req.user._id);
+      if (!user) {
+        return res.status(404).json({
+          error: "User not found",
+          message: "Please create an account first",
+        });
+      }
       const userData = {
-        id: req.user._id,
-        email: req.user.email,
+        id: user._id,
+        email: user.email,
         displayName: req.user.displayName,
         profilePicture: req.user.profilePicture,
       };
