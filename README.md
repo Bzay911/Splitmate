@@ -13,19 +13,31 @@ A modern, full-stack mobile application built with React Native and Expo for spl
 - **Smart Splitting**: Automatically split expenses among group members
 - **Balance Tracking**: View who owes what at a glance
 - **Financial Dashboard**: Complete overview of your financial status
+<<<<<<< HEAD
+=======
+- **Easy Bill Upload**: Easy bill upload by just scanning your receipt using mobile cam
+>>>>>>> 29f9f6f509ecf0ad92014218dfe354aecfd7805a
 
 ### 📊 Financial Features
 - Real-time balance calculations
 - Credit/Debt tracking
+<<<<<<< HEAD
 - Expense history and analytics
 - Settlement suggestions
 - Multi-currency support ready
+=======
+- Expense history
+>>>>>>> 29f9f6f509ecf0ad92014218dfe354aecfd7805a
 
 ### 👥 Social Features
 - Add friends as "Splitmates"
 - Group-based expense sharing
 - Profile management with custom avatars
+<<<<<<< HEAD
 - Activity history and notifications
+=======
+- Activity history
+>>>>>>> 29f9f6f509ecf0ad92014218dfe354aecfd7805a
 
 ### 📱 Mobile Experience
 - Beautiful, modern UI with dark theme
@@ -209,6 +221,7 @@ npx expo start --web     # Web browser
 - Input validation and sanitization
 - Secure token storage
 - CORS configuration
+<<<<<<< HEAD
 
 ## 📦 Build & Deployment
 
@@ -246,6 +259,9 @@ Make sure to:
 4. Push to the branch (`git push origin feature/amazing-feature`)
 5. Open a Pull Request
 
+=======
+  
+>>>>>>> 29f9f6f509ecf0ad92014218dfe354aecfd7805a
 ### Development Guidelines
 - Follow TypeScript best practices
 - Use functional components with hooks
@@ -274,6 +290,7 @@ Make sure to:
 - `POST /api/expenses` - Add new expense
 - `PUT /api/expenses/:id` - Update expense
 - `DELETE /api/expenses/:id` - Delete expense
+<<<<<<< HEAD
 
 ## 🐛 Troubleshooting
 
@@ -320,3 +337,5 @@ For support, email [your-email@domain.com] or create an issue in the repository.
 ---
 
 **Built with ❤️ using React Native, Expo, and Node.js**
+=======
+>>>>>>> 29f9f6f509ecf0ad92014218dfe354aecfd7805a
