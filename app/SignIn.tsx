@@ -7,7 +7,8 @@ import {
   StyleSheet,
   Text,
   TextInput,
-  View
+  View,
+  Alert
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { apiUrl } from "../constants/ApiConfig";
@@ -50,12 +51,10 @@ export function LoginScreen() {
         body: JSON.stringify({ email, password }),
       });
       const data = await response.json();
-      console.log("data", data);
-      console.log("data.user", data.user);
-      console.log("data.token", data.token);
       login(data.token, data.user);
       // return data.user;
     } catch (error: any) {
+      Alert.alert("Error signing in", error.message);
       console.error("Error signing in", error);
     }
   };

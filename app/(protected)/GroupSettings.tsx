@@ -128,7 +128,7 @@ const GroupSettings = () => {
                     text: "OK",
                     onPress: () => {
                       // Navigate back to groups list
-                      router.replace("/(tabs)/Groups");
+                      router.replace("/(protected)/(tabs)/Groups");
                     }
                   }
                 ]

@@ -41,7 +41,7 @@ const Profile = () => {
       <View style={styles.profileSection}>
         <View style={styles.profileHeader}>
           <Image 
-            source={user?.photoURL ? { uri: user.photoURL } : require('../../../assets/images/cat.png')} 
+            source={user?.profilePicture ? { uri: user.profilePicture } : require('../../../assets/images/cat.png')} 
             style={styles.avatarImage} 
           />
           <View style={styles.userInfo}>

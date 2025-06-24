@@ -17,10 +17,9 @@ export default function CameraScreen() {
   const [isUploading, setIsUploading] = useState(false);
   const [receiptData, setReceiptData] = useState(null);
   const { refreshFinancialSummary } = useFinancial();
-  
+  const {user, token} = useAuth();
   const {groupId} = useLocalSearchParams<{groupId: string}>();
 
-  console.log(`groupId from camera: ${groupId}`);
 
   // Get screen dimensions
   const screenHeight = Dimensions.get('window').height;
@@ -61,7 +60,6 @@ export default function CameraScreen() {
 
   const handleAddExpense = async (amount: string, description: string, date: string) => {
       try{
-        const {user, token} = useAuth();
         if(!user){
           Alert.alert("Error", "Please login to add an expense");
           router.replace("/");
@@ -110,13 +108,10 @@ export default function CameraScreen() {
       });
       setIsUploading(true);
   
-      const user = auth.currentUser;
       if(!user){
         Alert.alert("Error", "Please login to upload a receipt");
         return;
       }
-      const token = await user.getIdToken();
-  
       const response = await fetch(apiUrl(`api/expenses/groups/${groupId}/scan-receipt`), {
         method: 'POST',
         body: formData,

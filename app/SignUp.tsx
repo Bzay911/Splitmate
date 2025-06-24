@@ -17,7 +17,6 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { apiUrl } from "../constants/ApiConfig";
-import { auth } from "../src/firebaseConfig";
 
 
 interface InputFieldProps extends Omit<TextInputProps, 'style'> {
@@ -80,7 +79,6 @@ export default function SignUp() {
        }),
      });
   
-     console.log("response", response);
      if (!response.ok) {
        const errorData = await response.json();
        throw new Error(errorData.error || 'Failed to create user');
@@ -153,10 +151,7 @@ export default function SignUp() {
    try {
      const user = await handleSignUp(email, password, fullName);
      if (user) {
-      
-        console.log("user", user);
-        
-      //  router.replace("/(protected)/(tabs)");
+      console.log("user", user);
      }
    } catch (error) {
      console.error("Error creating user", error);

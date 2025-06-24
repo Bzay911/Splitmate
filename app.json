@@ -14,7 +14,7 @@
       "backgroundColor": "#1a1a1a"
     },
     "extra": {
-      "apiUrl": "http://192.168.1.11:3000"
+      "apiUrl": "http://192.168.1.2:3000"
     },
     "ios": {
       "supportsTablet": true,

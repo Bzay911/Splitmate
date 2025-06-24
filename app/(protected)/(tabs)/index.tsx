@@ -38,7 +38,6 @@ export default function HomeScreen() {
   const { groups, refreshGroups } = useContext(GroupsContext);
   const [splitmates, setSplitmates] = useState<Splitmate[]>([]);
 
-  console.log("user", user);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -139,7 +138,7 @@ export default function HomeScreen() {
         <View style={styles.rightTop}>
           <TouchableOpacity onPress={() => router.push('/Profile')}>
             <Image 
-              source={user?.photoURL ? { uri: user.photoURL } : require('../../../assets/images/cat.png')} 
+              source={user?.profilePicture ? { uri: user.profilePicture } : require('../../../assets/images/cat.png')} 
               style={styles.avatarImage} 
             />
           </TouchableOpacity>

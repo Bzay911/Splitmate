@@ -7,7 +7,7 @@ import { User } from '../../model/user.js';
 
 dotenv.config();
 const JWT_SECRET = process.env.JWT_SECRET;
-
+const EXPIRES_IN = process.env.EXPIRES_IN;
 
 export const userController = {
   // Create user
@@ -23,7 +23,7 @@ export const userController = {
       const user = new User({ email, password: hashed, displayName });
       await user.save();
 
-      const token = jwt.sign({ id: user._id, email: user.email }, JWT_SECRET, { expiresIn: '1h' });
+      const token = jwt.sign({ id: user._id, email: user.email }, JWT_SECRET, { expiresIn: EXPIRES_IN });
 
       res.status(201).json({ token, user: {email: user.email, displayName: user.displayName} });
     } catch (error) {
@@ -163,7 +163,7 @@ export const userController = {
         });
       }
       const userId = user._id;
-      const token = jwt.sign({ id: userId, email: user.email }, JWT_SECRET, { expiresIn: '1h' });
+      const token = jwt.sign({ id: userId, email: user.email }, JWT_SECRET, { expiresIn: EXPIRES_IN });
       const userData = {
         id: user._id,
         email: user.email,
