@@ -1,5 +1,5 @@
 import { apiUrl } from "@/constants/ApiConfig";
-import { createContext, ReactNode, useCallback, useContext, useState } from 'react';
+import { createContext, ReactNode, useContext, useState } from 'react';
 import { useAuth } from "./AuthContext";
 
 interface FinancialSummary {

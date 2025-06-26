@@ -3,12 +3,12 @@ import { useAuth } from "@/contexts/AuthContext";
 import { useFinancial } from "@/contexts/FinancialContext";
 import GroupsContext from "@/contexts/GroupsContext";
 import { Ionicons } from "@expo/vector-icons";
+import { Image } from "expo-image";
 import { LinearGradient } from "expo-linear-gradient";
 import { router } from "expo-router";
 import { useContext, useEffect, useState } from "react";
 import {
   FlatList,
-  Image,
   SafeAreaView,
   ScrollView,
   StyleSheet,
@@ -139,7 +139,10 @@ export default function HomeScreen() {
           <TouchableOpacity onPress={() => router.push('/Profile')}>
             <Image 
               source={user?.profilePicture ? { uri: user.profilePicture } : require('../../../assets/images/cat.png')} 
-              style={styles.avatarImage} 
+              style={styles.avatarImage}
+              placeholder={require('../../../assets/images/cat.png')}
+              contentFit="cover"
+              transition={200}
             />
           </TouchableOpacity>
         </View>

@@ -29,6 +29,7 @@ export default function ProtectedLayout() {
             <Stack.Screen name="CreateGroup" options={{ title: 'Create Group', headerBackTitle: 'Back', headerTintColor: 'white', headerStyle: { backgroundColor: '#2a2a2a' } }} />
             <Stack.Screen name="GroupSettings" options={{ title: 'Group Settings', headerBackTitle: 'Back', headerTintColor: 'white', headerStyle: { backgroundColor: '#2a2a2a' } }} />
             <Stack.Screen name="EditProfile" options={{ title: 'Edit Profile', headerBackTitle: 'Back', headerTintColor: 'white', headerStyle: { backgroundColor: '#2a2a2a' } }} />
+            <Stack.Screen name="SettleUp" options={{ title: 'Settle Up', headerBackTitle: 'Back', headerTintColor: 'white', headerStyle: { backgroundColor: '#2a2a2a' } }} />
           </Stack>
         </GroupsProvider>
       </ActivityProvider>

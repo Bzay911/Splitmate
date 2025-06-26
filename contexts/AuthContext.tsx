@@ -6,6 +6,7 @@ interface User {
   id: string;
   email: string;
   name: string;
+  displayName?: string;
 }
 
 interface AuthContextType {
@@ -13,6 +14,7 @@ interface AuthContextType {
   user: User | null;
   login: (token: string, userData: User) => Promise<void>;
   logout: () => Promise<void>;
+  updateUser: (userData: Partial<User>) => void;
   loading: boolean;
 }
 
@@ -39,6 +41,10 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     await AsyncStorage.removeItem('token');
   };
 
+  const updateUser = (userData: Partial<User>) => {
+    setUser(prevUser => prevUser ? { ...prevUser, ...userData } : null);
+  };
+
   useEffect(() => {
     const checkToken = async () => {
       try {
@@ -56,7 +62,6 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
           });
 
           if (response.ok) {
-            console.log("response from validate token", response);
             const userData = await response.json();
             setUser(userData.user);
           } else {
@@ -77,7 +82,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
   }, []);
 
   return (
-    <AuthContext.Provider value={{ token, user, login, logout, loading}}>
+    <AuthContext.Provider value={{ token, user, login, logout, updateUser, loading}}>
       {children}
     </AuthContext.Provider>
   );

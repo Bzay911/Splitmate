@@ -227,10 +227,14 @@ const GroupDetails = () => {
     let i = 0;
     let j = 0;
     const settlements: { from: string; to: string; amount: number }[] = [];
+    
+    // Create deep copies to avoid mutating original arrays
+    const debtorsCopy = debtors.map(debtor => ({ ...debtor }));
+    const creditorsCopy = creditors.map(creditor => ({ ...creditor }));
 
-    while (i < debtors.length && j < creditors.length) {
-      const debtor = debtors[i];
-      const creditor = creditors[j];
+    while (i < debtorsCopy.length && j < creditorsCopy.length) {
+      const debtor = debtorsCopy[i];
+      const creditor = creditorsCopy[j];
 
       const debtAmount = Math.abs(debtor.balance);
       const creditAmount = creditor.balance;
@@ -263,6 +267,10 @@ const GroupDetails = () => {
     return settlements;
   };
 
+  // for (const settlement of whoNeedsToPayWhom()) {
+  //   console.log(settlement);
+  // }
+
   const actions = [
     {
       text: "Scan Receipt",
@@ -277,6 +285,20 @@ const GroupDetails = () => {
       position: 2,
     },
   ];
+  
+
+  const handleSettleUp = () => {
+    // Get all settlements
+    const allSettlements = whoNeedsToPayWhom();
+    router.push({
+      pathname: "/SettleUp",
+      params: {
+        groupId: groupDetails._id,
+        groupName: groupDetails.name,
+        settlements: JSON.stringify(allSettlements),
+      },
+    });
+  };
 
   const renderSettlements = () => {
     const settlements = whoNeedsToPayWhom();
@@ -384,7 +406,7 @@ const GroupDetails = () => {
           </View>
 
           <View style={styles.buttonContainer}>
-            <TouchableOpacity style={styles.buttonWrapper}>
+            <TouchableOpacity style={styles.settleupButtonWrapper} onPress={handleSettleUp}>
               <LinearGradient
                 colors={["#EF4444", "#EC4899"]}
                 style={styles.settleupBtn}
@@ -567,6 +589,9 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     margin: 12,
     gap: 18,
+  },
+  settleupButtonWrapper: {
+    flex: 1,
   },
   buttonWrapper: {
     flex: 1,

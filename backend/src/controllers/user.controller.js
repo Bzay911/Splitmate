@@ -170,10 +170,6 @@ export const userController = {
         displayName: user.displayName,
         profilePicture: user.profilePicture,
       }
-
-      console.log("userData", userData);
-      console.log("token", token);
-
       res.json({ user: userData, token });
     } catch (error) {
       console.error("Login error:", error);
