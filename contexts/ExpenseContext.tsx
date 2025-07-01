@@ -5,6 +5,7 @@ import { Alert } from "react-native";
 import { useAuth } from "./AuthContext";
 import { useFinancial } from "./FinancialContext";
 import { useGroups } from "./GroupsContext";
+import { useActivity } from "./ActivityContext";
  
 interface GroupMember {
   _id: string;
@@ -74,7 +75,7 @@ export const ExpenseProvider = ({ children }: ExpenseProviderProps) => {
   const { token, user } = useAuth();
   const {refreshGroups } = useGroups();
   const { refreshFinancialSummary } = useFinancial();
-
+  const { refreshActivities } = useActivity();
   const fetchExpenses = useCallback(async (groupId: string) => {
     if(!user) return;
     
@@ -142,8 +143,6 @@ export const ExpenseProvider = ({ children }: ExpenseProviderProps) => {
     
     const uniqueMembers = Array.from(memberMap.values());
     setGroupMembers(uniqueMembers);
-    
-    // console.log("Extracted group members:", uniqueMembers);
   };
 
   // Calculate individual expense for each member
@@ -203,10 +202,10 @@ export const ExpenseProvider = ({ children }: ExpenseProviderProps) => {
   useEffect(() => {
     if (balances.length > 0) {
       const whoGetsPayment = balances
-        .filter((item) => item.balance > 0)
+        .filter((item) => item.balance > 0.01) // Filter out tiny amounts
         .sort((a, b) => b.balance - a.balance);
       const whoNeedToPay = balances
-        .filter((item) => item.balance < 0)
+        .filter((item) => item.balance < -0.01) // Filter out tiny amounts
         .sort((a, b) => a.balance - b.balance);
 
       setCreditors(whoGetsPayment);
@@ -214,14 +213,6 @@ export const ExpenseProvider = ({ children }: ExpenseProviderProps) => {
     }
   }, [balances]);
 
-  
-  // console.log("groupTotalExpense", groupTotalExpense);
-  // console.log("groupTotalMembers", groupTotalMembers);
-  // console.log("fairshare", fairshare);
-  // console.log("individualExpense", individualExpense);
-  // console.log("balances", balances);
-  // console.log("creditors", creditors);
-  // console.log("debtors", debtors);
 
   const addSettlementToState = (settlementData: any) => {
     // Convert backend settlement to our format and add to settlements array
@@ -314,13 +305,6 @@ export const ExpenseProvider = ({ children }: ExpenseProviderProps) => {
       
       const data = await response.json();
       
-      // Transform backend response to match Settlement interface
-      const settlementForRefresh: Settlement = {
-        from: data.updatedSettlement.fromUser.displayName,
-        to: data.updatedSettlement.toUser.displayName,
-        amount: data.updatedSettlement.amount
-      };
-      
       addSettlementToState({
         fromUser: data.updatedSettlement.fromUser,
         toUser: data.updatedSettlement.toUser,
@@ -334,6 +318,7 @@ export const ExpenseProvider = ({ children }: ExpenseProviderProps) => {
         Alert.alert('Success', 'Settlement saved successfully');
         refreshFinancialSummary();
         refreshGroups();
+        refreshActivities();
         router.back(); 
       } else {
         Alert.alert('Error', 'Failed to save settlement');

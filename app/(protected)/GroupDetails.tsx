@@ -32,14 +32,14 @@ interface GroupDetails {
   colors: [string, string];
 }
 
-interface Settlement {
-  _id: string;
-  groupId: string;
-  fromUser: GroupMember;
-  toUser: GroupMember;
-  amount: number;
-  settledAt: Date;
-}
+// interface Settlement {
+//   _id: string;
+//   groupId: string;
+//   fromUser: GroupMember;
+//   toUser: GroupMember;
+//   amount: number;
+//   settledAt: Date;
+// }
 
 const formatDate = (date: Date) => {
   const options: Intl.DateTimeFormatOptions = {
@@ -47,6 +47,20 @@ const formatDate = (date: Date) => {
     day: "numeric",
   };
   return new Date(date).toLocaleDateString("en-US", options);
+};
+
+// Helper function to handle floating point precision in balance display
+const formatBalance = (balance: number) => {
+  // If balance is very close to zero (less than 1 cent), treat it as zero
+  if (Math.abs(balance) < 0.01) {
+    return "0.00";
+  }
+  return Math.abs(balance).toFixed(2);
+};
+
+// Helper function to check if balance is essentially zero
+const isSettled = (balance: number) => {
+  return Math.abs(balance) < 0.01;
 };
 
 const GroupDetails = () => {
@@ -91,7 +105,6 @@ const GroupDetails = () => {
 
       const data = await response.json();
       setGroupDetails(data.group);
-      // console.log("groupDetails", data.group);
     } catch (error) {
       console.error("Error fetching group details:", error);
     } finally {
@@ -108,8 +121,9 @@ const GroupDetails = () => {
     useCallback(() => {
       if (user && groupId) {
         fetchExpenses(groupId as string);
+        fetchGroupDetails();
       }
-    }, [fetchExpenses, user, groupId])
+    }, [fetchExpenses, user, groupId, fetchGroupDetails])
   );
 
   if (!groupDetails) {
@@ -156,7 +170,6 @@ const GroupDetails = () => {
   
 
   const handleSettleUp = () => {
-    // Get all settlements
     const allSettlements = whoNeedsToPayWhom();
     router.push({
       pathname: "/SettleUp",
@@ -250,26 +263,28 @@ const GroupDetails = () => {
           </LinearGradient>
 
           <View style={styles.dividendSection}>
-            {creditors.find((item) => item.email === user?.email) ? (
-              <Text style={styles.ownerDividend}>
-                You are owed $
-                {creditors
-                  .find((item) => item.email === user?.email)
-                  ?.balance.toFixed(2)}{" "}
-                overall
-              </Text>
-            ) : debtors.find((item) => item.email === user?.email) ? (
-              <Text style={styles.ownerOwe}>
-                You owe $
-                {Math.abs(
-                  debtors.find((item) => item.email === user?.email)?.balance ||
-                    0
-                ).toFixed(2)}{" "}
-                overall
-              </Text>
-            ) : (
-              <Text style={styles.settlementText}>You are all settled up!</Text>
-            )}
+            {(() => {
+              const userCreditor = creditors.find((item) => item.email === user?.email);
+              const userDebtor = debtors.find((item) => item.email === user?.email);
+              
+              if (userCreditor && !isSettled(userCreditor.balance)) {
+                return (
+                  <Text style={styles.ownerDividend}>
+                    You are owed ${formatBalance(userCreditor.balance)} overall
+                  </Text>
+                );
+              } else if (userDebtor && !isSettled(userDebtor.balance)) {
+                return (
+                  <Text style={styles.ownerOwe}>
+                    You owe ${formatBalance(userDebtor.balance)} overall
+                  </Text>
+                );
+              } else {
+                return (
+                  <Text style={styles.settlementText}>You are all settled up!</Text>
+                );
+              }
+            })()}
             {renderSettlements()}
           </View>
 

@@ -32,6 +32,16 @@ interface Group {
   colors?: [string, string];
 }
 
+// Helper function to handle floating point precision in financial display
+const formatFinancialAmount = (amount: number | undefined) => {
+  if (!amount) return "0.00";
+  // If amount is very close to zero (less than 1 cent), treat it as zero
+  if (Math.abs(amount) < 0.01) {
+    return "0.00";
+  }
+  return amount.toFixed(2);
+};
+
 export default function HomeScreen() {
   const { financialSummary, refreshFinancialSummary } = useFinancial();
   const { user, token } = useAuth();
@@ -153,7 +163,7 @@ export default function HomeScreen() {
         <View style={styles.oweSection}>
           <Text style={styles.amountTitle}>I'm owed</Text>
           <Text style={styles.amount}>
-            ${financialSummary?.creditAmount.toFixed(2)}
+            ${formatFinancialAmount(financialSummary?.creditAmount)}
           </Text>
         </View>
 
@@ -161,13 +171,13 @@ export default function HomeScreen() {
           <View style={styles.paySection}>
             <Text style={styles.amountTitle}>Need to pay</Text>
             <Text style={styles.amount}>
-              -${financialSummary?.debtAmount.toFixed(2)}
+              -${formatFinancialAmount(financialSummary?.debtAmount)}
             </Text>
           </View>
           <View style={styles.expenseSection}>
             <Text style={styles.amountTitle}>Total expenses</Text>
             <Text style={styles.amount}>
-              ${financialSummary?.totalExpenses.toFixed(2)}
+              ${formatFinancialAmount(financialSummary?.totalExpenses)}
             </Text>
           </View>
         </View>

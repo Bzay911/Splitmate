@@ -2,6 +2,7 @@ import { apiUrl } from "@/constants/ApiConfig";
 import { useActivity } from '@/contexts/ActivityContext';
 import { useAuth } from "@/contexts/AuthContext";
 import { useFinancial } from "@/contexts/FinancialContext";
+import { useGroups } from "@/contexts/GroupsContext";
 import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from "expo-linear-gradient";
 import { router, useLocalSearchParams } from 'expo-router';
@@ -15,7 +16,7 @@ const AddExpense = () => {
   const { refreshFinancialSummary } = useFinancial();
   const { refreshActivities } = useActivity();
   const {user, token} = useAuth();
-  
+  const { refreshGroups } = useGroups();
   const handleAddExpense = async () => {
     if (!amount.trim()) {
         Alert.alert("Error", "Please enter a bill amount");
@@ -57,6 +58,7 @@ const AddExpense = () => {
         // Immediately refresh the financial summary
         await refreshFinancialSummary();
         await refreshActivities();
+        refreshGroups();
       }catch(error){
         console.error("Error adding expense:", error);
         Alert.alert("Error", "Failed to add expense");
