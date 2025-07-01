@@ -1,5 +1,6 @@
 import { apiUrl } from "@/constants/ApiConfig";
 import { useAuth } from "@/contexts/AuthContext";
+import { useExpense } from "@/contexts/ExpenseContext";
 import { useGroups } from "@/contexts/GroupsContext";
 import { Ionicons } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
@@ -31,17 +32,13 @@ interface GroupDetails {
   colors: [string, string];
 }
 
-interface Expense {
+interface Settlement {
   _id: string;
-  paidBy: GroupMember;
+  groupId: string;
+  fromUser: GroupMember;
+  toUser: GroupMember;
   amount: number;
-  description: string;
-  date: Date;
-}
-
-interface Balance {
-  email: string;
-  balance: number;
+  settledAt: Date;
 }
 
 const formatDate = (date: Date) => {
@@ -52,27 +49,17 @@ const formatDate = (date: Date) => {
   return new Date(date).toLocaleDateString("en-US", options);
 };
 
-const calculateDividend = (totalExpense: number, totalMembers: number) => {
-  const dividend = parseFloat((totalExpense / totalMembers).toFixed(2));
-  return dividend;
-};
-
 const GroupDetails = () => {
-  const { groupId, groupName, image, colors } = useLocalSearchParams();
+  const { groupId, groupName, colors } = useLocalSearchParams();
   const [groupDetails, setGroupDetails] = useState<GroupDetails | null>(null);
-  const [expenses, setExpenses] = useState<Expense[]>([]);
-  const [balances, setBalances] = useState<Balance[]>([]);
-  const [fairshare, setFairshare] = useState<number>(0);
-  const [creditors, setCreditors] = useState<Balance[]>([]);
-  const [debtors, setDebtors] = useState<Balance[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const { user, token } = useAuth();
   const { groups } = useGroups();
+  const { expenses, fetchExpenses, creditors, debtors, whoNeedsToPayWhom } = useExpense();
 
   const parsedColors =
     typeof colors === "string" ? colors.split(",") : ["#6366f1", "#818cf8"];
 
-  // Refresh group details when groups context updates (e.g., after inviting someone)
   useEffect(() => {
     if (groups.length > 0 && groupId) {
       const currentGroup = groups.find(g => g._id === groupId);
@@ -85,17 +72,7 @@ const GroupDetails = () => {
     }
   }, [groups, groupId, groupDetails]);
 
-  useEffect(() => {
-    if (groupDetails) {
-      setFairshare(
-        calculateDividend(
-          groupDetails.totalExpense,
-          groupDetails.members.length
-        )
-      );
-    }
-  }, [groupDetails]);
-
+  // Fetch group details
   const fetchGroupDetails = useCallback(async () => {
     if (!user) return;
 
@@ -114,35 +91,11 @@ const GroupDetails = () => {
 
       const data = await response.json();
       setGroupDetails(data.group);
+      // console.log("groupDetails", data.group);
     } catch (error) {
       console.error("Error fetching group details:", error);
     } finally {
       setIsLoading(false);
-    }
-  }, [groupId, user]);
-
-  const fetchExpenses = useCallback(async () => {
-    if (!user) return;
-
-    try {
-      const response = await fetch(
-        apiUrl(`api/expenses/groups/${groupId}/expenses`),
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-            "Content-Type": "application/json",
-          },
-        }
-      );
-
-      if (!response.ok) {
-        throw new Error(`Failed to fetch expenses (${response.status})`);
-      }
-
-      const data = await response.json();
-      setExpenses(data.expenses);
-    } catch (error) {
-      console.error("Error fetching expenses:", error);
     }
   }, [groupId, user]);
 
@@ -153,48 +106,11 @@ const GroupDetails = () => {
   // Refetch data every time screen comes into focus
   useFocusEffect(
     useCallback(() => {
-      if (user) {
-        fetchExpenses();
+      if (user && groupId) {
+        fetchExpenses(groupId as string);
       }
-    }, [fetchExpenses])
+    }, [fetchExpenses, user, groupId])
   );
-
-  const getIndividualExpense = useCallback((member: GroupMember) => {
-    const totalExpense = expenses.reduce((sum, expense) => {
-      if (expense.paidBy._id === member._id) {
-        return sum + expense.amount;
-      }
-      return sum;
-    }, 0);
-    return totalExpense;
-  }, [expenses]);
-
-  useEffect(() => {
-    if (groupDetails && expenses && fairshare) {
-      const newBalances = groupDetails.members.map((member) => {
-        const balance = getIndividualExpense(member) - fairshare;
-        return {
-          email: member.email,
-          balance: balance,
-        };
-      });
-      setBalances(newBalances);
-    }
-  }, [groupDetails, expenses, fairshare, getIndividualExpense]);
-
-  useEffect(() => {
-    if (balances.length > 0) {
-      const whoGetsPayment = balances
-        .filter((item) => item.balance > 0)
-        .sort((a, b) => b.balance - a.balance);
-      const whoNeedToPay = balances
-        .filter((item) => item.balance < 0)
-        .sort((a, b) => a.balance - b.balance);
-
-      setCreditors(whoGetsPayment);
-      setDebtors(whoNeedToPay);
-    }
-  }, [balances]);
 
   if (!groupDetails) {
     return (
@@ -222,54 +138,6 @@ const GroupDetails = () => {
       });
     }
   };
-
-  const whoNeedsToPayWhom = () => {
-    let i = 0;
-    let j = 0;
-    const settlements: { from: string; to: string; amount: number }[] = [];
-    
-    // Create deep copies to avoid mutating original arrays
-    const debtorsCopy = debtors.map(debtor => ({ ...debtor }));
-    const creditorsCopy = creditors.map(creditor => ({ ...creditor }));
-
-    while (i < debtorsCopy.length && j < creditorsCopy.length) {
-      const debtor = debtorsCopy[i];
-      const creditor = creditorsCopy[j];
-
-      const debtAmount = Math.abs(debtor.balance);
-      const creditAmount = creditor.balance;
-      const transferAmount = Math.min(debtAmount, creditAmount);
-
-      if (transferAmount > 0.01) {
-        const debtorMember = groupDetails?.members.find(
-          (member) => member.email === debtor.email
-        );
-        const creditorMember = groupDetails?.members.find(
-          (member) => member.email === creditor.email
-        );
-
-        if (debtorMember && creditorMember) {
-          settlements.push({
-            from: debtorMember.displayName,
-            to: creditorMember.displayName,
-            amount: Number(transferAmount.toFixed(2)),
-          });
-        }
-
-        debtor.balance += transferAmount;
-        creditor.balance -= transferAmount;
-      }
-
-      if (Math.abs(debtor.balance) < 0.01) i++;
-      if (Math.abs(creditor.balance) < 0.01) j++;
-    }
-
-    return settlements;
-  };
-
-  // for (const settlement of whoNeedsToPayWhom()) {
-  //   console.log(settlement);
-  // }
 
   const actions = [
     {

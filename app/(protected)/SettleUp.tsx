@@ -4,11 +4,20 @@ import React from 'react';
 import { Alert, FlatList, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView as SafeArea } from 'react-native-safe-area-context';
 import { useAuth } from '../../contexts/AuthContext';
+import { useExpense } from '../../contexts/ExpenseContext';
+
+interface GroupMember {
+  _id: string;
+  displayName: string;
+  email: string;
+}
 
 const SettleUp = () => {
-  const { user } = useAuth();
+  const { user, token } = useAuth();
   const username = user?.displayName;
-  const { settlements } = useLocalSearchParams();
+  const { settlements, groupId } = useLocalSearchParams();
+  const { settleUp } = useExpense();
+
   const parsedSettlements = settlements ? JSON.parse(settlements as string) : [];
 
   const handleSettlementPress = (settlement: { from: string; to: string; amount: number }) => {
@@ -27,10 +36,12 @@ const SettleUp = () => {
         },
         {
           text: 'Yes',
-          onPress: () => {
-            // Handle the settlement confirmation here
-            console.log('Settlement confirmed:', settlement);
-            // You can add your settlement logic here
+          onPress: async() => {
+            try {
+              await settleUp(settlement, groupId as string);
+            } catch (error) {
+              console.error("SettleUp: Error in settleUp call:", error);
+            }
           },
         },
       ]
