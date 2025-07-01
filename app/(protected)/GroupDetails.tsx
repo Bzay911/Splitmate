@@ -6,6 +6,7 @@ import { Ionicons } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
 import { router, useFocusEffect, useLocalSearchParams } from "expo-router";
 import React, { useCallback, useEffect, useState } from "react";
+import { Alert } from "react-native";
 import {
   SafeAreaView,
   ScrollView,
@@ -181,6 +182,10 @@ const GroupDetails = () => {
     });
   };
 
+  const handleExport = () => {
+    Alert.alert('Under Development!', 'This feature is not available yet.');
+  };
+
   const renderSettlements = () => {
     const settlements = whoNeedsToPayWhom();
     if (settlements.length === 0) return null;
@@ -300,7 +305,7 @@ const GroupDetails = () => {
               </LinearGradient>
             </TouchableOpacity>
 
-            <TouchableOpacity style={styles.buttonWrapper}>
+            <TouchableOpacity style={styles.buttonWrapper} onPress={handleExport}>
               <LinearGradient
                 colors={["#FB923C", "#EAB308"]}
                 style={styles.exportBtn}

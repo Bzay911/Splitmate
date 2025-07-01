@@ -85,6 +85,14 @@ export function LoginScreen() {
     return isValid;
   };
 
+  const handleForgotPassword = () => {
+    Alert.alert('Under Development!', 'This feature is not available yet.');
+  };
+
+  const handleGoogleSignIn = () => {
+    Alert.alert('Under Development!', 'This feature is not available yet.');
+  };
+
   // Handle sign in
   const handleSubmit = async () => {
     if (!validateForm()) return;
@@ -154,7 +162,7 @@ export function LoginScreen() {
           {passwordError ? <Text style={styles.errorText}>{passwordError}</Text> : null}
 
           <View style={styles.forgotPasswordContainer}>
-            <Pressable onPress={() => {}}>
+            <Pressable onPress={handleForgotPassword}>
               <Text style={styles.forgotLink}>Forgot password?</Text>
             </Pressable>
           </View>
@@ -181,6 +189,7 @@ export function LoginScreen() {
           <Pressable
             style={styles.googleButton}
             accessibilityRole="button"
+            onPress={handleGoogleSignIn}
           >
             <FontAwesome name="google" size={20} color="#18181b" />
             <Text style={styles.googleText}>Continue with Google</Text>

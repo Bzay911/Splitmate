@@ -25,6 +25,14 @@ const Profile = () => {
     router.push('/EditProfile');
   };
 
+  const handlePrivacy = () => {
+    Alert.alert('Under Development!', 'This feature is not available yet.');
+  };
+
+  const handleNotifications = () => {
+    Alert.alert('Under Development!', 'This feature is not available yet.');
+  };
+
   return (
     <LinearGradient
     colors={['#2a2a2a', '#1a1a1a', '#0f0f0f']}
@@ -56,12 +64,12 @@ const Profile = () => {
 
       <View style={styles.section}>
         <Text style={styles.sectionTitle}>Settings</Text>
-        <TouchableOpacity style={styles.settingItem}>
+        <TouchableOpacity style={styles.settingItem} onPress={handleNotifications}>
           <MaterialIcons name="notifications" size={24} color="#64748b" />
           <Text style={styles.settingText}>Notifications</Text>
           <MaterialIcons name="chevron-right" size={24} color="#64748b" />
         </TouchableOpacity>
-        <TouchableOpacity style={styles.settingItem}>
+        <TouchableOpacity style={styles.settingItem} onPress={handlePrivacy}>
           <MaterialIcons name="lock" size={24} color="#64748b" />
           <Text style={styles.settingText}>Privacy</Text>
           <MaterialIcons name="chevron-right" size={24} color="#64748b" />

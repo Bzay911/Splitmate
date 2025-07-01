@@ -14,8 +14,8 @@
       "backgroundColor": "#1a1a1a"
     },
     "extra": {
-      // "apiUrl": "https://splitmate-backend-6vlo.vercel.app"
-      "apiUrl": "http://192.168.1.2:3000"
+      "apiUrl": "https://splitmate-backend-6vlo.vercel.app"
+      // "apiUrl": "http://192.168.1.2:3000"
     },
     "ios": {
       "supportsTablet": true,
