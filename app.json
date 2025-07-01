@@ -4,12 +4,12 @@
     "slug": "Splitmate",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/images/appLogo.png",
+    "icon": "./assets/images/SplitmateAppIcon.png",
     "scheme": "splitmate",
     "userInterfaceStyle": "dark",
     "newArchEnabled": true,
     "splash": {
-      "image": "./assets/images/appLogo.png",
+      "image": "./assets/images/SplitmateAppIcon.png",
       "resizeMode": "contain",
       "backgroundColor": "#1a1a1a"
     },
@@ -19,17 +19,17 @@
     },
     "ios": {
       "supportsTablet": true,
-      "icon": "./assets/images/appLogo.png",
+      "icon": "./assets/images/SplitmateAppIcon.png",
       "splash": {
-        "image": "./assets/images/appLogo.png",
+        "image": "./assets/images/SplitmateAppIcon.png",
         "resizeMode": "contain",
         "backgroundColor": "#1a1a1a",
-        "tabletImage": "./assets/images/appLogo.png"
+        "tabletImage": "./assets/images/SplitmateAppIcon.png"
       }
     },
     "android": {
       "adaptiveIcon": {
-        "foregroundImage": "./assets/images/appLogo.png",
+        "foregroundImage": "./assets/images/SplitmateAppIcon.png",
         "backgroundColor": "#1a1a1a"
       },
       "edgeToEdgeEnabled": true,
