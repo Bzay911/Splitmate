@@ -36,7 +36,6 @@ export const GroupsProvider = ({ children }: { children: ReactNode }) => {
       if (!user) {
         throw new Error("No user logged in");
       }
-      console.log("token", token);
       const response = await fetch(apiUrl("api/groups"), {
         headers: {
           Authorization: `Bearer ${token}`,

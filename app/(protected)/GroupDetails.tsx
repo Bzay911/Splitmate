@@ -5,7 +5,7 @@ import { useGroups } from "@/contexts/GroupsContext";
 import { Ionicons } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
 import { router, useFocusEffect, useLocalSearchParams } from "expo-router";
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState, useRef } from "react";
 import { Alert } from "react-native";
 import {
   SafeAreaView,
@@ -16,6 +16,11 @@ import {
   View,
 } from "react-native";
 import { FloatingAction } from "react-native-floating-action";
+import Swipeable from "react-native-gesture-handler/ReanimatedSwipeable";
+import Animated, {
+  interpolate,
+  useAnimatedStyle,
+} from "react-native-reanimated";
 
 interface GroupMember {
   _id: string;
@@ -32,15 +37,6 @@ interface GroupDetails {
   createdBy: GroupMember;
   colors: [string, string];
 }
-
-// interface Settlement {
-//   _id: string;
-//   groupId: string;
-//   fromUser: GroupMember;
-//   toUser: GroupMember;
-//   amount: number;
-//   settledAt: Date;
-// }
 
 const formatDate = (date: Date) => {
   const options: Intl.DateTimeFormatOptions = {
@@ -70,14 +66,75 @@ const GroupDetails = () => {
   const [isLoading, setIsLoading] = useState(false);
   const { user, token } = useAuth();
   const { groups } = useGroups();
-  const { expenses, fetchExpenses, creditors, debtors, whoNeedsToPayWhom } = useExpense();
+  const { expenses, fetchExpenses, creditors, debtors, whoNeedsToPayWhom } =
+    useExpense();
+  const swipeableRef = useRef<Swipeable>(null);
+
+  const closeSwipe = () => {
+    if (swipeableRef.current) {
+      swipeableRef.current.close();
+    }
+  };
+
+  const handleDelete = async (id: string) => {
+    try {
+      const response = await fetch(
+        apiUrl(`api/expenses/groups/${groupId}/expenses/${id}`),
+        {
+          method: "DELETE",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+        const data = await response.json();
+      if (!response.ok) {
+        throw new Error(data.error || `Failed to delete expense (${response.status})`);
+      }
+
+      Alert.alert("Success", data.message ||  "Expense deleted successfully");
+
+      // Refresh expenses or group details here
+      fetchExpenses(groupId as string);
+      fetchGroupDetails();
+    } catch (error: any) {
+      console.error("Error deleting expense:", error);
+      Alert.alert("Error", error.message);
+    } finally {
+      closeSwipe();
+    }
+  };
+
+  const renderRightActions = (id: string, progress) => {
+    // animated style for sliding in
+    const animatedStyle = useAnimatedStyle(() => {
+      return {
+        transform: [
+          {
+            translateX: interpolate(progress.value, [0, 1], [80, 0], "clamp"),
+          },
+        ],
+      };
+    });
+
+    return (
+      <Animated.View style={[styles.deleteButton, animatedStyle]}>
+        <TouchableOpacity onPress={() => handleDelete(id)}>
+          <Ionicons name="trash" size={24} color="white" />
+          <Text style={styles.deleteText}>Delete</Text>
+        </TouchableOpacity>
+      </Animated.View>
+    );
+  };
 
   const parsedColors =
     typeof colors === "string" ? colors.split(",") : ["#6366f1", "#818cf8"];
 
   useEffect(() => {
     if (groups.length > 0 && groupId) {
-      const currentGroup = groups.find(g => g._id === groupId);
+      const currentGroup = groups.find((g) => g._id === groupId);
       if (currentGroup && groupDetails) {
         // If the member count has changed, refresh the details
         if (currentGroup.members.length !== groupDetails.members.length) {
@@ -168,7 +225,6 @@ const GroupDetails = () => {
       position: 2,
     },
   ];
-  
 
   const handleSettleUp = () => {
     const allSettlements = whoNeedsToPayWhom();
@@ -183,7 +239,7 @@ const GroupDetails = () => {
   };
 
   const handleExport = () => {
-    Alert.alert('Under Development!', 'This feature is not available yet.');
+    Alert.alert("Under Development!", "This feature is not available yet.");
   };
 
   const renderSettlements = () => {
@@ -237,7 +293,7 @@ const GroupDetails = () => {
               style={styles.settingsBtn}
               onPress={handleSettingsPress}
             >
-            <Text style={styles.groupName}>{groupName}</Text>
+              <Text style={styles.groupName}>{groupName}</Text>
               <Ionicons name="settings" size={24} color="white" />
             </TouchableOpacity>
 
@@ -269,9 +325,13 @@ const GroupDetails = () => {
 
           <View style={styles.dividendSection}>
             {(() => {
-              const userCreditor = creditors.find((item) => item.email === user?.email);
-              const userDebtor = debtors.find((item) => item.email === user?.email);
-              
+              const userCreditor = creditors.find(
+                (item) => item.email === user?.email
+              );
+              const userDebtor = debtors.find(
+                (item) => item.email === user?.email
+              );
+
               if (userCreditor && !isSettled(userCreditor.balance)) {
                 return (
                   <Text style={styles.ownerDividend}>
@@ -286,7 +346,9 @@ const GroupDetails = () => {
                 );
               } else {
                 return (
-                  <Text style={styles.settlementText}>You are all settled up!</Text>
+                  <Text style={styles.settlementText}>
+                    You are all settled up!
+                  </Text>
                 );
               }
             })()}
@@ -294,7 +356,10 @@ const GroupDetails = () => {
           </View>
 
           <View style={styles.buttonContainer}>
-            <TouchableOpacity style={styles.settleupButtonWrapper} onPress={handleSettleUp}>
+            <TouchableOpacity
+              style={styles.settleupButtonWrapper}
+              onPress={handleSettleUp}
+            >
               <LinearGradient
                 colors={["#EF4444", "#EC4899"]}
                 style={styles.settleupBtn}
@@ -305,7 +370,10 @@ const GroupDetails = () => {
               </LinearGradient>
             </TouchableOpacity>
 
-            <TouchableOpacity style={styles.buttonWrapper} onPress={handleExport}>
+            <TouchableOpacity
+              style={styles.buttonWrapper}
+              onPress={handleExport}
+            >
               <LinearGradient
                 colors={["#FB923C", "#EAB308"]}
                 style={styles.exportBtn}
@@ -320,25 +388,40 @@ const GroupDetails = () => {
           <Text style={styles.sectionTitle}>Expenses</Text>
 
           {expenses.map((expense) => (
-            <View key={expense._id} style={styles.expensesContainer}>
-              <View style={styles.expenseIcon}>
-                <Ionicons name="cart" size={24} color="black" />
-              </View>
+            <Swipeable
+              key={expense._id}
+              renderRightActions={(progress) =>
+                renderRightActions(expense._id, progress)
+              }
+              ref={(ref) => {
+                if (ref) {
+                  swipeableRef.current = ref;
+                }
+              }}
+              onSwipeableOpen={closeSwipe}
+            >
+              <View key={expense._id} style={styles.expensesContainer}>
+                <View style={styles.expenseIcon}>
+                  <Ionicons name="cart" size={24} color="black" />
+                </View>
 
-              <View style={styles.dateContainer}>
-                <Text style={styles.dateText}>{formatDate(expense.date)}</Text>
-              </View>
+                <View style={styles.dateContainer}>
+                  <Text style={styles.dateText}>
+                    {formatDate(expense.date)}
+                  </Text>
+                </View>
 
-              <View style={styles.expenses}>
-                <Text style={styles.expenseDescription}>
-                  {expense.description}
-                </Text>
-                <Text style={styles.expenseAmount}>
-                  {expense?.paidBy?.displayName || "Anonymous"} added{" "}
-                  <Text style={styles.addedTotalCost}>${expense.amount}</Text>
-                </Text>
+                <View style={styles.expenses}>
+                  <Text style={styles.expenseDescription}>
+                    {expense.description}
+                  </Text>
+                  <Text style={styles.expenseAmount}>
+                    {expense?.paidBy?.displayName || "Anonymous"} added{" "}
+                    <Text style={styles.addedTotalCost}>${expense.amount}</Text>
+                  </Text>
+                </View>
               </View>
-            </View>
+            </Swipeable>
           ))}
         </ScrollView>
       </SafeAreaView>
@@ -398,7 +481,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     padding: 20,
     borderRadius: 16,
-    margin: 16
+    margin: 16,
   },
   groupImage: {
     width: 100,
@@ -598,6 +681,16 @@ const styles = StyleSheet.create({
   refreshText: {
     fontSize: 16,
     color: "white",
+  },
+  deleteButton: {
+    backgroundColor: "red",
+    justifyContent: "center",
+    alignItems: "center",
+    width: 80,
+  },
+  deleteText: {
+    color: "white",
+    fontWeight: "bold",
   },
 });
 

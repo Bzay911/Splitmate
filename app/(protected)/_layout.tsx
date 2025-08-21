@@ -6,6 +6,7 @@ import { GroupsProvider } from "@/contexts/GroupsContext";
 import { SettlementProvider } from "@/contexts/SettlementContext";
 import { Redirect, Stack } from "expo-router";
 import { ActivityIndicator } from "react-native";
+import { GestureHandlerRootView } from "react-native-gesture-handler";
 
 export default function ProtectedLayout() {
   const { token, loading } = useAuth();
@@ -25,7 +26,8 @@ export default function ProtectedLayout() {
         <GroupsProvider>
           <ExpenseProvider>
             <SettlementProvider>
-              
+              <GestureHandlerRootView>
+
             <Stack>
               <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
               <Stack.Screen name="GroupDetails" options={{ title: 'Group Details', headerBackTitle: 'Back', headerTintColor: 'white', headerStyle: { backgroundColor: '#2a2a2a' } }} />
@@ -36,6 +38,8 @@ export default function ProtectedLayout() {
               <Stack.Screen name="EditProfile" options={{ title: 'Edit Profile', headerBackTitle: 'Back', headerTintColor: 'white', headerStyle: { backgroundColor: '#2a2a2a' } }} />
               <Stack.Screen name="SettleUp" options={{ title: 'Settle Up', headerBackTitle: 'Back', headerTintColor: 'white', headerStyle: { backgroundColor: '#2a2a2a' } }} />
             </Stack>
+            </GestureHandlerRootView>
+
             </SettlementProvider>
           </ExpenseProvider>
         </GroupsProvider>

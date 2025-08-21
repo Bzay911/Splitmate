@@ -4,18 +4,22 @@
     "slug": "Splitmate",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/images/SplitmateAppIcon.png",
+    "icon": "./assets/images/playstore.png",
     "scheme": "splitmate",
     "userInterfaceStyle": "dark",
     "newArchEnabled": true,
     "splash": {
       "image": "./assets/images/SplitmateAppIcon.png",
       "resizeMode": "contain",
-      "backgroundColor": "#1a1a1a"
+      "backgroundColor": "#000000"
     },
     "extra": {
-      "apiUrl": "https://splitmate-backend-6vlo.vercel.app"
-      // "apiUrl": "http://192.168.1.2:3000"
+      // "apiUrl": "https://splitmate-backend-6vlo.vercel.app",
+      "apiUrl": "http://192.168.1.29:3000",
+      "router": {},
+      "eas": {
+        "projectId": "8cc11141-6144-4370-933c-0af42aac097c"
+      }
     },
     "ios": {
       "supportsTablet": true,
@@ -23,21 +27,27 @@
       "splash": {
         "image": "./assets/images/SplitmateAppIcon.png",
         "resizeMode": "contain",
-        "backgroundColor": "#1a1a1a",
+        "backgroundColor": "#000000",
         "tabletImage": "./assets/images/SplitmateAppIcon.png"
-      }
+      },
+      "bundleIdentifier": "com.beejaya.Splitmate"
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/SplitmateAppIcon.png",
-        "backgroundColor": "#1a1a1a"
+        "backgroundColor": "#000000"
       },
       "edgeToEdgeEnabled": true,
       "splash": {
-        "image": "./assets/images/appLogo.png",
+        "image": "./assets/images/SplitmateAppIcon.png",
         "resizeMode": "contain",
-        "backgroundColor": "#1a1a1a"
-      }
+        "backgroundColor": "#000000"
+      },
+      "permissions": [
+        "android.permission.CAMERA",
+        "android.permission.RECORD_AUDIO"
+      ],
+      "package": "com.beejaya.Splitmate"
     },
     "web": {
       "bundler": "metro",
@@ -49,10 +59,10 @@
       [
         "expo-splash-screen",
         {
-          "image": "./assets/images/appLogo.png",
+          "image": "./assets/images/playstore.png",
           "imageWidth": 200,
           "resizeMode": "contain",
-          "backgroundColor": "#1a1a1a"
+          "backgroundColor": "#000000"
         }
       ],
       [
@@ -61,7 +71,8 @@
           "cameraPermission": "Allow Splitmate to access your camera",
           "recordAudioAndroid": true
         }
-      ]
+      ],
+      "expo-web-browser"
     ],
     "experiments": {
       "typedRoutes": true
