@@ -2,6 +2,8 @@ import { apiUrl } from "@/constants/ApiConfig";
 import { useAuth } from "@/contexts/AuthContext";
 import { useExpense } from "@/contexts/ExpenseContext";
 import { useGroups } from "@/contexts/GroupsContext";
+import { useFinancial } from "@/contexts/FinancialContext";
+import { useActivity } from "@/contexts/ActivityContext";
 import { Ionicons } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
 import { router, useFocusEffect, useLocalSearchParams } from "expo-router";
@@ -68,6 +70,8 @@ const GroupDetails = () => {
   const { groups } = useGroups();
   const { expenses, fetchExpenses, creditors, debtors, whoNeedsToPayWhom } =
     useExpense();
+  const { refreshFinancialSummary } = useFinancial();
+  const { refreshActivities } = useActivity();
   const swipeableRef = useRef<Swipeable>(null);
 
   const closeSwipe = () => {
@@ -76,6 +80,9 @@ const GroupDetails = () => {
     }
   };
 
+
+
+  // Handle delete expense action
   const handleDelete = async (id: string) => {
     try {
       const response = await fetch(
@@ -88,17 +95,17 @@ const GroupDetails = () => {
           },
         }
       );
-
-        const data = await response.json();
+      const data = await response.json();
       if (!response.ok) {
-        throw new Error(data.error || `Failed to delete expense (${response.status})`);
+        throw new Error(
+          data.error || `Failed to delete expense (${response.status})`
+        );
       }
 
-      Alert.alert("Success", data.message ||  "Expense deleted successfully");
-
-      // Refresh expenses or group details here
+      Alert.alert("Success", data.message || "Expense deleted successfully");
       fetchExpenses(groupId as string);
-      fetchGroupDetails();
+      await refreshFinancialSummary();
+      await refreshActivities();
     } catch (error: any) {
       console.error("Error deleting expense:", error);
       Alert.alert("Error", error.message);
@@ -443,6 +450,7 @@ const GroupDetails = () => {
               pathname: "/AddExpense",
               params: {
                 groupId: groupDetails._id,
+                members: JSON.stringify(groupDetails.members)
               },
             });
           }

@@ -12,11 +12,13 @@ import { Alert, Keyboard, SafeAreaView, StyleSheet, Text, TextInput, TouchableOp
 const AddExpense = () => {
   const [amount, setAmount] = useState('');
   const [description, setDescription] = useState('');
-  const { groupId } = useLocalSearchParams();
+  const { groupId, members } = useLocalSearchParams();
   const { refreshFinancialSummary } = useFinancial();
   const { refreshActivities } = useActivity();
   const {user, token} = useAuth();
   const { refreshGroups } = useGroups();
+
+  
   const handleAddExpense = async () => {
     if (!amount.trim()) {
         Alert.alert("Error", "Please enter a bill amount");
@@ -34,6 +36,9 @@ const AddExpense = () => {
           router.replace("/");
           return;
         }
+
+  const groupMembers = members ? JSON.parse(members as string): [];
+       const memberIds = groupMembers.map((m:any) => m._id) 
         const response = await fetch(
             apiUrl(`api/expenses/groups/${groupId}/expenses`),
             {
@@ -45,6 +50,7 @@ const AddExpense = () => {
                 body: JSON.stringify({
                     amount: parseFloat(amount),
                     description,
+                    memberIds
                 }),
             }
         )
