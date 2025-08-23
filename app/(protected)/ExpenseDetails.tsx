@@ -5,11 +5,16 @@ import {
   StyleSheet,
   TouchableOpacity,
   TextInput,
+  Alert,
 } from "react-native";
 import { useLocalSearchParams } from "expo-router";
 import { LinearGradient } from "expo-linear-gradient";
 import BottomSheet, { BottomSheetView } from "@gorhom/bottom-sheet";
 import { useRef, useState, useMemo } from "react";
+import { useDeleteExpense } from "@/utils/HandleDelete";
+import { useRouter } from "expo-router";
+import { apiUrl } from "@/constants/ApiConfig";
+import { useAuth } from "@/contexts/AuthContext";
 
 const ExpenseDetails = () => {
   const {
@@ -20,8 +25,13 @@ const ExpenseDetails = () => {
     createdAt,
     colors,
     expenseDescription,
+    groupId,
+    expenseId,
   } = useLocalSearchParams();
 
+  const handleDelete = useDeleteExpense();
+  const { token } = useAuth();
+  const router = useRouter();
   const snapPoints = useMemo(() => ["70%"], []);
 
   const bottomSheetRef = useRef<BottomSheet>(null);
@@ -34,8 +44,9 @@ const ExpenseDetails = () => {
     ? expenseDescription[0]
     : expenseDescription ?? "";
 
-  const [amount, setAmount] = useState(initialAmount);
-  const [description, setDescription] = useState(initialDescription);
+  const [newAmount, setnewAmount] = useState(initialAmount);
+  const [newDescription, setnewDescription] = useState(initialDescription);
+  const [loading, setLoading] = useState(false);
 
   const parsedColors =
     typeof colors === "string" ? colors.split(",") : ["#6366f1", "#818cf8"];
@@ -60,14 +71,59 @@ const ExpenseDetails = () => {
     setSheetVisible(true);
   };
 
-  const handleSaveChanges = () => {
-    console.log("Saved amount:", amount);
-    console.log("Saved description:", description);
-    bottomSheetRef.current?.close();
-  };
+const handleSaveChanges = async () => {
+  try {
+    setLoading(true);
+    const response = await fetch(apiUrl(`api/expenses/expenses/${expenseId}`), {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify({
+        amount: newAmount,
+        description: newDescription,
+      }),
+    });
+
+    if (!response.ok) {
+      throw new Error(`Failed to update expense (${response.status})`);
+    }
+
+    Alert.alert("Success", "Expense updated successfully");
+    router.back();
+  } catch (error: any) {
+    console.error("Error updating expense:", error);
+    Alert.alert("Error", error.message);
+  }finally {
+    setLoading(false);
+  }
+
+  bottomSheetRef.current?.close();
+};
 
   const handleDeleteExpense = () => {
-    console.log("Delete button pressed");
+    Alert.alert(
+      "Confirm Delete",
+      "Are you sure you want to delete this expense?",
+      [
+        {
+          text: "Cancel",
+          style: "cancel",
+        },
+        {
+          text: "Delete",
+          style: "destructive",
+          onPress: async () => {
+            await handleDelete(
+              expenseId as string,
+              groupId as string
+            );
+            router.back();
+          },
+        },
+      ]
+    );
   };
 
   return (
@@ -147,8 +203,8 @@ const ExpenseDetails = () => {
             <Text style={styles.sheetLabel}>Edit Amount</Text>
             <TextInput
               style={styles.sheetInput}
-              value={amount}
-              onChangeText={setAmount}
+              value={newAmount}
+              onChangeText={setnewAmount}
               keyboardType="numeric"
               placeholderTextColor="#666"
             />
@@ -156,8 +212,8 @@ const ExpenseDetails = () => {
             <Text style={styles.sheetLabel}>Edit Description</Text>
             <TextInput
               style={styles.sheetInput}
-              value={description}
-              onChangeText={setDescription}
+              value={newDescription}
+              onChangeText={setnewDescription}
               placeholderTextColor="#666"
               multiline
             />
@@ -166,7 +222,9 @@ const ExpenseDetails = () => {
               style={styles.saveButton}
               onPress={handleSaveChanges}
             >
-              <Text style={styles.saveButtonText}>Save Changes</Text>
+              <Text style={styles.saveButtonText}>
+                {loading ? "Saving..." : "Save Changes"}
+                </Text>
             </TouchableOpacity>
           </BottomSheetView>
         </BottomSheet>

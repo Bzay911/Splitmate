@@ -2,12 +2,12 @@ import { apiUrl } from "@/constants/ApiConfig";
 import { useAuth } from "@/contexts/AuthContext";
 import { useExpense } from "@/contexts/ExpenseContext";
 import { useGroups } from "@/contexts/GroupsContext";
-import { useFinancial } from "@/contexts/FinancialContext";
-import { useActivity } from "@/contexts/ActivityContext";
+import Dialog from "react-native-dialog";
 import { Ionicons } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
 import { router, useFocusEffect, useLocalSearchParams } from "expo-router";
 import React, { useCallback, useEffect, useState, useRef } from "react";
+import { useDeleteExpense } from "@/utils/HandleDelete";
 import { Alert } from "react-native";
 import {
   SafeAreaView,
@@ -70,47 +70,18 @@ const GroupDetails = () => {
   const { groups } = useGroups();
   const { expenses, fetchExpenses, creditors, debtors, whoNeedsToPayWhom } =
     useExpense();
-  const { refreshFinancialSummary } = useFinancial();
-  const { refreshActivities } = useActivity();
+  const handleDelete = useDeleteExpense();
   const swipeableRef = useRef<Swipeable>(null);
+
+  const [visible, setVisible] = useState(false);
+  const [selectedExpenseId, setSelectedExpenseId] = useState<string | null>(
+    null
+  );
+  
 
   const closeSwipe = () => {
     if (swipeableRef.current) {
       swipeableRef.current.close();
-    }
-  };
-
-
-
-  // Handle delete expense action
-  const handleDelete = async (id: string) => {
-    try {
-      const response = await fetch(
-        apiUrl(`api/expenses/groups/${groupId}/expenses/${id}`),
-        {
-          method: "DELETE",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-      const data = await response.json();
-      if (!response.ok) {
-        throw new Error(
-          data.error || `Failed to delete expense (${response.status})`
-        );
-      }
-
-      Alert.alert("Success", data.message || "Expense deleted successfully");
-      fetchExpenses(groupId as string);
-      await refreshFinancialSummary();
-      await refreshActivities();
-    } catch (error: any) {
-      console.error("Error deleting expense:", error);
-      Alert.alert("Error", error.message);
-    } finally {
-      closeSwipe();
     }
   };
 
@@ -128,7 +99,12 @@ const GroupDetails = () => {
 
     return (
       <Animated.View style={[styles.deleteButton, animatedStyle]}>
-        <TouchableOpacity onPress={() => handleDelete(id)}>
+        <TouchableOpacity
+          onPress={() => {
+            setSelectedExpenseId(id);
+            setVisible(true);
+          }}
+        >
           <Ionicons name="trash" size={24} color="white" />
           <Text style={styles.deleteText}>Delete</Text>
         </TouchableOpacity>
@@ -407,44 +383,52 @@ const GroupDetails = () => {
               }}
               onSwipeableOpen={closeSwipe}
             >
-              <TouchableOpacity onPress={() => {
-                router.push({
-                  pathname: "/ExpenseDetails",
-                  params: {
-                    expenseDescription: expense.description,
-                    expenseAmount: expense.amount,
-                    paidBy: expense.paidBy ? expense.paidBy.displayName : "Anonymous",
-                    paidByEmail: expense.paidBy ? expense.paidBy.email : null,
-                    groupName: groupDetails.name,
-                    createdAt: expense.createdAt ? new Date(expense.createdAt).toISOString() : null,
-                    colors: colors,
-                  },
-                });
-              }}>
+              <TouchableOpacity
+                onPress={() => {
+                  router.push({
+                    pathname: "/ExpenseDetails",
+                    params: {
+                      expenseId: expense._id,
+                      groupId: groupDetails._id,
+                      expenseDescription: expense.description,
+                      expenseAmount: expense.amount,
+                      paidBy: expense.paidBy
+                        ? expense.paidBy.displayName
+                        : "Anonymous",
+                      paidByEmail: expense.paidBy ? expense.paidBy.email : null,
+                      groupName: groupDetails.name,
+                      createdAt: expense.createdAt
+                        ? new Date(expense.createdAt).toISOString()
+                        : null,
+                      colors: colors,
+                    },
+                  });
+                }}
+              >
+                <View key={expense._id} style={styles.expensesContainer}>
+                  <View style={styles.expenseIcon}>
+                    <Ionicons name="cart" size={24} color="black" />
+                  </View>
 
-              <View key={expense._id} style={styles.expensesContainer}>
-                <View style={styles.expenseIcon}>
-                  <Ionicons name="cart" size={24} color="black" />
-                </View>
+                  <View style={styles.dateContainer}>
+                    <Text style={styles.dateText}>
+                      {formatDate(expense.date)}
+                    </Text>
+                  </View>
 
-                <View style={styles.dateContainer}>
-                  <Text style={styles.dateText}>
-                    {formatDate(expense.date)}
-                  </Text>
+                  <View style={styles.expenses}>
+                    <Text style={styles.expenseDescription}>
+                      {expense.description}
+                    </Text>
+                    <Text style={styles.expenseAmount}>
+                      {expense?.paidBy?.displayName || "Anonymous"} added{" "}
+                      <Text style={styles.addedTotalCost}>
+                        ${expense.amount}
+                      </Text>
+                    </Text>
+                  </View>
                 </View>
-
-                <View style={styles.expenses}>
-                  <Text style={styles.expenseDescription}>
-                    {expense.description}
-                  </Text>
-                  <Text style={styles.expenseAmount}>
-                    {expense?.paidBy?.displayName || "Anonymous"} added{" "}
-                    <Text style={styles.addedTotalCost}>${expense.amount}</Text>
-                  </Text>
-                </View>
-              </View>
               </TouchableOpacity>
-
             </Swipeable>
           ))}
         </ScrollView>
@@ -467,7 +451,7 @@ const GroupDetails = () => {
               pathname: "/AddExpense",
               params: {
                 groupId: groupDetails._id,
-                members: JSON.stringify(groupDetails.members)
+                members: JSON.stringify(groupDetails.members),
               },
             });
           }
@@ -476,6 +460,26 @@ const GroupDetails = () => {
         position="right"
         distanceToEdge={20}
       />
+
+      {visible && (
+        <Dialog.Container visible={visible} onBackdropPress={() => setVisible(false)}>
+          <Dialog.Title>Delete Expense</Dialog.Title>
+          <Dialog.Description>
+            Do you want to delete this expense? You cannot undo this action.
+          </Dialog.Description>
+          <Dialog.Button label="Cancel" onPress={() => setVisible(false)} />
+          <Dialog.Button
+            label="Delete"
+            onPress={() => {
+              if (selectedExpenseId)
+                handleDelete(selectedExpenseId, groupId as string);
+              setVisible(false);
+              setSelectedExpenseId(null);
+              closeSwipe();
+            }}
+          />
+        </Dialog.Container>
+      )}
     </LinearGradient>
   );
 };
@@ -483,6 +487,12 @@ const GroupDetails = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+  },
+  dialogContainer: {
+    flex: 1,
+    backgroundColor: "#fff",
+    alignItems: "center",
+    justifyContent: "center",
   },
   safeArea: {
     flex: 1,
