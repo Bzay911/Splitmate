@@ -27,6 +27,7 @@ interface Expense {
   description: string;
   date: Date;
   splitBetween: GroupMember[];
+  createdAt: Date;
 }
 
 interface Balance {
@@ -53,6 +54,7 @@ interface ExpenseContextType {
   whoNeedsToPayWhom: () => Settlement[];
   settleUp: (settlement: Settlement, groupId: string) => Promise<void>;
   resetSettlements: () => void;
+  handleDelete: (id: string, groupId: string) => Promise<void>;
 }
 
 interface BackendSettlement {
@@ -227,8 +229,6 @@ export const ExpenseProvider = ({ children }: ExpenseProviderProps) => {
 
   // Calculate creditors and debtors
   useEffect(() => {
-    console.log("Balances:", balances);
-
     if (balances.length > 0) {
       const whoGetsPayment = balances
         .filter((item) => item.balance > 0.01)
@@ -361,6 +361,36 @@ export const ExpenseProvider = ({ children }: ExpenseProviderProps) => {
     }
   };
 
+   // Handle delete expense action
+    const handleDelete = async (id: string, groupId: string) => {
+      try {
+        const response = await fetch(
+          apiUrl(`api/expenses/groups/${groupId}/expenses/${id}`),
+          {
+            method: "DELETE",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+        const data = await response.json();
+        if (!response.ok) {
+          throw new Error(
+            data.error || `Failed to delete expense (${response.status})`
+          );
+        }
+  
+        Alert.alert("Success", data.message || "Expense deleted successfully");
+        fetchExpenses(groupId as string);
+        await refreshFinancialSummary();
+        await refreshActivities();
+      } catch (error: any) {
+        console.error("Error deleting expense:", error);
+        Alert.alert("Error", error.message);
+      } 
+    };
+
   return (
     <ExpenseContext.Provider
       value={{
@@ -374,6 +404,7 @@ export const ExpenseProvider = ({ children }: ExpenseProviderProps) => {
         whoNeedsToPayWhom,
         settleUp,
         resetSettlements,
+        handleDelete,
       }}
     >
       {children}

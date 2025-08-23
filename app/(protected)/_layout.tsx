@@ -7,6 +7,7 @@ import { SettlementProvider } from "@/contexts/SettlementContext";
 import { Redirect, Stack } from "expo-router";
 import { ActivityIndicator } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
+import { BottomSheetModalProvider } from "@gorhom/bottom-sheet";
 
 export default function ProtectedLayout() {
   const { token, loading } = useAuth();
@@ -26,8 +27,8 @@ export default function ProtectedLayout() {
         <GroupsProvider>
           <ExpenseProvider>
             <SettlementProvider>
-              <GestureHandlerRootView>
-
+              <GestureHandlerRootView style={{ flex: 1 }}>
+                 <BottomSheetModalProvider>
             <Stack>
               <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
               <Stack.Screen name="GroupDetails" options={{ title: 'Group Details', headerBackTitle: 'Back', headerTintColor: 'white', headerStyle: { backgroundColor: '#2a2a2a' } }} />
@@ -37,9 +38,10 @@ export default function ProtectedLayout() {
               <Stack.Screen name="GroupSettings" options={{ title: 'Group Settings', headerBackTitle: 'Back', headerTintColor: 'white', headerStyle: { backgroundColor: '#2a2a2a' } }} />
               <Stack.Screen name="EditProfile" options={{ title: 'Edit Profile', headerBackTitle: 'Back', headerTintColor: 'white', headerStyle: { backgroundColor: '#2a2a2a' } }} />
               <Stack.Screen name="SettleUp" options={{ title: 'Settle Up', headerBackTitle: 'Back', headerTintColor: 'white', headerStyle: { backgroundColor: '#2a2a2a' } }} />
+              <Stack.Screen name="ExpenseDetails" options={{ title: 'Expense Details', headerBackTitle: 'Back', headerTintColor: 'white', headerStyle: { backgroundColor: '#2a2a2a' } }} />
             </Stack>
+            </BottomSheetModalProvider>
             </GestureHandlerRootView>
-
             </SettlementProvider>
           </ExpenseProvider>
         </GroupsProvider>

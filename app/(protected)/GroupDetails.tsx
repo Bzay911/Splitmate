@@ -407,6 +407,21 @@ const GroupDetails = () => {
               }}
               onSwipeableOpen={closeSwipe}
             >
+              <TouchableOpacity onPress={() => {
+                router.push({
+                  pathname: "/ExpenseDetails",
+                  params: {
+                    expenseDescription: expense.description,
+                    expenseAmount: expense.amount,
+                    paidBy: expense.paidBy ? expense.paidBy.displayName : "Anonymous",
+                    paidByEmail: expense.paidBy ? expense.paidBy.email : null,
+                    groupName: groupDetails.name,
+                    createdAt: expense.createdAt ? new Date(expense.createdAt).toISOString() : null,
+                    colors: colors,
+                  },
+                });
+              }}>
+
               <View key={expense._id} style={styles.expensesContainer}>
                 <View style={styles.expenseIcon}>
                   <Ionicons name="cart" size={24} color="black" />
@@ -428,6 +443,8 @@ const GroupDetails = () => {
                   </Text>
                 </View>
               </View>
+              </TouchableOpacity>
+
             </Swipeable>
           ))}
         </ScrollView>
