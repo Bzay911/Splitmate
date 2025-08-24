@@ -79,10 +79,10 @@ export default function CameraScreen() {
                 }),
             }
         )
-
-        if(!response.ok){
-          throw new Error(`Failed to add expense (${response.status})`);
-        }
+        const result = await response.json();
+        if (!response.ok || !result.success) {
+      throw new Error(result.error || `Failed with status ${response.status}`);
+    }
         Alert.alert("Success", "Expense added successfully");
         router.back();
         
@@ -94,52 +94,60 @@ export default function CameraScreen() {
       }
   };
 
-  const upload = async() => {
-    if(!uri){
-      Alert.alert("Error", "Please scan a receipt first");
+const upload = async() => {
+  if(!uri){
+    Alert.alert("Error", "Please scan a receipt first");
+    return;
+  }
+  try{
+    const formData = new FormData();
+    formData.append('receipt', {
+      uri: uri,
+      type: 'image/jpeg',
+      name: 'receipt.jpg',
+    });
+    setIsUploading(true);
+
+    if(!user){
+      Alert.alert("Error", "Please login to upload a receipt");
       return;
     }
-    try{
-      const formData = new FormData();
-      formData.append('receipt', {
-        uri: uri,
-        type: 'image/jpeg',
-        name: 'receipt.jpg',
-      });
-      setIsUploading(true);
-  
-      if(!user){
-        Alert.alert("Error", "Please login to upload a receipt");
-        return;
+    
+    const response = await fetch(apiUrl(`api/expenses/groups/${groupId}/scan-receipt`), {
+      method: 'POST',
+      body: formData,
+      headers: {
+        'Content-Type': 'multipart/form-data',
+        'Authorization': `Bearer ${token}`,
       }
-      const response = await fetch(apiUrl(`api/expenses/groups/${groupId}/scan-receipt`), {
-        method: 'POST',
-        body: formData,
-        headers: {
-          'Content-Type': 'multipart/form-data',
-          'Authorization': `Bearer ${token}`,
-        }
-      });
-  
-      if (!response.ok) {
-        throw new Error(`Server error: ${response.status}`);
-      }
-  
-      const result = await response.json();
-      if (result.success) {
-        console.log('Receipt data:', result.data);
-        setReceiptData(result.data);
-        Alert.alert('Success', 'Receipt scanned successfully!');
-      } else {
-        throw new Error(result.error || 'Failed to process receipt');
-      } 
-    } catch (error) {
-      console.error('Error capturing/uploading receipt:', error);
-      Alert.alert('Error', 'Failed to process receipt. Please try again.');
-    } finally {
-      setIsUploading(false);
+    });
+
+    // Parse the response body regardless of status code
+    const result = await response.json();
+
+    if (response.ok && result.success) {
+      console.log('Receipt data:', result.data);
+      setReceiptData(result.data);
+      Alert.alert('Success', 'Receipt scanned successfully!');
+    } else {
+      // Use the specific error message from the backend
+      const errorMessage = result.error || result.message || 'Failed to process receipt';
+      throw new Error(errorMessage);
+    } 
+  } catch (error) {
+    console.error('Error capturing/uploading receipt:', error);
+    
+    // Check if it's a network error vs backend error
+    let displayMessage = error.message;
+    if (error.message.includes('Server error:') || error.message.includes('Failed to fetch')) {
+      displayMessage = 'Network error. Please check your connection and try again.';
     }
+    
+    Alert.alert('Error', displayMessage);
+  } finally {
+    setIsUploading(false);
   }
+}
 
   const startScanAnimation = () => {
     setIsScanning(true);

@@ -55,6 +55,7 @@ interface ExpenseContextType {
   settleUp: (settlement: Settlement, groupId: string) => Promise<void>;
   resetSettlements: () => void;
   handleDelete: (id: string, groupId: string) => Promise<void>;
+  clearExpenseData: () => void;
 }
 
 interface BackendSettlement {
@@ -391,6 +392,15 @@ export const ExpenseProvider = ({ children }: ExpenseProviderProps) => {
       } 
     };
 
+    const clearExpenseData = useCallback(() => {
+      setExpenses([]);
+      setGroupMembers([]);
+      setBalances([]);
+      setCreditors([]);
+      setDebtors([]);
+      setSettlements([]);
+    }, []);
+
   return (
     <ExpenseContext.Provider
       value={{
@@ -405,6 +415,7 @@ export const ExpenseProvider = ({ children }: ExpenseProviderProps) => {
         settleUp,
         resetSettlements,
         handleDelete,
+        clearExpenseData
       }}
     >
       {children}

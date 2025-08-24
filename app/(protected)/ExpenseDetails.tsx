@@ -6,10 +6,15 @@ import {
   TouchableOpacity,
   TextInput,
   Alert,
+  Keyboard,
 } from "react-native";
 import { useLocalSearchParams } from "expo-router";
 import { LinearGradient } from "expo-linear-gradient";
-import BottomSheet, { BottomSheetView } from "@gorhom/bottom-sheet";
+import BottomSheet, {
+  BottomSheetView,
+  BottomSheetBackdrop,
+  TouchableWithoutFeedback,
+} from "@gorhom/bottom-sheet";
 import { useRef, useState, useMemo } from "react";
 import { useDeleteExpense } from "@/utils/HandleDelete";
 import { useRouter } from "expo-router";
@@ -32,8 +37,9 @@ const ExpenseDetails = () => {
   const handleDelete = useDeleteExpense();
   const { token } = useAuth();
   const router = useRouter();
-  const snapPoints = useMemo(() => ["70%"], []);
 
+  // For BottomSheet
+  const snapPoints = useMemo(() => [600], []);
   const bottomSheetRef = useRef<BottomSheet>(null);
   const [isSheetVisible, setSheetVisible] = useState(false);
 
@@ -71,36 +77,39 @@ const ExpenseDetails = () => {
     setSheetVisible(true);
   };
 
-const handleSaveChanges = async () => {
-  try {
-    setLoading(true);
-    const response = await fetch(apiUrl(`api/expenses/expenses/${expenseId}`), {
-      method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
-      },
-      body: JSON.stringify({
-        amount: newAmount,
-        description: newDescription,
-      }),
-    });
+  const handleSaveChanges = async () => {
+    try {
+      setLoading(true);
+      const response = await fetch(
+        apiUrl(`api/expenses/expenses/${expenseId}`),
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({
+            amount: newAmount,
+            description: newDescription,
+          }),
+        }
+      );
 
-    if (!response.ok) {
-      throw new Error(`Failed to update expense (${response.status})`);
+      if (!response.ok) {
+        throw new Error(`Failed to update expense (${response.status})`);
+      }
+
+      Alert.alert("Success", "Expense updated successfully");
+      router.back();
+    } catch (error: any) {
+      console.error("Error updating expense:", error);
+      Alert.alert("Error", error.message);
+    } finally {
+      setLoading(false);
     }
 
-    Alert.alert("Success", "Expense updated successfully");
-    router.back();
-  } catch (error: any) {
-    console.error("Error updating expense:", error);
-    Alert.alert("Error", error.message);
-  }finally {
-    setLoading(false);
-  }
-
-  bottomSheetRef.current?.close();
-};
+    bottomSheetRef.current?.close();
+  };
 
   const handleDeleteExpense = () => {
     Alert.alert(
@@ -115,10 +124,7 @@ const handleSaveChanges = async () => {
           text: "Delete",
           style: "destructive",
           onPress: async () => {
-            await handleDelete(
-              expenseId as string,
-              groupId as string
-            );
+            await handleDelete(expenseId as string, groupId as string);
             router.back();
           },
         },
@@ -187,45 +193,51 @@ const handleSaveChanges = async () => {
       {isSheetVisible && (
         <BottomSheet
           ref={bottomSheetRef}
-          index={0} // first snap point visible
+          index={1}
           snapPoints={snapPoints}
           enablePanDownToClose={true}
           onClose={() => setSheetVisible(false)}
           backgroundStyle={{ backgroundColor: "#1e1e1e" }}
+          enableHandlePanningGesture={true}
           handleIndicatorStyle={{
             backgroundColor: "#666",
             width: 40,
             height: 4,
           }}
+          backdropComponent={(props) => <BottomSheetBackdrop {...props} />}
           style={{ zIndex: 1000, elevation: 1000 }}
         >
           <BottomSheetView style={styles.sheetContent}>
-            <Text style={styles.sheetLabel}>Edit Amount</Text>
-            <TextInput
-              style={styles.sheetInput}
-              value={newAmount}
-              onChangeText={setnewAmount}
-              keyboardType="numeric"
-              placeholderTextColor="#666"
-            />
+            <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+              <View>
+                <Text style={styles.sheetLabel}>Edit Amount</Text>
+                <TextInput
+                  style={styles.sheetInput}
+                  value={newAmount}
+                  onChangeText={setnewAmount}
+                  keyboardType="numeric"
+                  placeholderTextColor="#666"
+                />
 
-            <Text style={styles.sheetLabel}>Edit Description</Text>
-            <TextInput
-              style={styles.sheetInput}
-              value={newDescription}
-              onChangeText={setnewDescription}
-              placeholderTextColor="#666"
-              multiline
-            />
+                <Text style={styles.sheetLabel}>Edit Description</Text>
+                <TextInput
+                  style={styles.sheetInput}
+                  value={newDescription}
+                  onChangeText={setnewDescription}
+                  placeholderTextColor="#666"
+                  multiline
+                />
 
-            <TouchableOpacity
-              style={styles.saveButton}
-              onPress={handleSaveChanges}
-            >
-              <Text style={styles.saveButtonText}>
-                {loading ? "Saving..." : "Save Changes"}
-                </Text>
-            </TouchableOpacity>
+                <TouchableOpacity
+                  style={styles.saveButton}
+                  onPress={handleSaveChanges}
+                >
+                  <Text style={styles.saveButtonText}>
+                    {loading ? "Saving..." : "Save Changes"}
+                  </Text>
+                </TouchableOpacity>
+              </View>
+            </TouchableWithoutFeedback>
           </BottomSheetView>
         </BottomSheet>
       )}

@@ -24,6 +24,7 @@ import Animated, {
   useAnimatedStyle,
 } from "react-native-reanimated";
 
+
 interface GroupMember {
   _id: string;
   displayName: string;
@@ -48,16 +49,13 @@ const formatDate = (date: Date) => {
   return new Date(date).toLocaleDateString("en-US", options);
 };
 
-// Helper function to handle floating point precision in balance display
 const formatBalance = (balance: number) => {
-  // If balance is very close to zero (less than 1 cent), treat it as zero
   if (Math.abs(balance) < 0.01) {
     return "0.00";
   }
   return Math.abs(balance).toFixed(2);
 };
 
-// Helper function to check if balance is essentially zero
 const isSettled = (balance: number) => {
   return Math.abs(balance) < 0.01;
 };
@@ -68,7 +66,7 @@ const GroupDetails = () => {
   const [isLoading, setIsLoading] = useState(false);
   const { user, token } = useAuth();
   const { groups } = useGroups();
-  const { expenses, fetchExpenses, creditors, debtors, whoNeedsToPayWhom } =
+  const { expenses, fetchExpenses, creditors, debtors, whoNeedsToPayWhom, clearExpenseData } =
     useExpense();
   const handleDelete = useDeleteExpense();
   const swipeableRef = useRef<Swipeable>(null);
@@ -161,6 +159,7 @@ const GroupDetails = () => {
   useFocusEffect(
     useCallback(() => {
       if (user && groupId) {
+        clearExpenseData();
         fetchExpenses(groupId as string);
         fetchGroupDetails();
       }
@@ -182,6 +181,7 @@ const GroupDetails = () => {
   }
 
   const handleSettingsPress = () => {
+    console.log("Pressed for android")
     if (groupDetails) {
       router.push({
         pathname: "/GroupSettings",
@@ -210,6 +210,7 @@ const GroupDetails = () => {
   ];
 
   const handleSettleUp = () => {
+    
     const allSettlements = whoNeedsToPayWhom();
     router.push({
       pathname: "/SettleUp",
@@ -262,6 +263,7 @@ const GroupDetails = () => {
       style={styles.container}
       start={{ x: 0, y: 0 }}
       end={{ x: 0, y: 1 }}
+      pointerEvents="box-none"
     >
       <SafeAreaView style={styles.safeArea}>
         <ScrollView
@@ -271,7 +273,9 @@ const GroupDetails = () => {
           <LinearGradient
             colors={parsedColors as [string, string]}
             style={styles.header}
+             pointerEvents="box-none"
           >
+
             <TouchableOpacity
               style={styles.settingsBtn}
               onPress={handleSettingsPress}
@@ -303,7 +307,8 @@ const GroupDetails = () => {
                   )}
                 </View>
               </View>
-            </View>
+          </View>
+
           </LinearGradient>
 
           <View style={styles.dividendSection}>
