@@ -14,8 +14,7 @@
       "backgroundColor": "#000000"
     },
     "extra": {
-      // "apiUrl": "https://splitmate-backend-6vlo.vercel.app",
-      "apiUrl": "http://192.168.1.30:3000",
+      "apiUrl": "http://192.168.1.241:3000",
       "router": {},
       "eas": {
         "projectId": "8cc11141-6144-4370-933c-0af42aac097c"
@@ -30,7 +29,10 @@
         "backgroundColor": "#000000",
         "tabletImage": "./assets/images/SplitmateAppIcon.png"
       },
-      "bundleIdentifier": "com.beejaya.Splitmate"
+      "bundleIdentifier": "com.beejaya.Splitmate",
+      "infoPlist": {
+        "ITSAppUsesNonExemptEncryption": false
+      }
     },
     "android": {
       "adaptiveIcon": {
@@ -55,6 +57,12 @@
       "favicon": "./assets/images/favicon.png"
     },
     "plugins": [
+      [
+        "@react-native-google-signin/google-signin/app.plugin.js",
+        {
+          "iosUrlScheme": "com.googleusercontent.apps.908503370224-lpv2uf8iosv76gtd65jlsd9k3r4rsl98"
+        }
+      ],
       "expo-router",
       [
         "expo-splash-screen",
@@ -76,6 +84,7 @@
     ],
     "experiments": {
       "typedRoutes": true
-    }
+    },
+    
   }
 }

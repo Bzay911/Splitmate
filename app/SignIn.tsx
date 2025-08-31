@@ -1,30 +1,101 @@
 import { FontAwesome, MaterialIcons } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
 import { router } from "expo-router";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import {
   Alert,
   Pressable,
   StyleSheet,
   Text,
   TextInput,
-  View
+  View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { apiUrl } from "../constants/ApiConfig";
 import { useAuth } from "../contexts/AuthContext";
+import {
+  GoogleSignin,
+  isErrorWithCode,
+  isSuccessResponse,
+  statusCodes,
+} from "@react-native-google-signin/google-signin";
 
 export function LoginScreen() {
-  const [email, setEmail] = React.useState("");
-  const [password, setPassword] = React.useState("");
-  const [isLoading, setIsLoading] = React.useState(false);
-  const [emailError, setEmailError] = React.useState("");
-  const [passwordError, setPasswordError] = React.useState("");
-  
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+  const [emailError, setEmailError] = useState("");
+  const [passwordError, setPasswordError] = useState("");
+  const [googleLoading, setGoogleLoading] = useState(false);
+
   const { login } = useAuth();
+  GoogleSignin.configure({
+    webClientId:
+      "908503370224-bfbpb92bo0cq6u8p9elvv76ones8uddm.apps.googleusercontent.com",
+    iosClientId:
+      "908503370224-lpv2uf8iosv76gtd65jlsd9k3r4rsl98.apps.googleusercontent.com",
+  });
+
+  const googleSignIn = async () => {
+    try {
+      setGoogleLoading(true);
+      await GoogleSignin.hasPlayServices();
+      const response = await GoogleSignin.signIn();
+      if (isSuccessResponse(response)) {
+        console.log(`Successfully done google sign in, ${response.data}`);
+        const { user, idToken } = response.data;
+        console.log(user);
+        console.log(`Token: ${idToken}`);
+        if (!idToken) return;
+        await handleGoogleSignin(idToken);
+      } else {
+        console.log(`Sign in cancelled by user: ${response.data}`);
+      }
+    } catch (error) {
+      if (isErrorWithCode(error)) {
+        switch (error.code) {
+          case statusCodes.IN_PROGRESS:
+            console.log("Login in progress", error.message);
+            break;
+          case statusCodes.PLAY_SERVICES_NOT_AVAILABLE:
+            console.log("Play service not available", error.message);
+            break;
+          default:
+            console.log(`Something else ${error.message}`);
+            console.log(`Something else ${error.code}`);
+        }
+      }
+    }
+  };
+
+  const handleGoogleSignin = async (idToken: string) => {
+    try {
+      console.log("trigerred!");
+      const res = await fetch(apiUrl("api/auth/handleGoogleSignin"), {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ idToken }),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        console.log("Login failed", data.message);
+        return;
+      }
+      console.log(`Backend response: ${data}`);
+      console.log("App token:", data.appToken);
+      console.log("User info:", data.user);
+      login(data.appToken, data.user);
+    } catch (error) {
+      console.log(`error from handleSignin: ${error}`);
+    }
+  };
 
   const handleSignin = async (email: string, password: string) => {
     try {
+      console.log(`Email: ${email}`);
+      console.log(`password: ${password}`);
       // Input validation
       if (!email.trim()) {
         alert("Please enter your email address");
@@ -43,16 +114,16 @@ export function LoginScreen() {
         return null;
       }
 
-      const response = await fetch(apiUrl('api/auth/login'), {
-        method: 'POST',  
+      const response = await fetch(apiUrl("api/auth/login"), {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         body: JSON.stringify({ email, password }),
       });
       const data = await response.json();
+      console.log(data);
       login(data.token, data.user);
-      // return data.user;
     } catch (error: any) {
       Alert.alert("Error signing in", error.message);
       console.error("Error signing in", error);
@@ -62,7 +133,7 @@ export function LoginScreen() {
   // Validate form
   const validateForm = () => {
     let isValid = true;
-    
+
     // Reset errors
     setEmailError("");
     setPasswordError("");
@@ -86,11 +157,7 @@ export function LoginScreen() {
   };
 
   const handleForgotPassword = () => {
-    Alert.alert('Under Development!', 'This feature is not available yet.');
-  };
-
-  const handleGoogleSignIn = () => {
-    Alert.alert('Under Development!', 'This feature is not available yet.');
+    Alert.alert("Under Development!", "This feature is not available yet.");
   };
 
   // Handle sign in
@@ -112,101 +179,107 @@ export function LoginScreen() {
 
   return (
     <LinearGradient
-    colors={['#2a2a2a', '#1a1a1a', '#0f0f0f']}
-    style={styles.safeArea}
-    start={{ x: 0, y: 0 }}
-    end={{ x: 0, y: 1 }}
-  >
-    <SafeAreaView style={styles.safeArea} edges={["top"]}>
-      <View style={styles.container}>
-        <View style={styles.header}>
-          <Text style={styles.title}>Welcome back</Text>
-          <Text style={styles.subtitle}>
-            Sign in to your Splitmate account
-          </Text>
-        </View>
-
-        <View style={styles.form}>
-          <InputField
-            label="Email"
-            icon="mail-outline"
-            value={email}
-            onChangeText={(text) => {
-              setEmail(text);
-              setEmailError(""); // Clear error on change
-            }}
-            placeholder="Enter your email"
-            keyboardType="email-address"
-            autoCapitalize="none"
-            autoComplete="email"
-            textContentType="emailAddress"
-            returnKeyType="next"
-          />
-          {emailError ? <Text style={styles.errorText}>{emailError}</Text> : null}
-
-          <InputField
-            label="Password"
-            icon="lock-outline"
-            value={password}
-            onChangeText={(text) => {
-              setPassword(text);
-              setPasswordError(""); // Clear error on change
-            }}
-            placeholder="Enter your password"
-            secureTextEntry
-            autoCapitalize="none"
-            autoComplete="password"
-            textContentType="password"
-            returnKeyType="done"
-          />
-          {passwordError ? <Text style={styles.errorText}>{passwordError}</Text> : null}
-
-          <View style={styles.forgotPasswordContainer}>
-            <Pressable onPress={handleForgotPassword}>
-              <Text style={styles.forgotLink}>Forgot password?</Text>
-            </Pressable>
+      colors={["#2a2a2a", "#1a1a1a", "#0f0f0f"]}
+      style={styles.safeArea}
+      start={{ x: 0, y: 0 }}
+      end={{ x: 0, y: 1 }}
+    >
+      <SafeAreaView style={styles.safeArea} edges={["top"]}>
+        <View style={styles.container}>
+          <View style={styles.header}>
+            <Text style={styles.title}>Welcome back</Text>
+            <Text style={styles.subtitle}>
+              Sign in to your Splitmate account
+            </Text>
           </View>
 
-          <Pressable
-            style={[styles.signInButton, isLoading && styles.signInButtonDisabled]}
-            accessibilityRole="button"
-            onPress={handleSubmit}
-            disabled={isLoading}
-          >
-            <Text style={styles.signInText}>
-              {isLoading ? "Signing in..." : "Sign In to Splitmate"}
-            </Text>
-          </Pressable>
+          <View style={styles.form}>
+            <InputField
+              label="Email"
+              icon="mail-outline"
+              value={email}
+              onChangeText={(text) => {
+                setEmail(text);
+                setEmailError(""); // Clear error on change
+              }}
+              placeholder="Enter your email"
+              keyboardType="email-address"
+              autoCapitalize="none"
+              autoComplete="email"
+              textContentType="emailAddress"
+              returnKeyType="next"
+            />
+            {emailError ? (
+              <Text style={styles.errorText}>{emailError}</Text>
+            ) : null}
 
-          <View style={styles.dividerContainer}>
-            <View style={styles.dividerRow}>
-              <View style={styles.divider} />
-              <Text style={styles.dividerText}>Or continue with</Text>
-              <View style={styles.divider} />
+            <InputField
+              label="Password"
+              icon="lock-outline"
+              value={password}
+              onChangeText={(text) => {
+                setPassword(text);
+                setPasswordError(""); // Clear error on change
+              }}
+              placeholder="Enter your password"
+              secureTextEntry
+              autoCapitalize="none"
+              autoComplete="password"
+              textContentType="password"
+              returnKeyType="done"
+            />
+            {passwordError ? (
+              <Text style={styles.errorText}>{passwordError}</Text>
+            ) : null}
+
+            <View style={styles.forgotPasswordContainer}>
+              <Pressable onPress={handleForgotPassword}>
+                <Text style={styles.forgotLink}>Forgot password?</Text>
+              </Pressable>
             </View>
-          </View>
 
-          <Pressable
-            style={styles.googleButton}
-            accessibilityRole="button"
-            onPress={handleGoogleSignIn}
-          >
-            <FontAwesome name="google" size={20} color="#18181b" />
-            <Text style={styles.googleText}>Continue with Google</Text>
-          </Pressable>
-
-          <Text style={styles.signUpText}>
-            Don't have an account?{" "}
-            <Text 
-              style={styles.link}
-              onPress={() => router.push("/SignUp")}
+            <Pressable
+              style={[
+                styles.signInButton,
+                isLoading && styles.signInButtonDisabled,
+              ]}
+              accessibilityRole="button"
+              onPress={handleSubmit}
+              disabled={isLoading}
             >
-              Sign Up
+              <Text style={styles.signInText}>
+                {isLoading ? "Signing in..." : "Sign In to Splitmate"}
+              </Text>
+            </Pressable>
+
+            <View style={styles.dividerContainer}>
+              <View style={styles.dividerRow}>
+                <View style={styles.divider} />
+                <Text style={styles.dividerText}>Or continue with</Text>
+                <View style={styles.divider} />
+              </View>
+            </View>
+
+            <Pressable
+              style={styles.googleButton}
+              accessibilityRole="button"
+              onPress={googleSignIn}
+            >
+              <FontAwesome name="google" size={20} color="#18181b" />
+              <Text style={styles.googleText}>
+                {googleLoading ? "Signing in" : "Continue with Google"}
+              </Text>
+            </Pressable>
+
+            <Text style={styles.signUpText}>
+              Don't have an account?{" "}
+              <Text style={styles.link} onPress={() => router.push("/SignUp")}>
+                Sign Up
+              </Text>
             </Text>
-          </Text>
+          </View>
         </View>
-      </View>
-    </SafeAreaView>
+      </SafeAreaView>
     </LinearGradient>
   );
 }
@@ -237,7 +310,12 @@ function InputField({
     <View style={styles.inputContainer}>
       <Text style={styles.label}>{label}</Text>
       <View style={styles.inputWrapper}>
-        <MaterialIcons name={icon} size={20} color="white" style={styles.inputIcon} />
+        <MaterialIcons
+          name={icon}
+          size={20}
+          color="white"
+          style={styles.inputIcon}
+        />
         <TextInput
           style={styles.input}
           placeholder={placeholder}

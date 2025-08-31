@@ -2,6 +2,8 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import React, { createContext, ReactNode, useContext, useEffect, useState } from 'react';
 import { apiUrl } from '../constants/ApiConfig';
 
+
+
 interface User {
   id: string;
   email: string;
@@ -24,10 +26,13 @@ interface AuthProviderProps {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
+
 export const AuthProvider = ({ children }: AuthProviderProps) => {
   const [token, setToken] = useState<string | null>(null);  
   const [user, setUser] = useState<User | null>(null);    
   const [loading, setLoading] = useState(true);
+
+
 
   const login = async (token: string, userData: User) => {
     setToken(token);
