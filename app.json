@@ -4,17 +4,18 @@
     "slug": "Splitmate",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/images/playstore.png",
+    "icon": "./assets/images/newplaystore.png",
     "scheme": "splitmate",
     "userInterfaceStyle": "dark",
     "newArchEnabled": true,
     "splash": {
-      "image": "./assets/images/SplitmateAppIcon.png",
+      "image": "./assets/images/SplitshareIcon.png",
       "resizeMode": "contain",
-      "backgroundColor": "#000000"
+      "backgroundColor": "#0bb754"
     },
     "extra": {
-      "apiUrl": "http://192.168.1.241:3000",
+      "apiUrl": "https://splitmate-backend-6vlo.vercel.app",
+      // "apiUrl": "http://192.168.1.241:3000",
       "router": {},
       "eas": {
         "projectId": "8cc11141-6144-4370-933c-0af42aac097c"
@@ -22,12 +23,12 @@
     },
     "ios": {
       "supportsTablet": true,
-      "icon": "./assets/images/SplitmateAppIcon.png",
+      "icon": "./assets/images/SplitshareIcon.png",
       "splash": {
-        "image": "./assets/images/SplitmateAppIcon.png",
+        "image": "./assets/images/SplitshareIcon.png",
         "resizeMode": "contain",
         "backgroundColor": "#000000",
-        "tabletImage": "./assets/images/SplitmateAppIcon.png"
+        "tabletImage": "./assets/images/SplitshareIcon.png"
       },
       "bundleIdentifier": "com.beejaya.Splitmate",
       "infoPlist": {
@@ -36,12 +37,12 @@
     },
     "android": {
       "adaptiveIcon": {
-        "foregroundImage": "./assets/images/SplitmateAppIcon.png",
+        "foregroundImage": "./assets/images/SplitshareIcon.png",
         "backgroundColor": "#000000"
       },
       "edgeToEdgeEnabled": true,
       "splash": {
-        "image": "./assets/images/SplitmateAppIcon.png",
+        "image": "./assets/images/SplitshareIcon.png",
         "resizeMode": "contain",
         "backgroundColor": "#000000"
       },
