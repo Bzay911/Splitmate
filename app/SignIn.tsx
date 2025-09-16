@@ -123,6 +123,10 @@ export function LoginScreen() {
       });
       const data = await response.json();
       console.log(data);
+      if (data.error) {
+        alert(`${data.error}!\n\n${data.message}`);
+        return;
+      }
       login(data.token, data.user);
     } catch (error: any) {
       Alert.alert("Error signing in", error.message);
