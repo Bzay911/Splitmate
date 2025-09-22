@@ -14,8 +14,6 @@
       "backgroundColor": "#0bb754"
     },
     "extra": {
-      "apiUrl": "https://splitmate-backend-6vlo.vercel.app",
-      // "apiUrl": "http://192.168.1.241:3000",
       "router": {},
       "eas": {
         "projectId": "8cc11141-6144-4370-933c-0af42aac097c"

@@ -58,7 +58,7 @@ export default function CameraScreen() {
     }
   }
 
-  const handleAddExpense = async (amount: string, description: string, date: string) => {
+  const handleAddExpense = async (amount: string, description: string) => {
       try{
         if(!user){
           Alert.alert("Error", "Please login to add an expense");
@@ -80,7 +80,7 @@ export default function CameraScreen() {
             }
         )
         const result = await response.json();
-        if (!response.ok || !result.success) {
+        if (!response.ok) {
       throw new Error(result.error || `Failed with status ${response.status}`);
     }
         Alert.alert("Success", "Expense added successfully");
@@ -137,13 +137,13 @@ const upload = async() => {
   } catch (error) {
     console.error('Error capturing/uploading receipt:', error);
     
-    // Check if it's a network error vs backend error
-    let displayMessage = error.message;
-    if (error.message.includes('Server error:') || error.message.includes('Failed to fetch')) {
-      displayMessage = 'Network error. Please check your connection and try again.';
-    }
+    // // Check if it's a network error vs backend error
+    // let displayMessage = error.message;
+    // if (error.message.includes('Server error:') || error.message.includes('Failed to fetch')) {
+    //   displayMessage = 'Network error. Please check your connection and try again.';
+    // }
     
-    Alert.alert('Error', displayMessage);
+    // Alert.alert('Error', displayMessage);
   } finally {
     setIsUploading(false);
   }
