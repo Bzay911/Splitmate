@@ -16,6 +16,9 @@ import {
   TextInput,
   TouchableOpacity,
   View,
+  ScrollView,
+  KeyboardAvoidingView,
+  Platform,
 } from "react-native";
 
 const AddExpense = () => {
@@ -80,82 +83,106 @@ const AddExpense = () => {
     } catch (error) {
       console.error("Error adding expense:", error);
       Alert.alert("Error", "Failed to add expense");
-    }
-    finally{
+    } finally {
       setLoading(false);
       Keyboard.dismiss();
     }
   };
 
   return (
-    <LinearGradient
-      colors={["#2a2a2a", "#1a1a1a", "#0f0f0f"]}
-      style={styles.container}
-      start={{ x: 0, y: 0 }}
-      end={{ x: 0, y: 1 }}
-    >
-      <SafeAreaView>
-        <View style={styles.content}>
-          {/* Calculator Icon */}
-          <View style={styles.iconContainer}>
-            <Ionicons name="calculator" size={24} color="#4B7BE5" />
-          </View>
+  <LinearGradient
+    colors={["#2a2a2a", "#1a1a1a", "#0f0f0f"]}
+    style={styles.container}
+    start={{ x: 0, y: 0 }}
+    end={{ x: 0, y: 1 }}
+  >
+    <SafeAreaView style={styles.container}>
+      <KeyboardAvoidingView
+        style={{ flex: 1 }}
+        behavior={Platform.OS === "ios" ? "padding" : "height"}
+        keyboardVerticalOffset={Platform.OS === "ios" ? 0 : 20}
+      >
+        <ScrollView 
+          contentContainerStyle={styles.scrollContent}
+          keyboardShouldPersistTaps="handled"
+        >
+          <View style={styles.content}>
+            {/* Calculator Icon */}
+            <View style={styles.iconContainer}>
+              <Ionicons name="calculator" size={24} color="#4B7BE5" />
+            </View>
 
-          {/* Title and Subtitle */}
-          <Text style={styles.title}>New Expense</Text>
-          <Text style={styles.subtitle}>Enter your expense details below</Text>
+            {/* Title and Subtitle */}
+            <Text style={styles.title}>New Expense</Text>
+            <Text style={styles.subtitle}>
+              Enter your expense details below
+            </Text>
 
-          {/* Bill Amount Input */}
-          <View style={styles.inputSection}>
-            <Text style={styles.label}>Bill Amount</Text>
-            <View style={styles.amountInputContainer}>
-              <Text style={styles.currencySymbol}>$</Text>
-              <TextInput
-                style={styles.amountInput}
-                value={amount}
-                onChangeText={setAmount}
-                keyboardType="decimal-pad"
-                placeholder="0.00"
-                placeholderTextColor="#64748b"
-              />
+            {/* Bill Amount Input */}
+            <View style={styles.inputSection}>
+              <Text style={styles.label}>Bill Amount</Text>
+              <View style={styles.amountInputContainer}>
+                <Text style={styles.currencySymbol}>$</Text>
+                <TextInput
+                  style={styles.amountInput}
+                  value={amount}
+                  onChangeText={setAmount}
+                  keyboardType="decimal-pad"
+                  placeholder="0.00"
+                  placeholderTextColor="#64748b"
+                />
+              </View>
+            </View>
+
+            {/* Description Input */}
+            <View style={styles.inputSection}>
+              <Text style={styles.label}>Description</Text>
+              <View style={styles.descriptionInputContainer}>
+                <TextInput
+                  style={styles.descriptionInput}
+                  value={description}
+                  onChangeText={setDescription}
+                  placeholder="What was this expense for?"
+                  placeholderTextColor="#64748b"
+                  returnKeyType="done"
+                  onSubmitEditing={Keyboard.dismiss}
+                />
+              </View>
             </View>
           </View>
-
-          {/* Description Input */}
-          <View style={styles.inputSection}>
-            <Text style={styles.label}>Description</Text>
-            <View style={styles.descriptionInputContainer}>
-              <TextInput
-                style={styles.descriptionInput}
-                value={description}
-                onChangeText={setDescription}
-                placeholder="What was this expense for?"
-                placeholderTextColor="#64748b"
-                returnKeyType="done"
-                onSubmitEditing={Keyboard.dismiss}
-              />
-            </View>
-          </View>
-
-          {/* Add Expense Button */}
-          <TouchableOpacity style={styles.addButton} onPress={handleAddExpense}>
+          
+        <View style={styles.buttonContainer}>
+          <TouchableOpacity
+            style={styles.addButton}
+            onPress={handleAddExpense}
+          >
             <Text style={styles.buttonText}>
-              {loading? "Adding..." : "Add Expense"}
-              </Text>
+              {loading ? "Adding..." : "Add Expense"}
+            </Text>
           </TouchableOpacity>
         </View>
-      </SafeAreaView>
-    </LinearGradient>
-  );
+        </ScrollView>
+        
+      </KeyboardAvoidingView>
+    </SafeAreaView>
+  </LinearGradient>
+);
 };
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
   },
+  scrollContent: {
+    flexGrow: 1,
+  },
   content: {
     padding: 20,
     alignItems: "center",
+  },
+  buttonContainer: {
+    padding: 20,
+    paddingTop: 10,
   },
   iconContainer: {
     width: 80,
@@ -228,7 +255,6 @@ const styles = StyleSheet.create({
     padding: 16,
     borderRadius: 8,
     alignItems: "center",
-    marginTop: "auto",
   },
   buttonText: {
     color: "#fff",
