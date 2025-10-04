@@ -148,7 +148,7 @@ export default function HomeScreen() {
         <View style={styles.rightTop}>
           <TouchableOpacity onPress={() => router.push('/Profile')}>
             <Image 
-              source={user?.profilePicture ? { uri: user.profilePicture } : require('../../../assets/images/cat.png')} 
+              source={require('../../../assets/images/cat.png')} 
               style={styles.avatarImage}
               placeholder={require('../../../assets/images/cat.png')}
               contentFit="cover"
@@ -394,12 +394,10 @@ const styles = StyleSheet.create({
     fontWeight: "600",
     fontSize: 16,
     marginBottom: 4,
-    // color: "white"
   },
   amount: {
     fontWeight: "600",
-    fontSize: 35,
-    // color: "white"
+    fontSize: 30,
   },
   recentGroupHeader: {
     padding: 12,

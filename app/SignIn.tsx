@@ -42,10 +42,7 @@ export function LoginScreen() {
       await GoogleSignin.hasPlayServices();
       const response = await GoogleSignin.signIn();
       if (isSuccessResponse(response)) {
-        console.log(`Successfully done google sign in, ${response.data}`);
         const { user, idToken } = response.data;
-        console.log(user);
-        console.log(`Token: ${idToken}`);
         if (!idToken) return;
         await handleGoogleSignin(idToken);
       } else {
@@ -70,7 +67,6 @@ export function LoginScreen() {
 
   const handleGoogleSignin = async (idToken: string) => {
     try {
-      console.log("trigerred!");
       const res = await fetch(apiUrl("api/auth/handleGoogleSignin"), {
         method: "POST",
         headers: {
@@ -83,9 +79,6 @@ export function LoginScreen() {
         console.log("Login failed", data.message);
         return;
       }
-      console.log(`Backend response: ${data}`);
-      console.log("App token:", data.appToken);
-      console.log("User info:", data.user);
       login(data.appToken, data.user);
     } catch (error) {
       console.log(`error from handleSignin: ${error}`);
@@ -122,7 +115,6 @@ export function LoginScreen() {
         body: JSON.stringify({ email, password }),
       });
       const data = await response.json();
-      console.log(data);
       if (data.error) {
         alert(`${data.error}!\n\n${data.message}`);
         return;

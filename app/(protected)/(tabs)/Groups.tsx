@@ -10,6 +10,7 @@ import {
   Text,
   TouchableOpacity,
   View,
+  Image
 } from "react-native";
 
 interface Group {
@@ -91,7 +92,13 @@ const Groups = () => {
         </View>
       ) : groups.length === 0 ? (
         <View style={styles.noGroupsContainer}>
-          <Text style={styles.noGroupsText}>No groups joined</Text>
+          <Text style={styles.noGroupsText}>No any groups joined</Text>
+            <Link href="/CreateGroup" style={styles.createBtnCenter}>
+          <Text style={styles.createBtn}>Create New Group</Text>
+        </Link>
+        <Image source={require("../../../assets/images/noGroupJoined.png")}
+        style={styles.noGroupImage} />
+        
         </View>
       ) : (
         <FlatList
@@ -148,6 +155,13 @@ const styles = StyleSheet.create({
     color: "white",
     fontWeight: "500",
   },
+  createBtnCenter: {
+    borderColor: "#fccc28",
+    backgroundColor: "#fccc28",
+    borderWidth: 2,
+    padding: 8,
+    borderRadius: 4
+  },
   topBarTitle: {
     fontSize: 32,
     fontWeight: "700",
@@ -163,12 +177,13 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
+    gap: 5
   },
   noGroupsText: {
     fontSize: 18,
     fontWeight: "500",
     color: "#64748b",
-    marginTop: 16,
+    marginBottom: 16,
   },
   centerContainer: {
     flex: 1,
@@ -191,6 +206,11 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: "500",
   },
+  noGroupImage:{
+    height: 300,
+    width: 300,
+    resizeMode: "contain"
+  }
 });
 
 export default Groups;

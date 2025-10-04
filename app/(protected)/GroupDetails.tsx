@@ -43,7 +43,7 @@ interface GroupDetails {
 
 const formatDate = (date: Date) => {
   const options: Intl.DateTimeFormatOptions = {
-    month: "long",
+    month: "short",
     day: "numeric",
   };
   return new Date(date).toLocaleDateString("en-US", options);
@@ -69,7 +69,7 @@ const GroupDetails = () => {
   const { expenses, fetchExpenses, creditors, debtors, whoNeedsToPayWhom, clearExpenseData } =
     useExpense();
   const handleDelete = useDeleteExpense();
-  const swipeableRef = useRef<Swipeable>(null);
+  const swipeableRef = useRef< typeof Swipeable>(null);
 
   const [visible, setVisible] = useState(false);
   const [selectedExpenseId, setSelectedExpenseId] = useState<string | null>(
@@ -181,7 +181,6 @@ const GroupDetails = () => {
   }
 
   const handleSettingsPress = () => {
-    console.log("Pressed for android")
     if (groupDetails) {
       router.push({
         pathname: "/GroupSettings",
