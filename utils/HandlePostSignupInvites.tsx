@@ -1,4 +1,4 @@
-import { apiUrl } from "@/constants/ApiConfig";
+import { apiUrl } from "../constants/ApiConfig";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
 export const handlePostSignupInvites = async (email: string) => {

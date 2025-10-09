@@ -88,7 +88,6 @@ export default function SignUp() {
 
      const { token, user } = await response.json();
      login(token, user);
-     console.log(user)
      await handlePostSignupInvites(user.email);
    } catch (error){
     console.error("Error creating user", error);
@@ -167,12 +166,6 @@ export default function SignUp() {
 
 
  return (
-   <LinearGradient
-     colors={['#2a2a2a', '#1a1a1a', '#0f0f0f']}
-     style={styles.safeArea}
-     start={{ x: 0, y: 0 }}
-     end={{ x: 0, y: 1 }}
-   >
      <SafeAreaView style={styles.safeArea} edges={["top"]}>
        <KeyboardAvoidingView
          behavior={Platform.OS === "ios" ? "padding" : "height"}
@@ -302,7 +295,6 @@ export default function SignUp() {
          </ScrollView>
        </KeyboardAvoidingView>
      </SafeAreaView>
-   </LinearGradient>
  );
 }
 
@@ -310,6 +302,7 @@ export default function SignUp() {
 const styles = StyleSheet.create({
  safeArea: {
    flex: 1,
+   backgroundColor: 'black'
  },
  scrollContent: {
    flexGrow: 1,

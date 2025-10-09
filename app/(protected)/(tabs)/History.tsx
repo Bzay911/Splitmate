@@ -14,7 +14,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import Feather from 'react-native-vector-icons/Feather';
 
 const History = () => {
-  const { activities, isLoading, error, refreshActivities } = useActivity();
+  const { activities, isLoading, refreshActivities } = useActivity();
 
   const renderActivity = ({ item }: { item: any }) => {
     // Add null check for item

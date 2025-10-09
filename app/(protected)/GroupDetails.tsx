@@ -258,7 +258,7 @@ const GroupDetails = () => {
 
   return (
     <LinearGradient
-      colors={["#2a2a2a", "#1a1a1a", "#0f0f0f"]}
+      colors={["#000000ff", "#000000ff", "#0f0f0f"]}
       style={styles.container}
       start={{ x: 0, y: 0 }}
       end={{ x: 0, y: 1 }}

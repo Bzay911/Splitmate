@@ -2,6 +2,7 @@ import { useLocalSearchParams, useRouter } from "expo-router";
 import { useEffect } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Alert } from "react-native";
+import { apiUrl } from '../../constants/ApiConfig';
 
 export default function JoinGroup() {
   const params = useLocalSearchParams();
@@ -14,8 +15,7 @@ export default function JoinGroup() {
        if (!authToken || !groupId || !token || !email || deepLink != "true") return;
       if (authToken) {
         try {
-          const response = await fetch(
-            `http://192.168.1.239:3000/invite/acceptInvite`,
+          const response = await fetch(apiUrl("/invite/acceptInvite"),
             {
               method: "POST",
               headers: {

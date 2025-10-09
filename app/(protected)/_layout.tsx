@@ -31,14 +31,14 @@ export default function ProtectedLayout() {
                  <BottomSheetModalProvider>
             <Stack>
               <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-              <Stack.Screen name="GroupDetails" options={{ title: 'Group Details', headerBackTitle: 'Back', headerTintColor: 'white', headerStyle: { backgroundColor: '#2a2a2a' } }} />
-              <Stack.Screen name="AddExpense" options={{ title: 'Add Expense', headerBackTitle: 'Back', headerTintColor: 'white', headerStyle: { backgroundColor: '#2a2a2a' } }} />
-              <Stack.Screen name="Camera" options={{ title: 'Scan Expense', headerBackTitle: 'Back', headerTintColor: 'white', headerStyle: { backgroundColor: '#2a2a2a' } }} />
-              <Stack.Screen name="CreateGroup" options={{ title: 'Create Group', headerBackTitle: 'Back', headerTintColor: 'white', headerStyle: { backgroundColor: '#2a2a2a' } }} />
-              <Stack.Screen name="GroupSettings" options={{ title: 'Group Settings', headerBackTitle: 'Back', headerTintColor: 'white', headerStyle: { backgroundColor: '#2a2a2a' } }} />
-              <Stack.Screen name="EditProfile" options={{ title: 'Edit Profile', headerBackTitle: 'Back', headerTintColor: 'white', headerStyle: { backgroundColor: '#2a2a2a' } }} />
-              <Stack.Screen name="SettleUp" options={{ title: 'Settle Up', headerBackTitle: 'Back', headerTintColor: 'white', headerStyle: { backgroundColor: '#2a2a2a' } }} />
-              <Stack.Screen name="ExpenseDetails" options={{ title: 'Expense Details', headerBackTitle: 'Back', headerTintColor: 'white', headerStyle: { backgroundColor: '#2a2a2a' } }} />
+              <Stack.Screen name="GroupDetails" options={{ title: 'Group Details', headerBackTitle: 'Back', headerTintColor: 'white', headerStyle: { backgroundColor: 'black' } }} />
+              <Stack.Screen name="AddExpense" options={{ title: 'Add Expense', headerBackTitle: 'Back', headerTintColor: 'white', headerStyle: { backgroundColor: 'black' } }} />
+              <Stack.Screen name="Camera" options={{ title: 'Scan Expense', headerBackTitle: 'Back', headerTintColor: 'white', headerStyle: { backgroundColor: 'black' } }} />
+              <Stack.Screen name="CreateGroup" options={{ title: 'Create Group', headerBackTitle: 'Back', headerTintColor: 'white', headerStyle: { backgroundColor: 'black' } }} />
+              <Stack.Screen name="GroupSettings" options={{ title: 'Group Settings', headerBackTitle: 'Back', headerTintColor: 'white', headerStyle: { backgroundColor: 'black' } }} />
+              <Stack.Screen name="EditProfile" options={{ title: 'Edit Profile', headerBackTitle: 'Back', headerTintColor: 'white', headerStyle: { backgroundColor: 'black' } }} />
+              <Stack.Screen name="SettleUp" options={{ title: 'Settle Up', headerBackTitle: 'Back', headerTintColor: 'white', headerStyle: { backgroundColor: 'black' } }} />
+              <Stack.Screen name="ExpenseDetails" options={{ title: 'Expense Details', headerBackTitle: 'Back', headerTintColor: 'white', headerStyle: { backgroundColor: 'black' } }} />
             </Stack>
             </BottomSheetModalProvider>
             </GestureHandlerRootView>

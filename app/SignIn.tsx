@@ -1,7 +1,6 @@
 import { FontAwesome, MaterialIcons } from "@expo/vector-icons";
-import { LinearGradient } from "expo-linear-gradient";
 import { router } from "expo-router";
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import {
   Alert,
   Pressable,
@@ -9,6 +8,9 @@ import {
   Text,
   TextInput,
   View,
+  ScrollView,
+  KeyboardAvoidingView,
+  Platform,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { apiUrl } from "../constants/ApiConfig";
@@ -19,6 +21,7 @@ import {
   isSuccessResponse,
   statusCodes,
 } from "@react-native-google-signin/google-signin";
+import { handlePostSignupInvites } from "../utils/HandlePostSignupInvites";
 
 export function LoginScreen() {
   const [email, setEmail] = useState("");
@@ -80,6 +83,7 @@ export function LoginScreen() {
         return;
       }
       login(data.appToken, data.user);
+      await handlePostSignupInvites(data.user.email);
     } catch (error) {
       console.log(`error from handleSignin: ${error}`);
     }
@@ -174,109 +178,116 @@ export function LoginScreen() {
   };
 
   return (
-    <LinearGradient
-      colors={["#2a2a2a", "#1a1a1a", "#0f0f0f"]}
-      style={styles.safeArea}
-      start={{ x: 0, y: 0 }}
-      end={{ x: 0, y: 1 }}
-    >
-      <SafeAreaView style={styles.safeArea} edges={["top"]}>
-        <View style={styles.container}>
-          <View style={styles.header}>
-            <Text style={styles.title}>Welcome back</Text>
-            <Text style={styles.subtitle}>
-              Sign in to your Splitmate account
-            </Text>
-          </View>
-
-          <View style={styles.form}>
-            <InputField
-              label="Email"
-              icon="mail-outline"
-              value={email}
-              onChangeText={(text) => {
-                setEmail(text);
-                setEmailError(""); // Clear error on change
-              }}
-              placeholder="Enter your email"
-              keyboardType="email-address"
-              autoCapitalize="none"
-              autoComplete="email"
-              textContentType="emailAddress"
-              returnKeyType="next"
-            />
-            {emailError ? (
-              <Text style={styles.errorText}>{emailError}</Text>
-            ) : null}
-
-            <InputField
-              label="Password"
-              icon="lock-outline"
-              value={password}
-              onChangeText={(text) => {
-                setPassword(text);
-                setPasswordError(""); // Clear error on change
-              }}
-              placeholder="Enter your password"
-              secureTextEntry
-              autoCapitalize="none"
-              autoComplete="password"
-              textContentType="password"
-              returnKeyType="done"
-            />
-            {passwordError ? (
-              <Text style={styles.errorText}>{passwordError}</Text>
-            ) : null}
-
-            <View style={styles.forgotPasswordContainer}>
-              <Pressable onPress={handleForgotPassword}>
-                <Text style={styles.forgotLink}>Forgot password?</Text>
-              </Pressable>
+    <SafeAreaView style={styles.safeArea} edges={["top"]}>
+      <KeyboardAvoidingView
+        behavior={Platform.OS === "ios" ? "padding" : "height"}
+        keyboardVerticalOffset={Platform.OS === "ios" ? 0 : 20}
+      >
+        <ScrollView
+          contentContainerStyle={styles.scrollContent}
+          keyboardShouldPersistTaps="handled"
+          showsVerticalScrollIndicator={false}
+        >
+          <View style={styles.container}>
+            <View style={styles.header}>
+              <Text style={styles.title}>Welcome back</Text>
+              <Text style={styles.subtitle}>
+                Sign in to your Splitmate account
+              </Text>
             </View>
 
-            <Pressable
-              style={[
-                styles.signInButton,
-                isLoading && styles.signInButtonDisabled,
-              ]}
-              accessibilityRole="button"
-              onPress={handleSubmit}
-              disabled={isLoading}
-            >
-              <Text style={styles.signInText}>
-                {isLoading ? "Signing in..." : "Sign In to Splitmate"}
-              </Text>
-            </Pressable>
+            <View style={styles.form}>
+              <InputField
+                label="Email"
+                icon="mail-outline"
+                value={email}
+                onChangeText={(text) => {
+                  setEmail(text);
+                  setEmailError(""); // Clear error on change
+                }}
+                placeholder="Enter your email"
+                keyboardType="email-address"
+                autoCapitalize="none"
+                autoComplete="email"
+                textContentType="emailAddress"
+                returnKeyType="next"
+              />
+              {emailError ? (
+                <Text style={styles.errorText}>{emailError}</Text>
+              ) : null}
 
-            <View style={styles.dividerContainer}>
-              <View style={styles.dividerRow}>
-                <View style={styles.divider} />
-                <Text style={styles.dividerText}>Or continue with</Text>
-                <View style={styles.divider} />
+              <InputField
+                label="Password"
+                icon="lock-outline"
+                value={password}
+                onChangeText={(text) => {
+                  setPassword(text);
+                  setPasswordError(""); // Clear error on change
+                }}
+                placeholder="Enter your password"
+                secureTextEntry
+                autoCapitalize="none"
+                autoComplete="password"
+                textContentType="password"
+                returnKeyType="done"
+              />
+              {passwordError ? (
+                <Text style={styles.errorText}>{passwordError}</Text>
+              ) : null}
+
+              <View style={styles.forgotPasswordContainer}>
+                <Pressable onPress={handleForgotPassword}>
+                  <Text style={styles.forgotLink}>Forgot password?</Text>
+                </Pressable>
               </View>
+
+              <Pressable
+                style={[
+                  styles.signInButton,
+                  isLoading && styles.signInButtonDisabled,
+                ]}
+                accessibilityRole="button"
+                onPress={handleSubmit}
+                disabled={isLoading}
+              >
+                <Text style={styles.signInText}>
+                  {isLoading ? "Signing in..." : "Sign In to Splitmate"}
+                </Text>
+              </Pressable>
+
+              <View style={styles.dividerContainer}>
+                <View style={styles.dividerRow}>
+                  <View style={styles.divider} />
+                  <Text style={styles.dividerText}>Or continue with</Text>
+                  <View style={styles.divider} />
+                </View>
+              </View>
+
+              <Pressable
+                style={styles.googleButton}
+                accessibilityRole="button"
+                onPress={googleSignIn}
+              >
+                <FontAwesome name="google" size={20} color="#18181b" />
+                <Text style={styles.googleText}>
+                  {googleLoading ? "Signing in" : "Continue with Google"}
+                </Text>
+              </Pressable>
+
+              <Text style={styles.signUpText}>
+                Don't have an account?{" "}
+                <Text
+                  style={styles.link}
+                  onPress={() => router.push("/SignUp")}
+                >
+                  Sign Up
+                </Text>
+              </Text>
             </View>
-
-            <Pressable
-              style={styles.googleButton}
-              accessibilityRole="button"
-              onPress={googleSignIn}
-            >
-              <FontAwesome name="google" size={20} color="#18181b" />
-              <Text style={styles.googleText}>
-                {googleLoading ? "Signing in" : "Continue with Google"}
-              </Text>
-            </Pressable>
-
-            <Text style={styles.signUpText}>
-              Don't have an account?{" "}
-              <Text style={styles.link} onPress={() => router.push("/SignUp")}>
-                Sign Up
-              </Text>
-            </Text>
           </View>
-        </View>
-      </SafeAreaView>
-    </LinearGradient>
+        </ScrollView>
+      </KeyboardAvoidingView>
+    </SafeAreaView>
   );
 }
 
@@ -331,6 +342,10 @@ export default LoginScreen;
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
+    backgroundColor: "black",
+  },
+  scrollContent: {
+    flexGrow: 1,
   },
   container: {
     flex: 1,
@@ -371,7 +386,7 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     borderWidth: 1,
     borderColor: "#e4e4e7",
-    backgroundColor: "#2a2a2a",
+    backgroundColor: "#000000ff",
     shadowColor: "#000",
     shadowOffset: {
       width: 0,
