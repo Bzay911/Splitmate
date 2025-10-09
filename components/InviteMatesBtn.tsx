@@ -12,14 +12,10 @@ interface InviteMatesBtnProps {
 
 const InviteMatesBtn: React.FC<InviteMatesBtnProps> = ({groupId}) => {
 
-    interface InviteFormData {
-        inviteeEmail: string;
-      }
-
       const [inviteeEmail, setInviteeEmail] = useState("");
       const [isInviting, setIsInviting] = useState(false);
       const {refreshGroups} = useGroups();
-      const {user, token} = useAuth();
+      const {token} = useAuth();
       
       const showInviteInfo = () => {
         Alert.alert(

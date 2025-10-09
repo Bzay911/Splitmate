@@ -667,7 +667,7 @@ const styles = StyleSheet.create({
   },
   expenseAmount: {
     fontSize: 14,
-    color: "#64748b",
+    color: "gray",
   },
   expenseDescription: {
     color: "white",

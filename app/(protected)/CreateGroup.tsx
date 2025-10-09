@@ -2,7 +2,6 @@ import { apiUrl } from "@/constants/ApiConfig";
 import { useAuth } from "@/contexts/AuthContext";
 import { useGroups } from "@/contexts/GroupsContext";
 import { Ionicons } from "@expo/vector-icons";
-import { LinearGradient } from "expo-linear-gradient";
 import { router } from "expo-router";
 import React, { useState } from "react";
 import {
@@ -10,13 +9,14 @@ import {
     Alert,
     KeyboardAvoidingView,
     Platform,
-    SafeAreaView,
+    ScrollView,
     StyleSheet,
     Text,
     TextInput,
     TouchableOpacity,
     View
 } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 const CreateGroup = () => {
   const [groupName, setGroupName] = useState("");
@@ -84,17 +84,15 @@ const CreateGroup = () => {
   };
 
   return (
-    <LinearGradient
-      colors={['#2a2a2a', '#1a1a1a', '#0f0f0f']}
-      style={styles.container}
-      start={{ x: 0, y: 0 }}
-      end={{ x: 0, y: 1 }}
-    >
       <SafeAreaView style={styles.safeArea}>
         <KeyboardAvoidingView 
           style={styles.keyboardView}
           behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+           keyboardVerticalOffset={Platform.OS === "ios" ? 0 : 90}
         >
+          <ScrollView contentContainerStyle={styles.scrollContent}
+          keyboardShouldPersistTaps="handled"
+          showsVerticalScrollIndicator={false}>
 
           {/* Content */}
           <View style={styles.content}>
@@ -111,7 +109,7 @@ const CreateGroup = () => {
               <TextInput
                 style={styles.input}
                 placeholder="Enter group name"
-                placeholderTextColor="#64748b"
+                placeholderTextColor="gray"
                 value={groupName}
                 onChangeText={setGroupName}
                 maxLength={50}
@@ -138,21 +136,22 @@ const CreateGroup = () => {
               )}
             </TouchableOpacity>
           </View>
+          </ScrollView>
         </KeyboardAvoidingView>
       </SafeAreaView>
-    </LinearGradient>
   );
 };
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
   safeArea: {
     flex: 1,
+    backgroundColor: 'black'
   },
   keyboardView: {
     flex: 1,
+  },
+    scrollContent: {
+    flexGrow: 1,
   },
   header: {
     flexDirection: 'row',
@@ -189,7 +188,7 @@ const styles = StyleSheet.create({
   },
   subtitle: {
     fontSize: 16,
-    color: '#94a3b8',
+    color: 'gray',
     textAlign: 'center',
     marginBottom: 40,
     lineHeight: 22,
@@ -206,7 +205,7 @@ const styles = StyleSheet.create({
   },
   input: {
     borderWidth: 1,
-    borderColor: '#374151',
+    borderColor: 'gray',
     backgroundColor: 'rgba(255, 255, 255, 0.05)',
     padding: 16,
     borderRadius: 12,
@@ -216,7 +215,7 @@ const styles = StyleSheet.create({
   },
   characterCount: {
     fontSize: 12,
-    color: '#64748b',
+    color: 'gray',
     textAlign: 'right',
     marginTop: 4,
   },
@@ -233,7 +232,7 @@ const styles = StyleSheet.create({
     elevation: 4,
   },
   createBtnDisabled: {
-    backgroundColor: "#64748b",
+    backgroundColor: "gray",
     shadowOpacity: 0,
     elevation: 0,
   },

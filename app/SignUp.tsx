@@ -18,6 +18,7 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { apiUrl } from "../constants/ApiConfig";
+import {handlePostSignupInvites} from "../utils/HandlePostSignupInvites"
 
 
 interface InputFieldProps extends Omit<TextInputProps, 'style'> {
@@ -87,11 +88,14 @@ export default function SignUp() {
 
      const { token, user } = await response.json();
      login(token, user);
+     console.log(user)
+     await handlePostSignupInvites(user.email);
    } catch (error){
     console.error("Error creating user", error);
     return null;
    }
   }
+
   
  // Form validation function
  const validateForm = () => {

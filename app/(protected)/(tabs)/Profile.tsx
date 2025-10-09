@@ -3,7 +3,8 @@ import { MaterialIcons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useRouter } from 'expo-router';
 import React from 'react';
-import { Alert, Image, SafeAreaView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { Alert, Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 const Profile = () => {
   const router = useRouter();
@@ -34,13 +35,7 @@ const Profile = () => {
   };
 
   return (
-    <LinearGradient
-    colors={['#2a2a2a', '#1a1a1a', '#0f0f0f']}
-    style={styles.container}
-    start={{ x: 0, y: 0 }}
-    end={{ x: 0, y: 1 }}
-  >
-    <SafeAreaView>
+    <SafeAreaView style={styles.safeArea}>
       <View style={styles.header}>
         <Text style={styles.title}>Profile</Text>
         <Text style={styles.subtitle}>Manage your account and preferences</Text>
@@ -49,7 +44,7 @@ const Profile = () => {
       <View style={styles.profileSection}>
         <View style={styles.profileHeader}>
           <Image 
-            source={user?.profilePicture ? { uri: user.profilePicture } : require('../../../assets/images/cat.png')} 
+            source={require('../../../assets/images/cat.png')}
             style={styles.avatarImage} 
           />
           <View style={styles.userInfo}>
@@ -81,14 +76,13 @@ const Profile = () => {
         </TouchableOpacity>
       </View>
     </SafeAreaView>
-    </LinearGradient>
   );
 };
 
 const styles = StyleSheet.create({
-  container: {
+  safeArea: {
     flex: 1,
-    backgroundColor: '#fff',
+    backgroundColor: 'black'
   },
   header: {
     padding: 24,

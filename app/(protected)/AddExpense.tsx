@@ -90,17 +90,11 @@ const AddExpense = () => {
   };
 
   return (
-  <LinearGradient
-    colors={["#2a2a2a", "#1a1a1a", "#0f0f0f"]}
-    style={styles.container}
-    start={{ x: 0, y: 0 }}
-    end={{ x: 0, y: 1 }}
-  >
     <SafeAreaView style={styles.container}>
       <KeyboardAvoidingView
         style={{ flex: 1 }}
         behavior={Platform.OS === "ios" ? "padding" : "height"}
-        keyboardVerticalOffset={Platform.OS === "ios" ? 0 : 20}
+        keyboardVerticalOffset={Platform.OS === "ios" ? 0 : 90}
       >
         <ScrollView 
           contentContainerStyle={styles.scrollContent}
@@ -129,7 +123,7 @@ const AddExpense = () => {
                   onChangeText={setAmount}
                   keyboardType="decimal-pad"
                   placeholder="0.00"
-                  placeholderTextColor="#64748b"
+                  placeholderTextColor="gray"
                 />
               </View>
             </View>
@@ -143,7 +137,7 @@ const AddExpense = () => {
                   value={description}
                   onChangeText={setDescription}
                   placeholder="What was this expense for?"
-                  placeholderTextColor="#64748b"
+                  placeholderTextColor="gray"
                   returnKeyType="done"
                   onSubmitEditing={Keyboard.dismiss}
                 />
@@ -165,13 +159,13 @@ const AddExpense = () => {
         
       </KeyboardAvoidingView>
     </SafeAreaView>
-  </LinearGradient>
 );
 };
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor:'black'
   },
   scrollContent: {
     flexGrow: 1,
@@ -196,7 +190,7 @@ const styles = StyleSheet.create({
   icon: {
     width: 40,
     height: 40,
-    tintColor: "#4B7BE5",
+    tintColor: "#fccc28",
   },
   title: {
     fontSize: 28,
@@ -250,7 +244,7 @@ const styles = StyleSheet.create({
     color: "white",
   },
   addButton: {
-    backgroundColor: "#4B7BE5",
+    backgroundColor: "#fccc28",
     width: "100%",
     padding: 16,
     borderRadius: 8,
