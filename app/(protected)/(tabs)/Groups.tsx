@@ -74,6 +74,7 @@ const Groups = () => {
         </Link>
       </View>
 
+
       {isLoading ? (
         <View style={styles.centerContainer}>
           <Text>Loading groups...</Text>
@@ -104,7 +105,7 @@ const Groups = () => {
           showsVerticalScrollIndicator={false}
           refreshing={isLoading}
           onRefresh={refreshGroups}
-        />
+          />
       )}
     </SafeAreaView>
   );
@@ -123,7 +124,7 @@ const styles = StyleSheet.create({
   },
   recentGroupList: {
     paddingHorizontal: 24,
-    paddingBottom: 24,
+    paddingBottom: 100,
   },
   groupName: {
     fontSize: 16,

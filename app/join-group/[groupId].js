@@ -7,15 +7,16 @@ import { apiUrl } from '../../constants/ApiConfig';
 export default function JoinGroup() {
   const params = useLocalSearchParams();
   const router = useRouter();
-  const {groupId, email, token, deepLink} = params;
+  const {groupId, email, token} = params;
 
   useEffect(() => {
     const joinGroup = async () => {
+      console.log("JoinGroup params:", { groupId, email, token });
       const authToken = await AsyncStorage.getItem("token");
-       if (!authToken || !groupId || !token || !email || deepLink != "true") return;
+       if (!authToken || !groupId || !token || !email) return;
       if (authToken) {
         try {
-          const response = await fetch(apiUrl("/invite/acceptInvite"),
+          const response = await fetch(apiUrl("invite/acceptInvite"),
             {
               method: "POST",
               headers: {

@@ -4,7 +4,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 export const handlePostSignupInvites = async (email: string) => {
   try {
     const authToken = await AsyncStorage.getItem("token");
-    const response = await fetch(apiUrl("/invite/checkPendingInvite"), {
+    const response = await fetch(apiUrl("invite/checkPendingInvite"), {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

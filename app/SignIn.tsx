@@ -124,6 +124,7 @@ export function LoginScreen() {
         return;
       }
       login(data.token, data.user);
+      await handlePostSignupInvites(data.user.email);
     } catch (error: any) {
       Alert.alert("Error signing in", error.message);
       console.error("Error signing in", error);

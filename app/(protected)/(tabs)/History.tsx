@@ -1,7 +1,7 @@
 import { useActivity } from "@/contexts/ActivityContext";
 import { Ionicons } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
-import React from "react";
+import React, { useState } from "react";
 import {
   ActivityIndicator,
   FlatList,
@@ -9,12 +9,53 @@ import {
   StyleSheet,
   Text,
   View,
+  ScrollView,
+  TouchableOpacity,
+  Dimensions,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import Feather from 'react-native-vector-icons/Feather';
+import Feather from "react-native-vector-icons/Feather";
 
 const History = () => {
   const { activities, isLoading, refreshActivities } = useActivity();
+  const [selectedFilter, setSelectedFilter] = useState("All");
+  const filters = ["All", "Expenses", "Settlements", "Groups", "Members"];
+  const {height} = Dimensions.get('window');
+
+  // Filter activities based on selected chip
+  const getFilteredActivities = () => {
+    if (selectedFilter === "All") return activities;
+
+    return activities.filter((item) => {
+      const message = item?.message?.toLowerCase() || "";
+
+      switch (selectedFilter) {
+        case "Expenses":
+          return (
+            message.includes("expense") ||
+            message.includes("added") 
+          );
+        case "Settlements":
+          return (
+            message.includes("settlement") ||
+            message.includes("settled up") ||
+            message.includes("payment")
+          );
+        case "Groups":
+          return message.includes("group") || message.includes("created");
+        case "Members":
+          return (
+            message.includes("member") ||
+            message.includes("joined") ||
+            message.includes("left")
+          );
+        default:
+          return true;
+      }
+    });
+  };
+
+  const filteredActivities = getFilteredActivities();
 
   const renderActivity = ({ item }: { item: any }) => {
     // Add null check for item
@@ -87,7 +128,7 @@ const History = () => {
           <Text style={styles.topBarTitle}>Activity</Text>
         </View>
         <View style={styles.centerContent}>
-            <Feather name="trending-up" size={64} color="gray" />
+          <Feather name="trending-up" size={64} color="gray" />
           <Text style={styles.emptyText}>No activities yet</Text>
           <Text style={styles.subEmptyText}>
             Your expense activites will appear here
@@ -102,25 +143,57 @@ const History = () => {
       <View style={styles.topSection}>
         <Text style={styles.topBarTitle}>Activity</Text>
       </View>
-      <FlatList
-        data={activities}
-        renderItem={renderActivity}
-        showsVerticalScrollIndicator={false}
-        keyExtractor={(item) => item?._id || Math.random().toString()}
-        refreshControl={
-          <RefreshControl
-            refreshing={isLoading}
-            onRefresh={refreshActivities}
-            tintColor="#fccc28"
-          />
-        }
-        contentContainerStyle={styles.listContent}
-        ListEmptyComponent={
-          <View style={styles.centerContent}>
-            <Text style={styles.emptyText}>No activities found</Text>
-          </View>
-        }
-      />
+
+      <View>
+        {/* Filter Chips */}
+        <ScrollView
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          contentContainerStyle={styles.chipsContainer}
+        >
+          {filters.map((filter) => (
+            <TouchableOpacity
+              key={filter}
+              style={[
+                styles.chip,
+                selectedFilter === filter && styles.chipSelected,
+              ]}
+              onPress={() => setSelectedFilter(filter)}
+            >
+              <Text
+                style={[
+                  styles.chipText,
+                  selectedFilter === filter && styles.chipTextSelected,
+                ]}
+              >
+                {filter}
+              </Text>
+            </TouchableOpacity>
+          ))}
+        </ScrollView>
+
+        <FlatList
+          data={filteredActivities}
+          renderItem={renderActivity}
+          showsVerticalScrollIndicator={false}
+          keyExtractor={(item) => item?._id || Math.random().toString()}
+          refreshControl={
+            <RefreshControl
+              refreshing={isLoading}
+              onRefresh={refreshActivities}
+              tintColor="#fccc28"
+            />
+          }
+          contentContainerStyle={styles.listContent}
+          ListEmptyComponent={
+            <View style={[styles.centerContent, {height: height - 200}]}>
+              <Text style={styles.emptyText}>
+                No {selectedFilter.toLowerCase()} found
+              </Text>
+            </View>
+          }
+        />
+      </View>
     </SafeAreaView>
   );
 };
@@ -143,6 +216,34 @@ const styles = StyleSheet.create({
     color: "white",
     marginBottom: 8,
   },
+  chipsContainer: {
+    paddingHorizontal: 16,
+    paddingBottom: 12,
+    gap: 8,
+  },
+  chip: {
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    borderRadius: 20,
+    backgroundColor: "#2a2a2a",
+    marginRight: 8,
+    borderWidth: 1,
+    borderColor: "#3a3a3a",
+    height: 36,
+  },
+  chipSelected: {
+    backgroundColor: "#fccc28",
+    borderColor: "#fccc28",
+  },
+  chipText: {
+    color: "#888",
+    fontSize: 14,
+    fontWeight: "500",
+  },
+  chipTextSelected: {
+    color: "#000",
+    fontWeight: "600",
+  },
   activityContent: {
     flex: 1,
     marginLeft: 12,
@@ -154,27 +255,17 @@ const styles = StyleSheet.create({
     fontWeight: "500",
     flexWrap: "wrap",
   },
-  activityTimestamp: {
-    fontSize: 12,
-    color: "white",
-  },
   centerContent: {
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
-    paddingVertical: 50,
-  },
-  errorText: {
-    color: "#ef4444",
-    fontSize: 16,
   },
   emptyText: {
-     fontSize: 20,
-    fontWeight: "500",
-    color: "white",
+    fontSize: 16,
+    color: "gray",
   },
   subEmptyText: {
-      fontSize: 14,
+    fontSize: 14,
     fontWeight: "500",
     color: "gray",
     marginBottom: 16,
