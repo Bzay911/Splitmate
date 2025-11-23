@@ -45,7 +45,7 @@ export function LoginScreen() {
       await GoogleSignin.hasPlayServices();
       const response = await GoogleSignin.signIn();
       if (isSuccessResponse(response)) {
-        const { user, idToken } = response.data;
+        const {idToken } = response.data;
         if (!idToken) return;
         await handleGoogleSignin(idToken);
       } else {
@@ -193,7 +193,7 @@ export function LoginScreen() {
             <View style={styles.header}>
               <Text style={styles.title}>Welcome back</Text>
               <Text style={styles.subtitle}>
-                Sign in to your Splitmate account
+                Sign in to your SplitShare account
               </Text>
             </View>
 
@@ -252,7 +252,7 @@ export function LoginScreen() {
                 disabled={isLoading}
               >
                 <Text style={styles.signInText}>
-                  {isLoading ? "Signing in..." : "Sign In to Splitmate"}
+                  {isLoading ? "Signing in..." : "Sign In to SplitShare"}
                 </Text>
               </Pressable>
 
@@ -361,25 +361,26 @@ const styles = StyleSheet.create({
     width: "100%",
   },
   title: {
-    fontSize: 32,
-    fontWeight: "700",
+    fontSize: 22,
     marginBottom: 8,
     textAlign: "center",
     color: "white",
+    fontFamily: "Inter-Medium"
   },
   subtitle: {
     fontSize: 16,
     textAlign: "center",
     color: "white",
+    fontFamily: "Inter-Regular"
   },
   inputContainer: {
     marginBottom: 20,
   },
   label: {
     fontSize: 16,
-    fontWeight: "600",
     marginBottom: 8,
     color: "white",
+    fontFamily: "Inter-Regular"
   },
   inputWrapper: {
     flexDirection: "row",
@@ -406,6 +407,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     fontSize: 16,
     color: "white",
+    fontFamily: "Inter-Regular"
   },
   forgotPasswordContainer: {
     alignItems: "flex-end",
@@ -414,7 +416,7 @@ const styles = StyleSheet.create({
   forgotLink: {
     color: "#fccc28",
     fontSize: 14,
-    fontWeight: "500",
+    fontFamily: "Inter-Regular"
   },
   signInButton: {
     width: "100%",
@@ -434,9 +436,9 @@ const styles = StyleSheet.create({
     elevation: 3,
   },
   signInText: {
-    color: "#fff",
+    color: "white",
     fontSize: 16,
-    fontWeight: "600",
+    fontFamily: "Inter-Medium"
   },
   dividerContainer: {
     marginBottom: 24,
@@ -455,6 +457,7 @@ const styles = StyleSheet.create({
     marginHorizontal: 16,
     fontSize: 14,
     color: "#71717a",
+    fontFamily: "Inter-Regular"
   },
   googleButton: {
     flexDirection: "row",
@@ -477,18 +480,20 @@ const styles = StyleSheet.create({
   },
   googleText: {
     fontSize: 16,
-    fontWeight: "600",
     marginLeft: 12,
     color: "#18181b",
+    fontFamily: "Inter-Medium"
   },
   signUpText: {
     fontSize: 14,
     textAlign: "center",
     color: "#71717a",
+    fontFamily: "Inter-Regular"
   },
   link: {
     color: "#fccc28",
-    fontWeight: "500",
+    fontFamily: "Inter-Regular",
+    textDecorationLine: "underline"
   },
   errorText: {
     color: "#ef4444", // Red color

@@ -8,7 +8,7 @@ import {
   Alert,
   Keyboard,
 } from "react-native";
-import { useLocalSearchParams } from "expo-router";
+import { useLocalSearchParams, useRouter } from "expo-router";
 import { LinearGradient } from "expo-linear-gradient";
 import BottomSheet, {
   BottomSheetView,
@@ -17,7 +17,6 @@ import BottomSheet, {
 } from "@gorhom/bottom-sheet";
 import { useRef, useState, useMemo } from "react";
 import { useDeleteExpense } from "@/utils/HandleDelete";
-import { useRouter } from "expo-router";
 import { apiUrl } from "@/constants/ApiConfig";
 import { useAuth } from "@/contexts/AuthContext";
 
@@ -153,7 +152,7 @@ const ExpenseDetails = () => {
               <Text style={styles.infoLabel}>Paid By</Text>
               <Text style={styles.infoText}>{paidBy}</Text>
               {paidByEmail && (
-                <Text style={styles.infoSubtext}>{paidByEmail}</Text>
+                <Text style={styles.infoSubtext}>({paidByEmail})</Text>
               )}
             </View>
 
@@ -269,11 +268,12 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: "#888",
     marginBottom: 8,
+    fontFamily: "Inter-Regular"
   },
   amount: {
     fontSize: 42,
-    fontWeight: "800",
     color: "#fccc28",
+    fontFamily: "Inter-Medium"
   },
   divider: {
     height: 1,
@@ -290,18 +290,19 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: "#888",
     marginBottom: 4,
-    textTransform: "uppercase",
     letterSpacing: 1,
+    fontFamily: "Inter-Regular"
   },
   infoText: {
-    fontSize: 18,
+    fontSize: 16,
     color: "#fff",
-    fontWeight: "600",
+    fontFamily: "Inter-Regular"
   },
   infoSubtext: {
     fontSize: 14,
     color: "#aaa",
     marginTop: 2,
+    fontFamily: "Inter-Regular"
   },
   buttonContainer: {
     gap: 16,
@@ -318,8 +319,8 @@ const styles = StyleSheet.create({
   },
   buttonText: {
     fontSize: 16,
-    fontWeight: "600",
     color: "#fff",
+    fontFamily: "Inter-Regular"
   },
   sheetContent: {
     flex: 1,
@@ -327,10 +328,10 @@ const styles = StyleSheet.create({
     backgroundColor: "#1e1e1e",
   },
   sheetLabel: {
-    fontWeight: "600",
     marginBottom: 8,
     color: "#fff",
     fontSize: 16,
+    fontFamily: "Inter-Regular"
   },
   sheetInput: {
     borderWidth: 1,
@@ -341,6 +342,7 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     marginBottom: 20,
     fontSize: 16,
+    fontFamily: "Inter-Regular"
   },
   saveButton: {
     backgroundColor: "#6366f1",
@@ -352,7 +354,7 @@ const styles = StyleSheet.create({
   saveButtonText: {
     color: "#fff",
     fontSize: 16,
-    fontWeight: "600",
     marginBottom: 4,
+    fontFamily: "Inter-Regular"
   },
 });

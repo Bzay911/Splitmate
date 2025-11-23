@@ -283,13 +283,14 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   username: {
-    fontSize: 28,
-    fontWeight: "700",
-    color: "white",
-  },
-  title: {
     fontSize: 22,
     color: "white",
+    fontFamily: "Inter-Medium"
+  },
+  title: {
+    fontSize: 16,
+    color: "white",
+    fontFamily: "Inter-Regular"
   },
   rightTop: {
     flexDirection: "row",
@@ -352,7 +353,8 @@ const styles = StyleSheet.create({
   },
   emptyText: {
     color: "gray",
-    fontSize: 16,
+    fontSize: 14,
+    fontFamily: "Inter-Regular"
   },
   texts: {
     flexDirection: "row",
@@ -394,25 +396,26 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: "white",
     marginBottom: 4,
-    fontWeight: "500",
+    fontFamily: "Inter-Medium"
   },
   totalExpense: {
     fontSize: 14,
     color: "gray",
+    fontFamily: "Inter-Regular"
   },
   eachTitle: {
-    fontWeight: "600",
     fontSize: 16,
     color: "white",
+    fontFamily: "Inter-Regular"
   },
   amountTitle: {
-    fontWeight: "600",
     fontSize: 16,
     marginBottom: 4,
+    fontFamily: "Inter-Medium"
   },
   amount: {
-    fontWeight: "600",
     fontSize: 30,
+    fontFamily: "Inter-Regular"
   },
   recentGroupHeader: {
     padding: 12,
@@ -420,6 +423,7 @@ const styles = StyleSheet.create({
   },
   seeAll: {
     color: "white",
-    fontSize: 14,
+    fontSize: 12,
+    fontFamily: "Inter-Regular"
   },
 });

@@ -14,7 +14,7 @@
       "backgroundColor": "#0bb754"
     },
     "extra": {
-       "router": {},
+      "router": {},
       "eas": {
         "projectId": "8cc11141-6144-4370-933c-0af42aac097c"
       }
@@ -79,11 +79,11 @@
           "recordAudioAndroid": true
         }
       ],
-      "expo-web-browser"
+      "expo-web-browser",
+      "expo-font"
     ],
     "experiments": {
       "typedRoutes": true
-    },
-    
+    }
   }
 }

@@ -192,6 +192,7 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     marginBottom: 40,
     lineHeight: 22,
+    fontFamily: "Inter-Regular"
   },
   inputContainer: {
     width: '100%',
@@ -199,9 +200,9 @@ const styles = StyleSheet.create({
   },
   inputLabel: {
     fontSize: 16,
-    fontWeight: '600',
     color: 'white',
     marginBottom: 8,
+    fontFamily: 'Inter-Medium'
   },
   input: {
     borderWidth: 1,
@@ -212,12 +213,14 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: 'white',
     width: '100%',
+    fontFamily: "Inter-Regular"
   },
   characterCount: {
     fontSize: 12,
     color: 'gray',
     textAlign: 'right',
     marginTop: 4,
+    fontFamily: "Inter-Regular"
   },
   createBtn: {
     backgroundColor: "#fccc28",
@@ -239,7 +242,7 @@ const styles = StyleSheet.create({
   createBtnText: {
     color: "black",
     fontSize: 16,
-    fontWeight: "700",
+    fontFamily: "Inter-Regular"
   },
 });
 

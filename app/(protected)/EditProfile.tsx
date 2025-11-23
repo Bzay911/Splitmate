@@ -178,6 +178,7 @@ const styles = StyleSheet.create({
     color: "#94a3b8",
     textAlign: "center",
     marginBottom: 32,
+    fontFamily: "Inter-Regular"
   },
   inputContainer: {
     width: "100%",
@@ -185,9 +186,9 @@ const styles = StyleSheet.create({
   },
   label: {
     fontSize: 16,
-    fontWeight: "600",
     color: "white",
     marginBottom: 8,
+     fontFamily: "Inter-Regular"
   },
   input: {
     width: "100%",
@@ -199,12 +200,14 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     fontSize: 16,
     color: "white",
+     fontFamily: "Inter-Regular"
   },
   characterCount: {
     fontSize: 12,
     color: "#64748b",
     textAlign: "right",
     marginTop: 4,
+     fontFamily: "Inter-Regular"
   },
   saveButton: {
     backgroundColor: "#fccc28",
@@ -227,7 +230,7 @@ const styles = StyleSheet.create({
   saveButtonText: {
     color: "black",
     fontSize: 16,
-    fontWeight: "700",
+    fontFamily: "Inter-Regular"
   },
 });
 

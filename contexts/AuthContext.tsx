@@ -1,7 +1,7 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import React, { createContext, ReactNode, useContext, useEffect, useState } from 'react';
 import { apiUrl } from '../constants/ApiConfig';
-
+import { Alert } from 'react-native';
 
 
 interface User {
@@ -73,6 +73,8 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
             // Token is invalid, clear it
             console.log("token is invalid, clearing it");
             await logout();
+            Alert.alert("Session Expired", "Please log in again.");
+            return;
           }
         }
       } catch (error) {

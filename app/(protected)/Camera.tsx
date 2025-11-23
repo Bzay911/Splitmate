@@ -1,14 +1,25 @@
 import { apiUrl } from "@/constants/ApiConfig";
 import { useAuth } from "@/contexts/AuthContext";
 import { useFinancial } from "@/contexts/FinancialContext";
-import { CameraType, CameraView, useCameraPermissions } from 'expo-camera';
+import { CameraType, CameraView, useCameraPermissions } from "expo-camera";
 import { router, useLocalSearchParams } from "expo-router";
-import React, { useEffect, useRef, useState } from 'react';
-import { ActivityIndicator, Alert, Animated, Button, Dimensions, Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import React, { useEffect, useRef, useState } from "react";
+import {
+  ActivityIndicator,
+  Alert,
+  Animated,
+  Button,
+  Dimensions,
+  Image,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
 
 export default function CameraScreen() {
   const [permission, requestPermission] = useCameraPermissions();
-  const [facing] = useState<CameraType>('back');
+  const [facing] = useState<CameraType>("back");
   const ref = useRef<CameraView>(null);
   const [uri, setUri] = useState<string | null>(null);
   const [isScanning, setIsScanning] = useState(false);
@@ -17,13 +28,12 @@ export default function CameraScreen() {
   const [isUploading, setIsUploading] = useState(false);
   const [receiptData, setReceiptData] = useState(null);
   const { refreshFinancialSummary } = useFinancial();
-  const {user, token} = useAuth();
-  const {groupId} = useLocalSearchParams<{groupId: string}>();
-
+  const { user, token } = useAuth();
+  const { groupId } = useLocalSearchParams<{ groupId: string }>();
 
   // Get screen dimensions
-  const screenHeight = Dimensions.get('window').height;
-  const frameHeight = 700; 
+  const screenHeight = Dimensions.get("window").height;
+  const frameHeight = 700;
 
   useEffect(() => {
     requestPermission();
@@ -56,98 +66,104 @@ export default function CameraScreen() {
         scanAnim.stopAnimation();
       });
     }
-  }
-
-  const handleAddExpense = async (amount: string, description: string) => {
-      try{
-        if(!user){
-          Alert.alert("Error", "Please login to add an expense");
-          router.replace("/");
-          return;
-        }
-        const response = await fetch(
-            apiUrl(`api/expenses/groups/${groupId}/expenses`),
-            {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                    "Authorization": `Bearer ${token}`,
-                },
-                body: JSON.stringify({
-                    amount: parseFloat(amount),
-                    description,
-                }),
-            }
-        )
-        const result = await response.json();
-        if (!response.ok) {
-      throw new Error(result.error || `Failed with status ${response.status}`);
-    }
-        Alert.alert("Success", "Expense added successfully");
-        router.back();
-        
-        // Immediately refresh the financial summary
-        await refreshFinancialSummary();
-      }catch(error){
-        console.error("Error adding expense:", error);
-        Alert.alert("Error", "Failed to add expense");
-      }
   };
 
-const upload = async() => {
-  if(!uri){
-    Alert.alert("Error", "Please scan a receipt first");
-    return;
-  }
-  try{
-    const formData = new FormData();
-    formData.append('receipt', {
-      uri: uri,
-      type: 'image/jpeg',
-      name: 'receipt.jpg',
-    });
-    setIsUploading(true);
+  const handleAddExpense = async (amount: string, description: string) => {
+    try {
+      if (!user) {
+        Alert.alert("Error", "Please login to add an expense");
+        router.replace("/");
+        return;
+      }
+      const response = await fetch(
+        apiUrl(`api/expenses/groups/${groupId}/expenses`),
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({
+            amount: parseFloat(amount),
+            description,
+          }),
+        }
+      );
+      const result = await response.json();
+      if (!response.ok) {
+        throw new Error(
+          result.error || `Failed with status ${response.status}`
+        );
+      }
+      Alert.alert("Success", "Expense added successfully");
+      router.back();
 
-    if(!user){
-      Alert.alert("Error", "Please login to upload a receipt");
+      // Immediately refresh the financial summary
+      await refreshFinancialSummary();
+    } catch (error) {
+      console.error("Error adding expense:", error);
+      Alert.alert("Error", "Failed to add expense");
+    }
+  };
+
+  const upload = async () => {
+    if (!uri) {
+      Alert.alert("Error", "Please scan a receipt first");
       return;
     }
-    
-    const response = await fetch(apiUrl(`api/expenses/groups/${groupId}/scan-receipt`), {
-      method: 'POST',
-      body: formData,
-      headers: {
-        'Content-Type': 'multipart/form-data',
-        'Authorization': `Bearer ${token}`,
+    try {
+      const formData = new FormData();
+      formData.append("receipt", {
+        uri: uri,
+        type: "image/jpeg",
+        name: "receipt.jpg",
+      });
+      setIsUploading(true);
+
+      if (!user) {
+        Alert.alert("Error", "Please login to upload a receipt");
+        return;
       }
-    });
 
-    // Parse the response body regardless of status code
-    const result = await response.json();
+      const response = await fetch(
+        apiUrl(`api/expenses/groups/${groupId}/scan-receipt`),
+        {
+          method: "POST",
+          body: formData,
+          headers: {
+            "Content-Type": "multipart/form-data",
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
 
-    if (response.ok && result.success) {
-      console.log('Receipt data:', result.data);
-      setReceiptData(result.data);
-      Alert.alert('Success', 'Receipt scanned successfully!');
-    } else {
-      // Use the specific error message from the backend
-      const errorMessage = result.error || result.message || 'Failed to process receipt';
-      throw new Error(errorMessage);
-    } 
-  } catch (error) {
-    console.error('Error capturing/uploading receipt:', error);
-    
-    // // Check if it's a network error vs backend error
-    // let displayMessage = error.message;
-    // if (error.message.includes('Server error:') || error.message.includes('Failed to fetch')) {
-    //   displayMessage = 'Network error. Please check your connection and try again.';
-    // }
-    
-    // Alert.alert('Error', displayMessage);
-  } finally {
-    setIsUploading(false);
-  }
-}
+      // Parse the response body regardless of status code
+      const result = await response.json();
+
+      if (response.ok && result.success) {
+        console.log("Receipt data:", result.data);
+        setReceiptData(result.data);
+        Alert.alert("Success", "Receipt scanned successfully!");
+      } else {
+        // Use the specific error message from the backend
+        const errorMessage =
+          result.error || result.message || "Failed to process receipt";
+        throw new Error(errorMessage);
+      }
+    } catch (error) {
+      console.error("Error capturing/uploading receipt:", error);
+
+      // // Check if it's a network error vs backend error
+      // let displayMessage = error.message;
+      // if (error.message.includes('Server error:') || error.message.includes('Failed to fetch')) {
+      //   displayMessage = 'Network error. Please check your connection and try again.';
+      // }
+
+      // Alert.alert('Error', displayMessage);
+    } finally {
+      setIsUploading(false);
+    }
+  };
 
   const startScanAnimation = () => {
     setIsScanning(true);
@@ -169,15 +185,15 @@ const upload = async() => {
 
     // Simulate scan delay, then take picture
     setTimeout(() => {
-       capture();
+      capture();
     }, 2000);
   };
 
   const scanTranslateY = scanAnim.interpolate({
     inputRange: [0, 1],
     outputRange: [
-      (screenHeight / 2) - (frameHeight / 2), 
-      (screenHeight / 2) + (frameHeight / 2) - 2 
+      screenHeight / 2 - frameHeight / 2,
+      screenHeight / 2 + frameHeight / 2 - 2,
     ],
   });
 
@@ -185,11 +201,11 @@ const upload = async() => {
     setUri("");
     setIsPreview(false);
     ref.current?.resumePreview();
-  }
+  };
 
   const ScannerFrame = () => {
     return (
-      <View style={styles.scannerFrameContainer} pointerEvents='none'>
+      <View style={styles.scannerFrameContainer} pointerEvents="none">
         <View style={styles.scannerFrame}>
           {/* Top-left corner */}
           <View style={[styles.corner, styles.cornerTopLeft]}>
@@ -224,29 +240,46 @@ const upload = async() => {
       {isPreview && uri ? (
         <>
           <Image source={{ uri: uri }} style={styles.preview} />
-          
+
           {receiptData ? (
-      
             <View style={styles.receiptDataContainer}>
-              
               <Text style={styles.receiptTitle}>Receipt Details</Text>
-              <Text style={styles.receiptText}>Description: {receiptData.description}</Text>
-              <Text style={styles.receiptText}>Date of purchase: {receiptData.date}</Text>
-              <Text style={styles.receiptText}>Total amount: ${receiptData.total.toFixed(2)}</Text>
+              <Text style={styles.receiptText}>
+                Description: {receiptData.description}
+              </Text>
+              <Text style={styles.receiptText}>
+                Date of purchase: {receiptData.date}
+              </Text>
+              <Text style={styles.receiptText}>
+                Total amount: ${receiptData.total.toFixed(2)}
+              </Text>
               <View style={styles.buttonContainer}>
-                <TouchableOpacity style={styles.scanAgainButton} onPress={retakePhoto}>
+                <TouchableOpacity
+                  style={styles.scanAgainButton}
+                  onPress={retakePhoto}
+                >
                   <Text style={styles.buttonText}>Scan Again</Text>
                 </TouchableOpacity>
-                <TouchableOpacity style={styles.useButton} onPress={() => handleAddExpense(receiptData?.total, receiptData?.description, receiptData?.date)}>
+                <TouchableOpacity
+                  style={styles.useButton}
+                  onPress={() =>
+                    handleAddExpense(
+                      receiptData?.total,
+                      receiptData?.description,
+                      receiptData?.date
+                    )
+                  }
+                >
                   <Text style={styles.buttonText}>Add Expense</Text>
                 </TouchableOpacity>
-
               </View>
             </View>
-            
           ) : (
             <View style={styles.buttonRow}>
-              <TouchableOpacity onPress={retakePhoto} style={styles.retakeButton}>
+              <TouchableOpacity
+                onPress={retakePhoto}
+                style={styles.retakeButton}
+              >
                 <Text style={styles.retakeText}>Retake</Text>
               </TouchableOpacity>
               {isUploading ? (
@@ -254,9 +287,10 @@ const upload = async() => {
                   <ActivityIndicator size="small" color="#fff" />
                 </View>
               ) : (
-                <TouchableOpacity 
-                onPress={() => upload()} 
-                style={styles.proceedButton}>
+                <TouchableOpacity
+                  onPress={() => upload()}
+                  style={styles.proceedButton}
+                >
                   <Text style={styles.proceedText}>Proceed</Text>
                 </TouchableOpacity>
               )}
@@ -265,20 +299,19 @@ const upload = async() => {
         </>
       ) : (
         <View style={styles.cameraWrapper}>
-          <CameraView 
-            ref={ref} 
-            style={styles.camera} 
-            facing={facing} 
-          />
-          
+          <CameraView ref={ref} style={styles.camera} facing={facing} />
+
           <ScannerFrame />
-          
+
           {isScanning && (
             <Animated.View
-              style={[styles.scanLine, { transform: [{ translateY: scanTranslateY }] }]}
+              style={[
+                styles.scanLine,
+                { transform: [{ translateY: scanTranslateY }] },
+              ]}
             />
           )}
-          
+
           {!isScanning && (
             <TouchableOpacity
               style={styles.captureButton}
@@ -301,14 +334,14 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
   },
-  cameraWrapper: { 
+  cameraWrapper: {
     flex: 1,
-    width: '100%',
-    position: 'relative',
+    width: "100%",
+    position: "relative",
   },
-  camera: { 
+  camera: {
     flex: 1,
-    width: '100%',
+    width: "100%",
   },
   captureButton: {
     position: "absolute",
@@ -319,10 +352,10 @@ const styles = StyleSheet.create({
     paddingVertical: 15,
     borderRadius: 10,
   },
-  captureText: { 
-    fontSize: 16, 
-    fontWeight: "bold",
-    color: "#fff"
+  captureText: {
+    fontSize: 16,
+    color: "#fff",
+    fontFamily: "Inter-Regular",
   },
   scanLine: {
     position: "absolute",
@@ -333,22 +366,22 @@ const styles = StyleSheet.create({
     backgroundColor: "lime",
     zIndex: 10,
   },
-  preview: { 
+  preview: {
     flex: 1,
-    width: '100%'
+    width: "100%",
   },
   buttonRow: {
     flexDirection: "row",
     justifyContent: "space-around",
     padding: 20,
     backgroundColor: "#000",
-    width: '100%'
+    width: "100%",
   },
   buttonContainer: {
     flexDirection: "row",
     justifyContent: "space-around",
     padding: 20,
-    width: '100%'
+    width: "100%",
   },
   retakeButton: {
     backgroundColor: "#eee",
@@ -369,12 +402,12 @@ const styles = StyleSheet.create({
   proceedText: {
     fontSize: 16,
     color: "#fff",
-    fontWeight: "bold",
+    fontFamily: "Inter-Regular",
   },
   retakeText: {
     fontSize: 16,
     color: "#000",
-    fontWeight: "bold",
+    fontFamily: "Inter-Regular",
   },
   scanAgainButton: {
     backgroundColor: "red",
@@ -384,27 +417,27 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   text: {
-    color: 'black',
-    textAlign: 'center',
+    color: "black",
+    textAlign: "center",
     marginTop: 20,
   },
   scannerFrameContainer: {
-    position: 'absolute',
+    position: "absolute",
     top: 0,
     left: 0,
     right: 0,
     bottom: 0,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
     zIndex: 5,
   },
   scannerFrame: {
     width: 400,
     height: 700,
-    position: 'relative',
+    position: "relative",
   },
   corner: {
-    position: 'absolute',
+    position: "absolute",
     width: 20,
     height: 20,
   },
@@ -428,46 +461,48 @@ const styles = StyleSheet.create({
     transform: [{ scale: -1 }],
   },
   cornerHorizontal: {
-    position: 'absolute',
+    position: "absolute",
     width: 20,
     height: 2,
-    backgroundColor: '#fff',
+    backgroundColor: "#fff",
   },
   cornerVertical: {
-    position: 'absolute',
+    position: "absolute",
     width: 2,
     height: 20,
-    backgroundColor: '#fff',
+    backgroundColor: "#fff",
   },
   receiptDataContainer: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
   },
   receiptTitle: {
     fontSize: 20,
-    fontWeight: 'bold',
     marginBottom: 10,
+    fontFamily: "Inter-Medium"
   },
   receiptText: {
     fontSize: 16,
     marginBottom: 5,
+    fontFamily: "Inter-Regular"
   },
   receiptSubtitle: {
     fontSize: 18,
-    fontWeight: 'bold',
     marginBottom: 5,
+     fontFamily: "Inter-Regular"
   },
   receiptItemText: {
     fontSize: 16,
     marginBottom: 2,
+     fontFamily: "Inter-Regular"
   },
   disabledButton: {
-    backgroundColor: '#ccc',
+    backgroundColor: "#ccc",
   },
   buttonText: {
     fontSize: 16,
-    fontWeight: 'bold',
-    color: '#fff',
+    color: "#fff",
+     fontFamily: "Inter-Regular"
   },
 });

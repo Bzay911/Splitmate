@@ -1,6 +1,5 @@
 import { useAuth } from '@/contexts/AuthContext';
 import { MaterialIcons } from '@expo/vector-icons';
-import { LinearGradient } from 'expo-linear-gradient';
 import { useRouter } from 'expo-router';
 import React from 'react';
 import { Alert, Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
@@ -10,7 +9,7 @@ const Profile = () => {
   const router = useRouter();
   const { user, logout } = useAuth();
 
-  const handleSignOut = async () => {
+  const handleSignOutPress = async () => {
     try {
       await logout();
     } catch (error) {
@@ -22,15 +21,15 @@ const Profile = () => {
     }
   };
 
-  const handleEditProfile = () => {
+  const handleEditProfilePress = () => {
     router.push('/EditProfile');
   };
 
-  const handlePrivacy = () => {
+  const handleThemePress = () => {
     Alert.alert('Under Development!', 'This feature is not available yet.');
   };
 
-  const handleNotifications = () => {
+  const handleNotificationsPress = () => {
     Alert.alert('Under Development!', 'This feature is not available yet.');
   };
 
@@ -52,24 +51,24 @@ const Profile = () => {
             <Text style={styles.userEmail}>{user?.email}</Text>
           </View>
         </View>
-        <TouchableOpacity style={styles.editButton} onPress={handleEditProfile}>
+        <TouchableOpacity style={styles.editButton} onPress={handleEditProfilePress}>
           <Text style={styles.editButtonText}>Edit</Text>
         </TouchableOpacity>
       </View>
 
       <View style={styles.section}>
-        <Text style={styles.sectionTitle}>Settings</Text>
-        <TouchableOpacity style={styles.settingItem} onPress={handleNotifications}>
+        <Text style={styles.sectionTitle}>Preferences</Text>
+        <TouchableOpacity style={styles.settingItem} onPress={handleNotificationsPress}>
           <MaterialIcons name="notifications" size={24} color="#64748b" />
           <Text style={styles.settingText}>Notifications</Text>
           <MaterialIcons name="chevron-right" size={24} color="#64748b" />
         </TouchableOpacity>
-        <TouchableOpacity style={styles.settingItem} onPress={handlePrivacy}>
-          <MaterialIcons name="lock" size={24} color="#64748b" />
-          <Text style={styles.settingText}>Privacy</Text>
+        <TouchableOpacity style={styles.settingItem} onPress={handleThemePress}>
+          <MaterialIcons name="color-lens" size={24} color="#64748b" />
+          <Text style={styles.settingText}>Theme</Text>
           <MaterialIcons name="chevron-right" size={24} color="#64748b" />
         </TouchableOpacity>
-        <TouchableOpacity style={styles.settingItem} onPress={handleSignOut}>
+        <TouchableOpacity style={styles.settingItem} onPress={handleSignOutPress}>
           <MaterialIcons name="logout" size={24} color="#ef4444" />
           <Text style={[styles.settingText, { color: '#ef4444' }]}>Sign Out</Text>
           <MaterialIcons name="chevron-right" size={24} color="#ef4444" />
@@ -88,10 +87,10 @@ const styles = StyleSheet.create({
     padding: 24,
   },
   title: {
-    fontSize: 32,
-    fontWeight: '700',
+    fontSize: 22,
     color: 'white',
-    marginBottom: 8,
+    marginBottom: 4,
+    fontFamily: "Inter-Medium"
   },
   avatarImage: {
     width: 80,
@@ -99,8 +98,9 @@ const styles = StyleSheet.create({
     borderRadius: 40,
   },
   subtitle: {
-    fontSize: 16,
-    color: 'white',
+    fontSize: 14,
+    color: 'gray',
+    fontFamily: "Inter-Regular"
   },
   profileSection: {
     flexDirection: 'row',
@@ -122,14 +122,15 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   userName: {
-    fontSize: 24,
-    fontWeight: '600',
+    fontSize: 22,
     color: 'white',
     marginBottom: 4,
+    fontFamily: "Inter-Medium"
   },
   userEmail: {
-    fontSize: 16,
+    fontSize: 14,
     color: 'white',
+    fontFamily: "Inter-Regular"
   },
   editButton: {
     paddingHorizontal: 20,
@@ -142,41 +143,17 @@ const styles = StyleSheet.create({
   },
   editButtonText: {
     fontSize: 16,
-    fontWeight: '500',
-    color: 'white', 
+    color: 'white',
+    fontFamily: "Inter-Regular" 
   },
   section: {
     paddingHorizontal: 24,
   },
   sectionTitle: {
-    fontSize: 20,
-    fontWeight: '600',
-    color: 'white',
-    marginVertical: 16,
-  },
-
-  statItem: {
-    alignItems: 'center',
-    flex: 1,
-  },
-  statIconContainer: {
-    width: 48,
-    height: 48,
-    borderRadius: 24,
-    backgroundColor: '#eff6ff',
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginBottom: 8,
-  },
-  statValue: {
     fontSize: 18,
-    fontWeight: '600',
     color: 'white',
-    marginBottom: 4,
-  },
-  statTitle: {
-    fontSize: 14,
-    color: 'white',
+    fontFamily: "Inter-Medium",
+    marginVertical: 12,
   },
   settingItem: {
     flexDirection: 'row',
@@ -188,6 +165,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: 'white',
     marginLeft: 16,
+    fontFamily: "Inter-Regular"
   },
 });
 

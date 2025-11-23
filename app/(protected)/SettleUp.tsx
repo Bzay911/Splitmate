@@ -6,14 +6,8 @@ import { SafeAreaView as SafeArea } from 'react-native-safe-area-context';
 import { useAuth } from '../../contexts/AuthContext';
 import { useExpense } from '../../contexts/ExpenseContext';
 
-interface GroupMember {
-  _id: string;
-  displayName: string;
-  email: string;
-}
-
 const SettleUp = () => {
-  const { user, token } = useAuth();
+  const { user } = useAuth();
   const username = user?.displayName;
   const { settlements, groupId } = useLocalSearchParams();
   const { settleUp } = useExpense();
@@ -75,7 +69,7 @@ const SettleUp = () => {
 
   return (
     <LinearGradient
-      colors={['#2a2a2a', '#1a1a1a', '#0f0f0f']}
+      colors={["#000000ff", "#000000ff", "#0f0f0f"]}
       style={styles.container}
       start={{ x: 0, y: 0 }}
       end={{ x: 0, y: 1 }}
@@ -134,14 +128,15 @@ const styles = StyleSheet.create({
   },
   emptyText: {
     fontSize: 18,
-    fontWeight: '600',
     color: 'white',
     marginBottom: 8,
+    fontFamily: "Inter-Medium"
   },
   emptySubtext: {
     fontSize: 14,
     color: '#94a3b8',
     textAlign: 'center',
+    fontFamily: "Inter-Regular"
   },
 });
 

@@ -33,6 +33,7 @@ function InputField({
   label,
   icon,
   value,
+
   onChangeText,
   placeholder,
   ...props
@@ -320,25 +321,26 @@ const styles = StyleSheet.create({
    width: "100%",
  },
  title: {
-   fontSize: 32,
-   fontWeight: "700",
+   fontSize: 22,
    marginBottom: 8,
    textAlign: "center",
    color: "white",
+   fontFamily: "Inter-Medium"
  },
  subtitle: {
    fontSize: 16,
    textAlign: "center",
    color: "white",
+   fontFamily: "Inter-Regular"
  },
  inputContainer: {
    marginBottom: 20,
  },
  label: {
-   fontSize: 16,
-   fontWeight: "600",
+   fontSize: 14,
    marginBottom: 8,
    color: "white",
+   fontFamily: "Inter-Regular"
  },
  inputWrapper: {
    flexDirection: "row",
@@ -399,10 +401,14 @@ const styles = StyleSheet.create({
    fontSize: 14,
    lineHeight: 20,
    color: "white",
+   fontFamily: "Inter-Regular"
+
  },
  termsLink: {
    color: "#fccc28",
    fontWeight: "500",
+   fontFamily: "Inter-Regular",
+   textDecorationLine: "underline"
  },
  createAccountButton: {
    width: "100%",
@@ -431,11 +437,12 @@ const styles = StyleSheet.create({
  createAccountButtonText: {
    color: "#fff",
    fontSize: 16,
-   fontWeight: "600",
+   fontFamily: "Inter-Medium"
  },
  signInText: {
    fontSize: 14,
    textAlign: "center",
    color: "#71717a",
+   fontFamily: 'Inter-Regular'
  },
 });

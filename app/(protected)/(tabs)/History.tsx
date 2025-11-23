@@ -32,8 +32,7 @@ const History = () => {
       switch (selectedFilter) {
         case "Expenses":
           return (
-            message.includes("expense") ||
-            message.includes("added") 
+            message.includes("expense")
           );
         case "Settlements":
           return (
@@ -144,7 +143,7 @@ const History = () => {
         <Text style={styles.topBarTitle}>Activity</Text>
       </View>
 
-      <View>
+      <View style={{ paddingBottom: 120 }}>
         {/* Filter Chips */}
         <ScrollView
           horizontal
@@ -211,10 +210,10 @@ const styles = StyleSheet.create({
     marginVertical: 16,
   },
   topBarTitle: {
-    fontSize: 32,
-    fontWeight: "700",
+    fontSize: 22,
     color: "white",
     marginBottom: 8,
+    fontFamily: "Inter-Medium"
   },
   chipsContainer: {
     paddingHorizontal: 16,
@@ -238,7 +237,7 @@ const styles = StyleSheet.create({
   chipText: {
     color: "#888",
     fontSize: 14,
-    fontWeight: "500",
+    fontFamily: "Inter-Regular"
   },
   chipTextSelected: {
     color: "#000",
@@ -252,8 +251,8 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: "white",
     marginBottom: 4,
-    fontWeight: "500",
     flexWrap: "wrap",
+    fontFamily: "Inter-Regular"
   },
   centerContent: {
     flex: 1,
@@ -262,13 +261,15 @@ const styles = StyleSheet.create({
   },
   emptyText: {
     fontSize: 16,
-    color: "gray",
+    color: "white",
+    fontFamily: "Inter-Regular",
+    marginBottom: 4
   },
   subEmptyText: {
     fontSize: 14,
-    fontWeight: "500",
     color: "gray",
     marginBottom: 16,
+    fontFamily: "Inter-Regular"
   },
   listContent: {
     paddingHorizontal: 16,
@@ -287,6 +288,7 @@ const styles = StyleSheet.create({
     color: "gray",
     marginTop: 4,
     flexWrap: "wrap",
+    fontFamily: "Inter-Regular"
   },
 });
 

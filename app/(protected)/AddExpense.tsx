@@ -4,7 +4,6 @@ import { useAuth } from "@/contexts/AuthContext";
 import { useFinancial } from "@/contexts/FinancialContext";
 import { useGroups } from "@/contexts/GroupsContext";
 import { Ionicons } from "@expo/vector-icons";
-import { LinearGradient } from "expo-linear-gradient";
 import { router, useLocalSearchParams } from "expo-router";
 import React, { useState } from "react";
 import {
@@ -193,15 +192,16 @@ const styles = StyleSheet.create({
     tintColor: "#fccc28",
   },
   title: {
-    fontSize: 28,
-    fontWeight: "bold",
+    fontSize: 22,
     marginBottom: 8,
     color: "white",
+    fontFamily: "Inter-Regular"
   },
   subtitle: {
     fontSize: 16,
-    color: "white",
+    color: "gray",
     marginBottom: 40,
+    fontFamily: "Inter-Regular"
   },
   inputSection: {
     width: "100%",
@@ -209,9 +209,9 @@ const styles = StyleSheet.create({
   },
   label: {
     fontSize: 16,
-    fontWeight: "600",
     marginBottom: 8,
     color: "white",
+    fontFamily: "Inter-Regular"
   },
   amountInputContainer: {
     flexDirection: "row",
@@ -230,6 +230,7 @@ const styles = StyleSheet.create({
     fontSize: 24,
     flex: 1,
     color: "white",
+    fontFamily: "Inter-Regular"
   },
   descriptionInputContainer: {
     borderWidth: 1,
@@ -242,6 +243,7 @@ const styles = StyleSheet.create({
     minHeight: 50,
     textAlignVertical: "top",
     color: "white",
+    fontFamily: "Inter-Regular"
   },
   addButton: {
     backgroundColor: "#fccc28",
@@ -253,7 +255,7 @@ const styles = StyleSheet.create({
   buttonText: {
     color: "#fff",
     fontSize: 18,
-    fontWeight: "600",
+    fontFamily: "Inter-Regular"
   },
 });
 

@@ -9,10 +9,8 @@ import {
   Text,
   TouchableOpacity,
   View,
-  Image
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { Icon } from "react-native-vector-icons/Icon";
 
 interface Group {
   _id: string;
@@ -24,7 +22,7 @@ interface Group {
 }
 
 const Groups = () => {
-  const { groups, isLoading, error, refreshGroups } = useGroups();
+  const { groups, error, isLoading, refreshGroups } = useGroups();
   const handleGroupPress = (group: Group) => {
     router.push({
       pathname: "/GroupDetails",
@@ -67,13 +65,11 @@ const Groups = () => {
   return (
     <SafeAreaView style={styles.safeAreaView}>
       <View style={styles.topSection}>
-        {/* <View style={{ width: 90 }} /> */}
         <Text style={styles.topBarTitle}>All Groups</Text>
         <Link href="/CreateGroup">
           <Text style={styles.createBtn}>+ New Group</Text>
         </Link>
       </View>
-
 
       {isLoading ? (
         <View style={styles.centerContainer}>
@@ -95,7 +91,6 @@ const Groups = () => {
           <Text style={styles.createBtn}>Create New Group</Text>
         </Link>
         </View>
-
       ) : (
         <FlatList
           data={groups}
@@ -145,7 +140,7 @@ const styles = StyleSheet.create({
   },
   createBtn: {
     color: "white",
-    fontWeight: "500",
+    fontFamily: "Inter-Regular"
   },
   createBtnCenter: {
     borderColor: "#2a2a2a",
@@ -155,10 +150,10 @@ const styles = StyleSheet.create({
     borderRadius: 4
   },
   topBarTitle: {
-    fontSize: 32,
-    fontWeight: "700",
+    fontSize: 22,
     color: "white",
     marginBottom: 8,
+     fontFamily: "Inter-Medium"
   },
   noGroups: {
     width: "100%",
@@ -172,15 +167,16 @@ const styles = StyleSheet.create({
     gap: 5
   },
   noGroupsText: {
-    fontSize: 20,
-    fontWeight: "500",
+    fontSize: 16,
     color: "white",
+    fontFamily: "Inter-Regular",
+    marginBottom: 4
   },
   noGroupssubText: {
     fontSize: 14,
-    fontWeight: "500",
     color: "gray",
     marginBottom: 16,
+    fontFamily: "Inter-Regular"
   },
   centerContainer: {
     flex: 1,
@@ -203,11 +199,6 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: "500",
   },
-  noGroupImage:{
-    height: 300,
-    width: 300,
-    resizeMode: "contain"
-  }
 });
 
 export default Groups;

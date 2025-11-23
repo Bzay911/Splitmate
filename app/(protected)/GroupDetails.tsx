@@ -8,7 +8,6 @@ import { LinearGradient } from "expo-linear-gradient";
 import { router, useFocusEffect, useLocalSearchParams } from "expo-router";
 import React, { useCallback, useEffect, useState, useRef } from "react";
 import { useDeleteExpense } from "@/utils/HandleDelete";
-import { Alert } from "react-native";
 import {
   SafeAreaView,
   ScrollView,
@@ -16,6 +15,7 @@ import {
   Text,
   TouchableOpacity,
   View,
+  Alert
 } from "react-native";
 import { FloatingAction } from "react-native-floating-action";
 import Swipeable from "react-native-gesture-handler/ReanimatedSwipeable";
@@ -411,7 +411,7 @@ const GroupDetails = () => {
               >
                 <View key={expense._id} style={styles.expensesContainer}>
                   <View style={styles.expenseIcon}>
-                    <Ionicons name="cart" size={24} color="black" />
+                    <Ionicons name="cart" size={18} color="black" />
                   </View>
 
                   <View style={styles.dateContainer}>
@@ -467,8 +467,8 @@ const GroupDetails = () => {
 
       {visible && (
         <Dialog.Container visible={visible} onBackdropPress={() => setVisible(false)}>
-          <Dialog.Title>Delete Expense</Dialog.Title>
-          <Dialog.Description>
+          <Dialog.Title style={{fontFamily: "Inter-Bold", color: "red"}}>Delete Expense</Dialog.Title>
+          <Dialog.Description style={{fontFamily: "Inter-Regular"}}>
             Do you want to delete this expense? You cannot undo this action.
           </Dialog.Description>
           <Dialog.Button label="Cancel" onPress={() => setVisible(false)} />
@@ -530,9 +530,9 @@ const styles = StyleSheet.create({
   },
   groupName: {
     fontSize: 24,
-    fontWeight: "bold",
     marginBottom: 8,
     color: "white",
+    fontFamily: "Inter-Medium"
   },
   oweSection: {
     flexDirection: "row",
@@ -544,15 +544,17 @@ const styles = StyleSheet.create({
   billTitle: {
     fontSize: 16,
     color: "white",
+    fontFamily: "Inter-Regular"
   },
   billAmount: {
     fontSize: 32,
-    fontWeight: "bold",
     color: "white",
+    fontFamily: "Inter-Regular"
   },
   splitTitle: {
     fontSize: 16,
     color: "white",
+    fontFamily: "Inter-Regular"
   },
   splitMembersContainer: {
     flexDirection: "row",
@@ -560,8 +562,8 @@ const styles = StyleSheet.create({
   },
   splitMembers: {
     fontSize: 32,
-    fontWeight: "bold",
     color: "white",
+    fontFamily: "Inter-Regular"
   },
   verticalLine: {
     width: 1,
@@ -619,7 +621,7 @@ const styles = StyleSheet.create({
   buttonText: {
     color: "white",
     fontSize: 16,
-    fontWeight: "600",
+    fontFamily: "Inter-Regular"
   },
   errorText: {
     color: "red",
@@ -642,12 +644,12 @@ const styles = StyleSheet.create({
   },
   sectionTitle: {
     fontSize: 20,
-    fontWeight: "bold",
     marginBottom: 12,
     marginLeft: 12,
     paddingLeft: 16,
     paddingTop: 16,
     color: "white",
+    fontFamily: "Inter-Regular"
   },
   expensesContainer: {
     margin: 12,
@@ -665,16 +667,19 @@ const styles = StyleSheet.create({
   expenses: {
     flexDirection: "column",
   },
-  expenseAmount: {
+   expenseAmount: {
     fontSize: 14,
     color: "gray",
+    fontFamily: "Inter-Regular"
   },
   expenseDescription: {
     color: "white",
     fontSize: 18,
+    fontFamily: "Inter-Regular"
   },
   addedTotalCost: {
     fontWeight: "bold",
+    fontFamily: "Inter-Regular"
   },
   dateContainer: {
     flexDirection: "row",
@@ -683,6 +688,7 @@ const styles = StyleSheet.create({
   dateText: {
     fontSize: 14,
     color: "white",
+    fontFamily: "Inter-Regular"
   },
   settlementItem: {
     marginBottom: 8,
@@ -691,6 +697,7 @@ const styles = StyleSheet.create({
   settlementText: {
     fontSize: 16,
     color: "white",
+    fontFamily: "Inter-Regular"
   },
   debtorName: {
     fontWeight: "600",
@@ -729,7 +736,7 @@ const styles = StyleSheet.create({
   },
   deleteText: {
     color: "white",
-    fontWeight: "bold",
+    fontFamily: "Inter-Regular"
   },
 });
 
