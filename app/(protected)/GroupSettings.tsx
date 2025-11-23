@@ -208,13 +208,14 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 24,
-    fontWeight: "bold",
     marginBottom: 8,
     color: "white",
+    fontFamily: "Inter-Medium"
   },
   subtitle: {
     fontSize: 16,
-    color: "white",
+    color: "gray",
+    fontFamily: "Inter-Regular"
   },
   membersList: {
     padding: 16,
@@ -239,13 +240,14 @@ const styles = StyleSheet.create({
   },
   memberName: {
     fontSize: 16,
-    fontWeight: "500",
     marginBottom: 4,
     color: "white",
+    fontFamily: "Inter-Regular"
   },
   memberPhone: {
     fontSize: 14,
     color: "white",
+    fontFamily: "Inter-Regular"
   },
   membersContainer: {
     padding: 8,
@@ -268,7 +270,7 @@ const styles = StyleSheet.create({
   deleteButtonText: {
     color: "white",
     fontSize: 16,
-    fontWeight: "600",
+    fontFamily: "Inter-Regular"
   },
   adminContainer: {
     position: "absolute",
@@ -281,7 +283,7 @@ const styles = StyleSheet.create({
   adminText: {
     color: "white",
     fontSize: 12,
-    fontWeight: "600",
+    fontFamily: "Inter-Regular"
   },
 });
 

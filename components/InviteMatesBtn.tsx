@@ -119,9 +119,10 @@ const styles = StyleSheet.create({
   },
   inviteBtnText: {
     color: "white",
-    fontWeight: "bold",
     textAlign: "center",
-    padding: 8,
+    padding: 4,
+    fontFamily: "Inter-Regular",
+    fontSize: 16
   },
   inviteSection: {
     padding: 16,
@@ -134,6 +135,7 @@ const styles = StyleSheet.create({
     marginBottom: 16,
     fontSize: 16,
     color: "white",
+    fontFamily: "Inter-Regular"
   },
   inviteBtnDisabled: {
     opacity: 0.7,
@@ -150,10 +152,10 @@ const styles = StyleSheet.create({
     fontSize: 16,
   },
   sectionTitle: {
-    fontSize: 20,
-    fontWeight: "bold",
+    fontSize: 16,
     marginBottom: 12,
     color: "white",
+    fontFamily: "Inter-Regular"
   },
   titleContainer: {
     flexDirection: "row",
@@ -167,7 +169,7 @@ const styles = StyleSheet.create({
   inviteText: {
     color: "#FF9D00",
     textDecorationLine: 'underline',
-    fontWeight: "bold",
+    fontFamily: "Inter-Regular"
   },
 });
 export default InviteMatesBtn;

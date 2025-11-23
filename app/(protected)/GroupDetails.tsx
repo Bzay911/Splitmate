@@ -15,7 +15,7 @@ import {
   Text,
   TouchableOpacity,
   View,
-  Alert
+  Alert,
 } from "react-native";
 import { FloatingAction } from "react-native-floating-action";
 import Swipeable from "react-native-gesture-handler/ReanimatedSwipeable";
@@ -23,7 +23,6 @@ import Animated, {
   interpolate,
   useAnimatedStyle,
 } from "react-native-reanimated";
-
 
 interface GroupMember {
   _id: string;
@@ -66,16 +65,21 @@ const GroupDetails = () => {
   const [isLoading, setIsLoading] = useState(false);
   const { user, token } = useAuth();
   const { groups } = useGroups();
-  const { expenses, fetchExpenses, creditors, debtors, whoNeedsToPayWhom, clearExpenseData } =
-    useExpense();
+  const {
+    expenses,
+    fetchExpenses,
+    creditors,
+    debtors,
+    whoNeedsToPayWhom,
+    clearExpenseData,
+  } = useExpense();
   const handleDelete = useDeleteExpense();
-  const swipeableRef = useRef< typeof Swipeable>(null);
+  const swipeableRef = useRef<typeof Swipeable>(null);
 
   const [visible, setVisible] = useState(false);
   const [selectedExpenseId, setSelectedExpenseId] = useState<string | null>(
     null
   );
-  
 
   const closeSwipe = () => {
     if (swipeableRef.current) {
@@ -180,6 +184,17 @@ const GroupDetails = () => {
     );
   }
 
+  const checkMembersLength = () => {
+    if (groupDetails) {
+      const memebersCount = groupDetails.members.length;
+      if (memebersCount > 1) {
+        return true;
+      } else {
+        return false;
+      }
+    }
+  };
+
   const handleSettingsPress = () => {
     if (groupDetails) {
       router.push({
@@ -209,7 +224,6 @@ const GroupDetails = () => {
   ];
 
   const handleSettleUp = () => {
-    
     const allSettlements = whoNeedsToPayWhom();
     router.push({
       pathname: "/SettleUp",
@@ -272,9 +286,8 @@ const GroupDetails = () => {
           <LinearGradient
             colors={parsedColors as [string, string]}
             style={styles.header}
-             pointerEvents="box-none"
+            pointerEvents="box-none"
           >
-
             <TouchableOpacity
               style={styles.settingsBtn}
               onPress={handleSettingsPress}
@@ -306,8 +319,7 @@ const GroupDetails = () => {
                   )}
                 </View>
               </View>
-          </View>
-
+            </View>
           </LinearGradient>
 
           <View style={styles.dividendSection}>
@@ -443,21 +455,90 @@ const GroupDetails = () => {
         color="#fccc28"
         floatingIcon={<Ionicons name="add" size={24} color="black" />}
         onPressItem={(name) => {
+          const groupHasMultipleMembers = checkMembersLength();
           if (name === "scanreceipt") {
-            router.push({
-              pathname: "/Camera",
-              params: {
-                groupId: groupDetails._id,
-              },
-            });
+            if (groupHasMultipleMembers) {
+              router.push({
+                pathname: "/Camera",
+                params: {
+                  groupId: groupDetails._id,
+                },
+              });
+            } else {
+              Alert.alert(
+                "You are the only person in this group!",
+                "Do you want to invite anyone in the group before adding an expense?",
+                [
+                  {
+                    text: "No",
+                    style: "cancel",
+                    onPress: () => {
+                      router.push({
+                        pathname: "/Camera",
+                        params: {
+                          groupId: groupDetails._id,
+                        },
+                      });
+                    },
+                  },
+                  {
+                    text: "Yes",
+                    onPress: () => {
+                      router.push({
+                        pathname: "/GroupSettings",
+                        params: {
+                          groupId: groupDetails._id,
+                          groupName: groupDetails.name,
+                          members: JSON.stringify(groupDetails.members),
+                        },
+                      });
+                    },
+                  },
+                ]
+              );
+            }
           } else if (name === "addexpense") {
-            router.push({
-              pathname: "/AddExpense",
-              params: {
-                groupId: groupDetails._id,
-                members: JSON.stringify(groupDetails.members),
-              },
-            });
+            if(groupHasMultipleMembers){
+              router.push({
+                pathname: "/AddExpense",
+                params: {
+                  groupId: groupDetails._id,
+                  members: JSON.stringify(groupDetails.members),
+                },
+              });
+            }else{
+                 Alert.alert(
+                "You are the only person in this group!",
+                "Do you want to invite anyone in the group before adding an expense?",
+                [
+                  {
+                    text: "No",
+                    style: "cancel",
+                    onPress: () => {
+                      router.push({
+                        pathname: "/AddExpense",
+                        params: {
+                          groupId: groupDetails._id,
+                        },
+                      });
+                    },
+                  },
+                  {
+                    text: "Yes",
+                    onPress: () => {
+                      router.push({
+                        pathname: "/GroupSettings",
+                        params: {
+                          groupId: groupDetails._id,
+                          groupName: groupDetails.name,
+                          members: JSON.stringify(groupDetails.members),
+                        },
+                      });
+                    },
+                  },
+                ]
+              );
+            }
           }
         }}
         showBackground={false}
@@ -466,9 +547,14 @@ const GroupDetails = () => {
       />
 
       {visible && (
-        <Dialog.Container visible={visible} onBackdropPress={() => setVisible(false)}>
-          <Dialog.Title style={{fontFamily: "Inter-Bold", color: "red"}}>Delete Expense</Dialog.Title>
-          <Dialog.Description style={{fontFamily: "Inter-Regular"}}>
+        <Dialog.Container
+          visible={visible}
+          onBackdropPress={() => setVisible(false)}
+        >
+          <Dialog.Title style={{ fontFamily: "Inter-Bold", color: "red" }}>
+            Delete Expense
+          </Dialog.Title>
+          <Dialog.Description style={{ fontFamily: "Inter-Regular" }}>
             Do you want to delete this expense? You cannot undo this action.
           </Dialog.Description>
           <Dialog.Button label="Cancel" onPress={() => setVisible(false)} />
@@ -532,7 +618,7 @@ const styles = StyleSheet.create({
     fontSize: 24,
     marginBottom: 8,
     color: "white",
-    fontFamily: "Inter-Medium"
+    fontFamily: "Inter-Medium",
   },
   oweSection: {
     flexDirection: "row",
@@ -544,17 +630,17 @@ const styles = StyleSheet.create({
   billTitle: {
     fontSize: 16,
     color: "white",
-    fontFamily: "Inter-Regular"
+    fontFamily: "Inter-Regular",
   },
   billAmount: {
     fontSize: 32,
     color: "white",
-    fontFamily: "Inter-Regular"
+    fontFamily: "Inter-Regular",
   },
   splitTitle: {
     fontSize: 16,
     color: "white",
-    fontFamily: "Inter-Regular"
+    fontFamily: "Inter-Regular",
   },
   splitMembersContainer: {
     flexDirection: "row",
@@ -563,7 +649,7 @@ const styles = StyleSheet.create({
   splitMembers: {
     fontSize: 32,
     color: "white",
-    fontFamily: "Inter-Regular"
+    fontFamily: "Inter-Regular",
   },
   verticalLine: {
     width: 1,
@@ -621,7 +707,7 @@ const styles = StyleSheet.create({
   buttonText: {
     color: "white",
     fontSize: 16,
-    fontFamily: "Inter-Regular"
+    fontFamily: "Inter-Regular",
   },
   errorText: {
     color: "red",
@@ -649,7 +735,7 @@ const styles = StyleSheet.create({
     paddingLeft: 16,
     paddingTop: 16,
     color: "white",
-    fontFamily: "Inter-Regular"
+    fontFamily: "Inter-Regular",
   },
   expensesContainer: {
     margin: 12,
@@ -667,19 +753,19 @@ const styles = StyleSheet.create({
   expenses: {
     flexDirection: "column",
   },
-   expenseAmount: {
+  expenseAmount: {
     fontSize: 14,
     color: "gray",
-    fontFamily: "Inter-Regular"
+    fontFamily: "Inter-Regular",
   },
   expenseDescription: {
     color: "white",
     fontSize: 18,
-    fontFamily: "Inter-Regular"
+    fontFamily: "Inter-Regular",
   },
   addedTotalCost: {
     fontWeight: "bold",
-    fontFamily: "Inter-Regular"
+    fontFamily: "Inter-Regular",
   },
   dateContainer: {
     flexDirection: "row",
@@ -688,7 +774,7 @@ const styles = StyleSheet.create({
   dateText: {
     fontSize: 14,
     color: "white",
-    fontFamily: "Inter-Regular"
+    fontFamily: "Inter-Regular",
   },
   settlementItem: {
     marginBottom: 8,
@@ -697,7 +783,7 @@ const styles = StyleSheet.create({
   settlementText: {
     fontSize: 16,
     color: "white",
-    fontFamily: "Inter-Regular"
+    fontFamily: "Inter-Regular",
   },
   debtorName: {
     fontWeight: "600",
@@ -736,7 +822,7 @@ const styles = StyleSheet.create({
   },
   deleteText: {
     color: "white",
-    fontFamily: "Inter-Regular"
+    fontFamily: "Inter-Regular",
   },
 });
 
