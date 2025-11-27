@@ -18,9 +18,9 @@ import Feather from "react-native-vector-icons/Feather";
 
 const History = () => {
   const { activities, isLoading, refreshActivities } = useActivity();
+  const {height} = Dimensions.get('window');
   const [selectedFilter, setSelectedFilter] = useState("All");
   const filters = ["All", "Expenses", "Settlements", "Groups", "Members"];
-  const {height} = Dimensions.get('window');
 
   // Filter activities based on selected chip
   const getFilteredActivities = () => {

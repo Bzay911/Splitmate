@@ -16,21 +16,9 @@ import {
   View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { Group } from "@/types/Group";
+import { Splitmate } from "@/types/Splitmate";
 
-// Add these interfaces
-interface Splitmate {
-  id: string;
-  name: string;
-  image: any;
-}
-
-interface Group {
-  _id: string;
-  name: string;
-  image: string;
-  totalExpense: number;
-  colors?: [string, string];
-}
 
 // Helper function to handle floating point precision in financial display
 const formatFinancialAmount = (amount: number | undefined) => {
@@ -215,7 +203,7 @@ export default function HomeScreen() {
                 <Text style={styles.emptyText}>No groups found</Text>
               </View>
             ) : (
-              groups.slice(0, 3).map((item) => (
+              groups.slice(0, 3).map((item : Group) => (
                 <TouchableOpacity
                   key={item._id}
                   onPress={() => handleGroupPress(item)}

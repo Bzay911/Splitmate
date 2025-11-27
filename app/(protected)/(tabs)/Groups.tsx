@@ -11,18 +11,11 @@ import {
   View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-
-interface Group {
-  _id: string;
-  name: string;
-  image: any;
-  totalExpense: number;
-  members: any[];
-  colors?: [string, string];
-}
+import { Group } from "@/types/Group";
 
 const Groups = () => {
   const { groups, error, isLoading, refreshGroups } = useGroups();
+  
   const handleGroupPress = (group: Group) => {
     router.push({
       pathname: "/GroupDetails",

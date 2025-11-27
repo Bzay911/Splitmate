@@ -130,12 +130,11 @@ const styles = StyleSheet.create({
     fontFamily: "Inter-Regular"
   },
   editButton: {
-    paddingHorizontal: 20,
-    paddingVertical: 8,
     borderRadius: 8,
     borderWidth: 1,
     borderColor: 'gray',
-    minWidth: 80,
+    minWidth: 60,
+    padding:8,
     alignItems: 'center',
   },
   editButtonText: {

@@ -1,11 +1,10 @@
 import { Ionicons } from '@expo/vector-icons';
-import { useLocalSearchParams } from 'expo-router';
+import { useLocalSearchParams, useRouter } from 'expo-router';
 import React from 'react';
 import { Alert, FlatList, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView as SafeArea } from 'react-native-safe-area-context';
 import { useAuth } from '../../contexts/AuthContext';
 import { useExpense } from '../../contexts/ExpenseContext';
-import { useRouter } from 'expo-router';
 
 const SettleUp = () => {
   const router = useRouter();

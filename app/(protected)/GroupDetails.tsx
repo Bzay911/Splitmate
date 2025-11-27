@@ -23,22 +23,9 @@ import Animated, {
   interpolate,
   useAnimatedStyle,
 } from "react-native-reanimated";
+import { GroupDetails as GroupDetailsType } from "@/types/GroupDetails";
 
-interface GroupMember {
-  _id: string;
-  displayName: string;
-  email: string;
-}
 
-interface GroupDetails {
-  _id: string;
-  name: string;
-  image: string;
-  totalExpense: number;
-  members: GroupMember[];
-  createdBy: GroupMember;
-  colors: [string, string];
-}
 
 const formatDate = (date: Date) => {
   const options: Intl.DateTimeFormatOptions = {
@@ -61,7 +48,7 @@ const isSettled = (balance: number) => {
 
 const GroupDetails = () => {
   const { groupId, groupName, colors } = useLocalSearchParams();
-  const [groupDetails, setGroupDetails] = useState<GroupDetails | null>(null);
+  const [groupDetails, setGroupDetails] = useState<GroupDetailsType | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const { user, token } = useAuth();
   const { groups } = useGroups();

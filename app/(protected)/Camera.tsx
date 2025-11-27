@@ -18,6 +18,7 @@ import {
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { ReceiptData } from "@/types/ReceiptData";
 
 export default function CameraScreen() {
   const [permission, requestPermission] = useCameraPermissions();
@@ -28,7 +29,7 @@ export default function CameraScreen() {
   const [isPreview, setIsPreview] = useState(false);
   const scanAnim = useRef(new Animated.Value(0)).current;
   const [isUploading, setIsUploading] = useState(false);
-  const [receiptData, setReceiptData] = useState(null);
+  const [receiptData, setReceiptData] = useState<ReceiptData | null>(null);
   const { refreshFinancialSummary } = useFinancial();
   const { user, token } = useAuth();
   const { groupId } = useLocalSearchParams<{ groupId: string }>();
@@ -119,7 +120,7 @@ export default function CameraScreen() {
         uri: uri,
         type: "image/jpeg",
         name: "receipt.jpg",
-      });
+      } as any);
       setIsUploading(true);
 
       if (!user) {
@@ -154,14 +155,6 @@ export default function CameraScreen() {
       }
     } catch (error) {
       console.error("Error capturing/uploading receipt:", error);
-
-      // // Check if it's a network error vs backend error
-      // let displayMessage = error.message;
-      // if (error.message.includes('Server error:') || error.message.includes('Failed to fetch')) {
-      //   displayMessage = 'Network error. Please check your connection and try again.';
-      // }
-
-      // Alert.alert('Error', displayMessage);
     } finally {
       setIsUploading(false);
     }
@@ -239,24 +232,26 @@ export default function CameraScreen() {
 
   return (
     <SafeAreaView style={styles.container}>
-       {/* Top Navigation Bar */}
-        <View style={styles.navBar}>
-          <TouchableOpacity
-            onPress={() => router.back()}
-            style={styles.backButton}
-          >
-            <Ionicons name="arrow-back" size={24} color="black" />
-          </TouchableOpacity>
+      {/* Top Navigation Bar */}
+      <View style={styles.navBar}>
+        <TouchableOpacity
+          onPress={() => router.back()}
+          style={styles.backButton}
+        >
+          <Ionicons name="arrow-back" size={24} color="black" />
+        </TouchableOpacity>
 
-          <Text style={styles.navTitle}>Scan Receipt</Text>
-        </View>
+        <Text style={styles.navTitle}>Scan Receipt</Text>
+      </View>
       {isPreview && uri ? (
         <>
           <Image source={{ uri: uri }} style={styles.preview} />
 
           {receiptData ? (
             <View style={styles.receiptDataContainer}>
-              <Text style={styles.receiptTitle}>----- Receipt Details -----</Text>
+              <Text style={styles.receiptTitle}>
+                ----- Receipt Details -----
+              </Text>
               <Text style={styles.receiptText}>
                 Description: {receiptData.description}
               </Text>
@@ -264,7 +259,7 @@ export default function CameraScreen() {
                 Date of purchase: {receiptData.date}
               </Text>
               <Text style={styles.receiptText}>
-                Total amount: ${receiptData.total.toFixed(2)}
+                Total amount: ${receiptData.total}
               </Text>
               <View style={styles.buttonContainer}>
                 <TouchableOpacity
@@ -277,9 +272,8 @@ export default function CameraScreen() {
                   style={styles.useButton}
                   onPress={() =>
                     handleAddExpense(
-                      receiptData?.total,
                       receiptData?.description,
-                      receiptData?.date
+                      receiptData?.total
                     )
                   }
                 >
@@ -493,22 +487,22 @@ const styles = StyleSheet.create({
   receiptTitle: {
     fontSize: 16,
     marginBottom: 10,
-    fontFamily: "Inter-Medium"
+    fontFamily: "Inter-Medium",
   },
   receiptText: {
     fontSize: 16,
     marginBottom: 5,
-    fontFamily: "Inter-Regular"
+    fontFamily: "Inter-Regular",
   },
   receiptSubtitle: {
     fontSize: 18,
     marginBottom: 5,
-     fontFamily: "Inter-Regular"
+    fontFamily: "Inter-Regular",
   },
   receiptItemText: {
     fontSize: 16,
     marginBottom: 2,
-     fontFamily: "Inter-Regular"
+    fontFamily: "Inter-Regular",
   },
   disabledButton: {
     backgroundColor: "#ccc",
@@ -516,7 +510,7 @@ const styles = StyleSheet.create({
   buttonText: {
     fontSize: 14,
     color: "#fff",
-     fontFamily: "Inter-Regular"
+    fontFamily: "Inter-Regular",
   },
   navBar: {
     width: "100%",
@@ -525,7 +519,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     backgroundColor: "#ffffff",
-    gap: 18
+    gap: 18,
   },
   backButton: {
     padding: 4,
