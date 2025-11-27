@@ -258,7 +258,7 @@ const styles = StyleSheet.create({
   },
   safeArea: {
     flex: 1,
-    backgroundColor: 'black'
+    backgroundColor: '#f5f5f5'
   },
   scrollContent: {
     paddingBottom: 100,
@@ -278,18 +278,24 @@ const styles = StyleSheet.create({
     width: 45,
     height: 45,
     borderRadius: 25,
+       shadowColor: "#000",
+  shadowOffset: {
+    width: 0,
+    height: 6,
+  },
+  shadowOpacity: 0.15,
+  shadowRadius: 3.5,
+  elevation: 5,
   },
   camera: {
     flex: 1,
   },
   username: {
     fontSize: 22,
-    color: "white",
     fontFamily: "Inter-Medium"
   },
   title: {
-    fontSize: 16,
-    color: "white",
+    fontSize: 14,
     fontFamily: "Inter-Regular"
   },
   rightTop: {
@@ -312,6 +318,14 @@ const styles = StyleSheet.create({
     padding: 12,
     justifyContent: "center",
     backgroundColor: "#fccc28",
+    shadowColor: "#000",
+  shadowOffset: {
+    width: 0,
+    height: 6,
+  },
+  shadowOpacity: 0.15,
+  shadowRadius: 3.5,
+  elevation: 5,
   },
   amountSubSection: {
     flexDirection: "row",
@@ -319,14 +333,22 @@ const styles = StyleSheet.create({
     width: "100%",
     paddingHorizontal: 12,
   },
-  paySection: {
-    height: 100,
-    borderRadius: 8,
-    padding: 12,
-    flex: 1,
-    justifyContent: "center",
-    backgroundColor: "#fccc28",
+paySection: {
+  height: 100,
+  borderRadius: 8,
+  padding: 12,
+  flex: 1,
+  justifyContent: "center",
+  backgroundColor: "#fccc28",
+  shadowColor: "#000",
+  shadowOffset: {
+    width: 0,
+    height: 6,
   },
+  shadowOpacity: 0.15,
+  shadowRadius: 3.5,
+  elevation: 5,
+},
   expenseSection: {
     height: 100,
     flex: 1,
@@ -334,10 +356,17 @@ const styles = StyleSheet.create({
     padding: 12,
     justifyContent: "center",
     backgroundColor: "#fccc28",
+    shadowColor: "#000",
+  shadowOffset: {
+    width: 0,
+    height: 6,
+  },
+  shadowOpacity: 0.15,
+  shadowRadius: 3.5,
+  elevation: 5,
   },
   splitMatesContainer: {
     width: "100%",
-    marginTop: 12,
     padding: 12,
     paddingBottom: 0,
   },
@@ -362,8 +391,8 @@ const styles = StyleSheet.create({
   },
 
   splitmateImage: {
-    width: 60,
-    height: 60,
+    width: 50,
+    height: 50,
     borderRadius: 25,
   },
   splitmatesList: {
@@ -371,13 +400,14 @@ const styles = StyleSheet.create({
     marginTop: 12,
   },
   splitmateName: {
+    fontSize: 12,
     textAlign: "center",
     marginTop: 4,
-    color: "white",
+    fontFamily: "Inter-Regular"
   },
   recentGroupSection: {
     width: "100%",
-    marginTop: 12,
+    marginTop: 22,
     paddingHorizontal: 12,
     paddingBottom: 30,
   },
@@ -393,37 +423,30 @@ const styles = StyleSheet.create({
     borderRadius: 25,
   },
   groupName: {
-    fontSize: 16,
-    color: "white",
+    fontSize: 14,
     marginBottom: 4,
     fontFamily: "Inter-Medium"
   },
   totalExpense: {
-    fontSize: 14,
+    fontSize: 12,
     color: "gray",
     fontFamily: "Inter-Regular"
   },
   eachTitle: {
     fontSize: 16,
-    color: "white",
-    fontFamily: "Inter-Regular"
+    fontFamily: "Inter-Medium"
   },
   amountTitle: {
-    fontSize: 16,
+    fontSize: 14,
     marginBottom: 4,
     fontFamily: "Inter-Medium"
   },
   amount: {
-    fontSize: 30,
+    fontSize: 26,
     fontFamily: "Inter-Regular"
-  },
-  recentGroupHeader: {
-    padding: 12,
-    marginTop: 24,
   },
   seeAll: {
-    color: "white",
     fontSize: 12,
-    fontFamily: "Inter-Regular"
+    fontFamily: "Inter-Regular",
   },
 });

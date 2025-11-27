@@ -11,6 +11,7 @@ import {
   ScrollView,
   KeyboardAvoidingView,
   Platform,
+  Image
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { apiUrl } from "../constants/ApiConfig";
@@ -269,7 +270,11 @@ export function LoginScreen() {
                 accessibilityRole="button"
                 onPress={googleSignIn}
               >
-                <FontAwesome name="google" size={20} color="#18181b" />
+                   <Image
+                  source={require("../assets/images/google_icon.png")}
+                  style={{ width: 24, height: 24 }}
+                  resizeMode="contain"
+                />
                 <Text style={styles.googleText}>
                   {googleLoading ? "Signing in" : "Continue with Google"}
                 </Text>
@@ -320,12 +325,12 @@ function InputField({
       <View style={styles.inputWrapper}>
         <MaterialIcons
           name={icon}
-          size={20}
-          color="white"
+          size={18}
+          color="black"
           style={styles.inputIcon}
         />
         <TextInput
-          style={styles.input}
+          style={styles.input && styles.secureInput}
           placeholder={placeholder}
           placeholderTextColor="#a1a1aa"
           value={value}
@@ -343,7 +348,7 @@ export default LoginScreen;
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: "black",
+    backgroundColor: "#f5f5f5",
   },
   scrollContent: {
     flexGrow: 1,
@@ -364,39 +369,27 @@ const styles = StyleSheet.create({
     fontSize: 22,
     marginBottom: 8,
     textAlign: "center",
-    color: "white",
     fontFamily: "Inter-Medium"
   },
   subtitle: {
     fontSize: 16,
     textAlign: "center",
-    color: "white",
     fontFamily: "Inter-Regular"
   },
   inputContainer: {
     marginBottom: 20,
   },
   label: {
-    fontSize: 16,
+    fontSize: 14,
     marginBottom: 8,
-    color: "white",
     fontFamily: "Inter-Regular"
   },
   inputWrapper: {
     flexDirection: "row",
     alignItems: "center",
-    borderRadius: 12,
+    borderRadius: 8,
     borderWidth: 1,
-    borderColor: "#e4e4e7",
-    backgroundColor: "#000000ff",
-    shadowColor: "#000",
-    shadowOffset: {
-      width: 0,
-      height: 1,
-    },
-    shadowOpacity: 0.05,
-    shadowRadius: 2,
-    elevation: 2,
+    borderColor: "gray",
   },
   inputIcon: {
     paddingLeft: 16,
@@ -405,23 +398,26 @@ const styles = StyleSheet.create({
     flex: 1,
     height: 52,
     paddingHorizontal: 16,
-    fontSize: 16,
-    color: "white",
+    fontSize: 14,
     fontFamily: "Inter-Regular"
   },
   forgotPasswordContainer: {
     alignItems: "flex-end",
     marginBottom: 24,
   },
-  forgotLink: {
+  secureInput:{
+    color: 'black'
+  },
+    forgotLink: {
     color: "#fccc28",
-    fontSize: 14,
-    fontFamily: "Inter-Regular"
+    fontSize: 12,
+    fontFamily: "Inter-Regular",
+    textDecorationLine: "underline"
   },
   signInButton: {
     width: "100%",
     height: 52,
-    borderRadius: 12,
+    borderRadius: 8,
     backgroundColor: "#fccc28",
     alignItems: "center",
     justifyContent: "center",
@@ -437,7 +433,7 @@ const styles = StyleSheet.create({
   },
   signInText: {
     color: "white",
-    fontSize: 16,
+    fontSize: 14,
     fontFamily: "Inter-Medium"
   },
   dividerContainer: {
@@ -455,7 +451,7 @@ const styles = StyleSheet.create({
   },
   dividerText: {
     marginHorizontal: 16,
-    fontSize: 14,
+    fontSize: 12,
     color: "#71717a",
     fontFamily: "Inter-Regular"
   },
@@ -465,7 +461,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     width: "100%",
     height: 52,
-    borderRadius: 12,
+    borderRadius: 8,
     borderColor: "#e4e4e7",
     backgroundColor: "#fff",
     marginBottom: 16,
@@ -479,7 +475,7 @@ const styles = StyleSheet.create({
     elevation: 2,
   },
   googleText: {
-    fontSize: 16,
+    fontSize: 14,
     marginLeft: 12,
     color: "#18181b",
     fontFamily: "Inter-Medium"

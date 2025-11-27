@@ -154,6 +154,17 @@ const GroupSettings = () => {
 
   return (
     <SafeAreaView style={styles.safeArea}>
+      {/* Top Navigation Bar */}
+              <View style={styles.navBar}>
+                <TouchableOpacity
+                  onPress={() => router.back()}
+                  style={styles.backButton}
+                >
+                  <Ionicons name="arrow-back" size={24} color="black" />
+                </TouchableOpacity>
+      
+                <Text style={styles.navTitle}>Group Settings</Text>
+              </View>
       <ScrollView
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
@@ -164,7 +175,7 @@ const GroupSettings = () => {
             Group Members ({parsedMembers.length})
           </Text>
         </View>
-        <View style={styles.membersContainer}>
+        <View>
           <View style={styles.membersList}>
             {parsedMembers.map((member, index) => (
               <View key={`${member.email}-${index}`}>
@@ -187,7 +198,7 @@ const GroupSettings = () => {
               <ActivityIndicator color="white" />
             ) : (
               <>
-                <Ionicons name="trash-outline" size={20} color="white" />
+                <Ionicons name="trash-outline" size={18} color="white" />
                 <Text style={styles.deleteButtonText}>Delete Group</Text>
               </>
             )}
@@ -201,19 +212,18 @@ const GroupSettings = () => {
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: "black",
+    backgroundColor: "#f5f5f5",
   },
   header: {
     padding: 20,
   },
   title: {
-    fontSize: 24,
+    fontSize: 20,
     marginBottom: 8,
-    color: "white",
     fontFamily: "Inter-Medium"
   },
   subtitle: {
-    fontSize: 16,
+    fontSize: 14,
     color: "gray",
     fontFamily: "Inter-Regular"
   },
@@ -224,13 +234,12 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    padding: 16,
-    backgroundColor: "#2a2a2a",
+    padding: 12,
     borderRadius: 8,
     marginBottom: 12,
     position: "relative",
     borderWidth: 1,
-    borderColor: "white",
+    borderColor: "black",
   },
   memberInfo: {
     flex: 1,
@@ -239,18 +248,14 @@ const styles = StyleSheet.create({
     paddingBottom: 100,
   },
   memberName: {
-    fontSize: 16,
+    fontSize: 14,
     marginBottom: 4,
-    color: "white",
     fontFamily: "Inter-Regular"
   },
   memberPhone: {
     fontSize: 14,
-    color: "white",
+    color: "gray",
     fontFamily: "Inter-Regular"
-  },
-  membersContainer: {
-    padding: 8,
   },
   deleteSection: {
     padding: 16,
@@ -260,7 +265,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
-    padding: 16,
+    padding: 12,
     borderRadius: 8,
     gap: 8,
   },
@@ -269,7 +274,7 @@ const styles = StyleSheet.create({
   },
   deleteButtonText: {
     color: "white",
-    fontSize: 16,
+    fontSize: 14,
     fontFamily: "Inter-Regular"
   },
   adminContainer: {
@@ -284,6 +289,23 @@ const styles = StyleSheet.create({
     color: "white",
     fontSize: 12,
     fontFamily: "Inter-Regular"
+  },
+  navBar: {
+    width: "100%",
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "#f5f5f5",
+    gap: 18
+  },
+  backButton: {
+    padding: 4,
+  },
+  navTitle: {
+    fontSize: 16,
+    fontFamily: "Inter-Medium",
+    color: "black",
   },
 });
 

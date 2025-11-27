@@ -5,7 +5,7 @@ import { FinancialProvider } from "@/contexts/FinancialContext";
 import { GroupsProvider } from "@/contexts/GroupsContext";
 import { SettlementProvider } from "@/contexts/SettlementContext";
 import { Redirect, Stack } from "expo-router";
-import { ActivityIndicator } from "react-native";
+import { ActivityIndicator, StatusBar } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { BottomSheetModalProvider } from "@gorhom/bottom-sheet";
 import { useFonts } from "expo-font";
@@ -33,6 +33,12 @@ export default function ProtectedLayout() {
   }
 
   return (
+    <>
+  <StatusBar 
+  barStyle="dark-content"  
+  backgroundColor="#f5f5f5"   
+  translucent={false}
+/>
     <FinancialProvider>
       <ActivityProvider>
         <GroupsProvider>
@@ -49,12 +55,8 @@ export default function ProtectedLayout() {
                       name="GroupDetails"
                       options={{
                         title: "Group Details",
-                        headerBackTitle: "Back",
-                        headerTintColor: "white",
-                        headerStyle: { backgroundColor: "black" },
+                        headerShown: false,
                         headerTitleStyle: {
-                          fontFamily: "Inter-Regular",
-                          fontSize: 18,
                         },
                       }}
                     />
@@ -62,74 +64,42 @@ export default function ProtectedLayout() {
                       name="AddExpense"
                       options={{
                         title: "Add Expense",
-                        headerBackTitle: "Back",
-                        headerTintColor: "white",
-                        headerStyle: { backgroundColor: "black" },
+                      headerShown: false,
                       }}
                     />
                     <Stack.Screen
                       name="Camera"
                       options={{
                         title: "Scan Expense",
-                        headerBackTitle: "Back",
-                        headerTintColor: "white",
-                        headerStyle: { backgroundColor: "black" },
-                        headerTitleStyle: {
-                          fontFamily: "Inter-Regular",
-                          fontSize: 18,
-                        },
+                        headerShown: false
                       }}
                     />
                     <Stack.Screen
                       name="CreateGroup"
                       options={{
                         title: "Create Group",
-                        headerBackTitle: "Back",
-                        headerTintColor: "white",
-                        headerStyle: { backgroundColor: "black" },
-                        headerTitleStyle: {
-                          fontFamily: "Inter-Regular",
-                          fontSize: 18,
-                        },
+                        headerShown:false
                       }}
                     />
                     <Stack.Screen
                       name="GroupSettings"
                       options={{
                         title: "Group Settings",
-                        headerBackTitle: "Back",
-                        headerTintColor: "white",
-                        headerStyle: { backgroundColor: "black" },
-                        headerTitleStyle: {
-                          fontFamily: "Inter-Regular",
-                          fontSize: 18,
-                        },
+                        headerShown: false
                       }}
                     />
                     <Stack.Screen
                       name="EditProfile"
                       options={{
                         title: "Edit Profile",
-                        headerBackTitle: "Back",
-                        headerTintColor: "white",
-                        headerStyle: { backgroundColor: "black" },
-                        headerTitleStyle: {
-                          fontFamily: "Inter-Regular",
-                          fontSize: 18,
-                        },
+                        headerShown: false
                       }}
                     />
                     <Stack.Screen
                       name="SettleUp"
                       options={{
                         title: "Settle Up",
-                        headerBackTitle: "Back",
-                        headerTintColor: "white",
-                        headerStyle: { backgroundColor: "black" },
-                        headerTitleStyle: {
-                          fontFamily: "Inter-Regular",
-                          fontSize: 18,
-                        },
+                        headerShown: false
                       }}
                     />
                     <Stack.Screen
@@ -153,5 +123,7 @@ export default function ProtectedLayout() {
         </GroupsProvider>
       </ActivityProvider>
     </FinancialProvider>
+    </>
+
   );
 }

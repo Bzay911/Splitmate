@@ -90,6 +90,17 @@ const AddExpense = () => {
 
   return (
     <SafeAreaView style={styles.container}>
+          {/* Top Navigation Bar */}
+              <View style={styles.navBar}>
+                <TouchableOpacity
+                  onPress={() => router.back()}
+                  style={styles.backButton}
+                >
+                  <Ionicons name="arrow-back" size={24} color="black" />
+                </TouchableOpacity>
+      
+                <Text style={styles.navTitle}>Add Expense</Text>
+              </View>
       <KeyboardAvoidingView
         style={{ flex: 1 }}
         behavior={Platform.OS === "ios" ? "padding" : "height"}
@@ -102,7 +113,7 @@ const AddExpense = () => {
           <View style={styles.content}>
             {/* Calculator Icon */}
             <View style={styles.iconContainer}>
-              <Ionicons name="calculator" size={24} color="#4B7BE5" />
+              <Ionicons name="calculator" size={24} color="white" />
             </View>
 
             {/* Title and Subtitle */}
@@ -164,7 +175,7 @@ const AddExpense = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor:'black'
+    backgroundColor:'#f5f5f5'
   },
   scrollContent: {
     flexGrow: 1,
@@ -181,7 +192,7 @@ const styles = StyleSheet.create({
     width: 80,
     height: 80,
     borderRadius: 40,
-    backgroundColor: "#E8F1FF",
+    backgroundColor: "#fccc28",
     justifyContent: "center",
     alignItems: "center",
     marginBottom: 20,
@@ -192,13 +203,12 @@ const styles = StyleSheet.create({
     tintColor: "#fccc28",
   },
   title: {
-    fontSize: 22,
+    fontSize: 16,
     marginBottom: 8,
-    color: "white",
     fontFamily: "Inter-Regular"
   },
   subtitle: {
-    fontSize: 16,
+    fontSize: 14,
     color: "gray",
     marginBottom: 40,
     fontFamily: "Inter-Regular"
@@ -208,41 +218,34 @@ const styles = StyleSheet.create({
     marginBottom: 24,
   },
   label: {
-    fontSize: 16,
+    fontSize: 14,
     marginBottom: 8,
-    color: "white",
     fontFamily: "Inter-Regular"
   },
   amountInputContainer: {
     flexDirection: "row",
     alignItems: "center",
     borderWidth: 1,
-    borderColor: "white",
     borderRadius: 8,
-    padding: 12,
+    padding: 8,
   },
   currencySymbol: {
-    fontSize: 24,
-    color: "white",
+    fontSize: 18,
     marginRight: 8,
   },
   amountInput: {
-    fontSize: 24,
+    fontSize: 16,
     flex: 1,
-    color: "white",
     fontFamily: "Inter-Regular"
   },
   descriptionInputContainer: {
     borderWidth: 1,
-    borderColor: "white",
     borderRadius: 8,
-    padding: 12,
+    padding: 8,
   },
   descriptionInput: {
-    fontSize: 16,
+    fontSize: 14,
     minHeight: 50,
-    textAlignVertical: "top",
-    color: "white",
     fontFamily: "Inter-Regular"
   },
   addButton: {
@@ -254,8 +257,27 @@ const styles = StyleSheet.create({
   },
   buttonText: {
     color: "#fff",
-    fontSize: 18,
+    fontSize: 14,
     fontFamily: "Inter-Regular"
+  },
+   navBar: {
+    width: "100%",
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "#f5f5f5",
+    gap: 18
+  },
+
+  backButton: {
+    padding: 4,
+  },
+
+  navTitle: {
+    fontSize: 16,
+    fontFamily: "Inter-Medium",
+    color: "black",
   },
 });
 

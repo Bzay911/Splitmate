@@ -85,6 +85,17 @@ const CreateGroup = () => {
 
   return (
       <SafeAreaView style={styles.safeArea}>
+         {/* Top Navigation Bar */}
+                <View style={styles.navBar}>
+                  <TouchableOpacity
+                    onPress={() => router.back()}
+                    style={styles.backButton}
+                  >
+                    <Ionicons name="arrow-back" size={24} color="black" />
+                  </TouchableOpacity>
+        
+                  <Text style={styles.navTitle}>Create Group</Text>
+                </View>
         <KeyboardAvoidingView 
           style={styles.keyboardView}
           behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
@@ -97,7 +108,7 @@ const CreateGroup = () => {
           {/* Content */}
           <View style={styles.content}>
             <View style={styles.iconContainer}>
-              <Ionicons name="people" size={48} color="#fccc28" />
+              <Ionicons name="people" size={32} color="white" />
             </View>
             
             <Text style={styles.subtitle}>
@@ -145,7 +156,7 @@ const CreateGroup = () => {
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: 'black'
+    backgroundColor: '#f5f5f5'
   },
   keyboardView: {
     flex: 1,
@@ -159,9 +170,6 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     paddingHorizontal: 16,
     paddingVertical: 16,
-  },
-  backButton: {
-    padding: 8,
   },
   headerTitle: {
     fontSize: 20,
@@ -181,14 +189,13 @@ const styles = StyleSheet.create({
     width: 80,
     height: 80,
     borderRadius: 40,
-    backgroundColor: 'rgba(252, 204, 40, 0.1)',
+    backgroundColor: '#fccc28',
     alignItems: 'center',
     justifyContent: 'center',
     marginBottom: 24,
   },
   subtitle: {
     fontSize: 16,
-    color: 'gray',
     textAlign: 'center',
     marginBottom: 40,
     lineHeight: 22,
@@ -199,19 +206,16 @@ const styles = StyleSheet.create({
     marginBottom: 40,
   },
   inputLabel: {
-    fontSize: 16,
-    color: 'white',
+    fontSize: 14,
     marginBottom: 8,
-    fontFamily: 'Inter-Medium'
+    fontFamily: 'Inter-Regular'
   },
   input: {
     borderWidth: 1,
     borderColor: 'gray',
-    backgroundColor: 'rgba(255, 255, 255, 0.05)',
     padding: 16,
-    borderRadius: 12,
-    fontSize: 16,
-    color: 'white',
+    borderRadius: 8,
+    fontSize: 14,
     width: '100%',
     fontFamily: "Inter-Regular"
   },
@@ -225,7 +229,7 @@ const styles = StyleSheet.create({
   createBtn: {
     backgroundColor: "#fccc28",
     padding: 16,
-    borderRadius: 12,
+    borderRadius: 8,
     width: "100%",
     alignItems: "center",
     shadowColor: "#fccc28",
@@ -240,9 +244,26 @@ const styles = StyleSheet.create({
     elevation: 0,
   },
   createBtnText: {
-    color: "black",
-    fontSize: 16,
+    color: "white",
+    fontSize: 14,
     fontFamily: "Inter-Regular"
+  },
+  navBar: {
+    width: "100%",
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "#f5f5f5",
+    gap: 18
+  },
+  backButton: {
+    padding: 4,
+  },
+  navTitle: {
+    fontSize: 16,
+    fontFamily: "Inter-Medium",
+    color: "black",
   },
 });
 

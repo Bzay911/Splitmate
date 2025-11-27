@@ -2,6 +2,7 @@ import { apiUrl } from "@/constants/ApiConfig";
 import { useAuth } from "@/contexts/AuthContext";
 import { useRouter } from "expo-router";
 import React, { useEffect, useState } from "react";
+import { Ionicons } from "@expo/vector-icons";
 import {
   ActivityIndicator,
   Alert,
@@ -72,6 +73,17 @@ const EditProfile = () => {
   };
   return (
     <SafeAreaView style={styles.safeArea}>
+       {/* Top Navigation Bar */}
+        <View style={styles.navBar}>
+          <TouchableOpacity
+            onPress={() => router.back()}
+            style={styles.backButton}
+          >
+            <Ionicons name="arrow-back" size={24} color="black" />
+          </TouchableOpacity>
+
+          <Text style={styles.navTitle}>Edit Profile</Text>
+        </View>
       <KeyboardAvoidingView
         style={styles.keyboardView}
         behavior={Platform.OS === "ios" ? "padding" : "height"}
@@ -130,7 +142,7 @@ const EditProfile = () => {
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: "black",
+    backgroundColor: "#f5f5f5",
   },
   keyboardView: {
     flex: 1,
@@ -144,9 +156,6 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     paddingHorizontal: 16,
     paddingVertical: 16,
-  },
-  backButton: {
-    padding: 8,
   },
   title: {
     fontSize: 20,
@@ -175,7 +184,6 @@ const styles = StyleSheet.create({
 
   subtitle: {
     fontSize: 14,
-    color: "#94a3b8",
     textAlign: "center",
     marginBottom: 32,
     fontFamily: "Inter-Regular"
@@ -185,8 +193,7 @@ const styles = StyleSheet.create({
     marginBottom: 32,
   },
   label: {
-    fontSize: 16,
-    color: "white",
+    fontSize: 14,
     marginBottom: 8,
      fontFamily: "Inter-Regular"
   },
@@ -194,12 +201,10 @@ const styles = StyleSheet.create({
     width: "100%",
     height: 48,
     borderWidth: 1,
-    borderColor: "#374151",
-    backgroundColor: "rgba(255, 255, 255, 0.05)",
-    borderRadius: 12,
+    borderColor: "gray",
+    borderRadius: 8,
     paddingHorizontal: 16,
-    fontSize: 16,
-    color: "white",
+    fontSize: 14,
      fontFamily: "Inter-Regular"
   },
   characterCount: {
@@ -211,9 +216,9 @@ const styles = StyleSheet.create({
   },
   saveButton: {
     backgroundColor: "#fccc28",
-    paddingVertical: 16,
+    paddingVertical: 12,
     paddingHorizontal: 32,
-    borderRadius: 12,
+    borderRadius: 8,
     width: "100%",
     alignItems: "center",
     shadowColor: "#fccc28",
@@ -228,9 +233,26 @@ const styles = StyleSheet.create({
     elevation: 0,
   },
   saveButtonText: {
-    color: "black",
-    fontSize: 16,
+    color: "white",
+    fontSize: 14,
     fontFamily: "Inter-Regular"
+  },
+  navBar: {
+    width: "100%",
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "#f5f5f5",
+    gap: 18
+  },
+  backButton: {
+    padding: 4,
+  },
+  navTitle: {
+    fontSize: 16,
+    fontFamily: "Inter-Medium",
+    color: "black",
   },
 });
 

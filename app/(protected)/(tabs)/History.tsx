@@ -66,7 +66,7 @@ const History = () => {
     return (
       <View style={styles.activityItem}>
         <View style={styles.activity}>
-          <Ionicons name="time-outline" size={24} color="white" />
+          <Ionicons name="time-outline" size={18} color="black" />
           <View style={styles.activityContent}>
             <Text
               style={styles.activityMessage}
@@ -200,7 +200,7 @@ const History = () => {
 const styles = StyleSheet.create({
   safeAreaView: {
     flex: 1,
-    backgroundColor: "black",
+    backgroundColor: "#f5f5f5",
   },
   topSection: {
     flexDirection: "row",
@@ -211,7 +211,6 @@ const styles = StyleSheet.create({
   },
   topBarTitle: {
     fontSize: 22,
-    color: "white",
     marginBottom: 8,
     fontFamily: "Inter-Medium"
   },
@@ -235,7 +234,7 @@ const styles = StyleSheet.create({
     borderColor: "#fccc28",
   },
   chipText: {
-    color: "#888",
+    color: "white",
     fontSize: 14,
     fontFamily: "Inter-Regular"
   },
@@ -248,8 +247,7 @@ const styles = StyleSheet.create({
     marginLeft: 12,
   },
   activityMessage: {
-    fontSize: 16,
-    color: "white",
+    fontSize: 14,
     marginBottom: 4,
     flexWrap: "wrap",
     fontFamily: "Inter-Regular"
@@ -261,7 +259,6 @@ const styles = StyleSheet.create({
   },
   emptyText: {
     fontSize: 16,
-    color: "white",
     fontFamily: "Inter-Regular",
     marginBottom: 4
   },

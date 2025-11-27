@@ -1,12 +1,14 @@
-import { LinearGradient } from 'expo-linear-gradient';
+import { Ionicons } from '@expo/vector-icons';
 import { useLocalSearchParams } from 'expo-router';
 import React from 'react';
 import { Alert, FlatList, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView as SafeArea } from 'react-native-safe-area-context';
 import { useAuth } from '../../contexts/AuthContext';
 import { useExpense } from '../../contexts/ExpenseContext';
+import { useRouter } from 'expo-router';
 
 const SettleUp = () => {
+  const router = useRouter();
   const { user } = useAuth();
   const username = user?.displayName;
   const { settlements, groupId } = useLocalSearchParams();
@@ -68,14 +70,23 @@ const SettleUp = () => {
   );
 
   return (
-    <LinearGradient
-      colors={["#000000ff", "#000000ff", "#0f0f0f"]}
-      style={styles.container}
-      start={{ x: 0, y: 0 }}
-      end={{ x: 0, y: 1 }}
-    >
+   
       <SafeArea style={styles.safeArea}>
+         {/* Top Navigation Bar */}
+        <View style={styles.navBar}>
+          <TouchableOpacity
+            onPress={() => router.back()}
+            style={styles.backButton}
+          >
+            <Ionicons name="arrow-back" size={24} color="black" />
+          </TouchableOpacity>
+
+          <Text style={styles.navTitle}>Settle Up</Text>
+        </View>
         <View style={styles.content}>
+          <Text style={styles.titleText}>Do you want to settle up this balance?</Text>
+          <Text style={styles.settleText}>(Press to settle)</Text>
+
           {filteredSettlements.length > 0 ? (
             <FlatList
               data={filteredSettlements}
@@ -92,7 +103,6 @@ const SettleUp = () => {
           )}
         </View>
       </SafeArea>
-    </LinearGradient>
   )
 }
 
@@ -107,19 +117,29 @@ const styles = StyleSheet.create({
     flex:1,
     paddingHorizontal: 20,
   },
+  titleText:{
+    fontSize: 18,
+    fontFamily: "Inter-Regular",
+  },
+  
+  settleText:{
+    color: 'gray',
+    marginBottom: 24,
+    fontFamily: 'Inter-Regular'
+  },
   list: {
     flex: 1,
   },
   settlementItem: {
-    backgroundColor: 'rgba(255, 255, 255, 0.05)',
+    backgroundColor: "gray",
     borderRadius: 8,
     padding: 16,
     marginBottom: 8,
   },
   settlementText: {
-    fontSize: 16,
+    fontSize: 14,
     color: 'white',
-    fontWeight: '400',
+    fontFamily: "Inter-Regular"
   },
   emptyContainer: {
     flex: 1,
@@ -137,6 +157,23 @@ const styles = StyleSheet.create({
     color: '#94a3b8',
     textAlign: 'center',
     fontFamily: "Inter-Regular"
+  },
+    navBar: {
+    width: "100%",
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "#f5f5f5",
+    gap: 18
+  },
+  backButton: {
+    padding: 4,
+  },
+  navTitle: {
+    fontSize: 16,
+    fontFamily: "Inter-Medium",
+    color: "black",
   },
 });
 

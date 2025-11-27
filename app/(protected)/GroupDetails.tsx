@@ -175,7 +175,7 @@ const GroupDetails = () => {
       <SafeAreaView style={styles.container}>
         {isLoading ? (
           <View style={styles.loadingContainer}>
-            <Text style={styles.loadingText}>Loading group details...</Text>
+            <Text style={styles.loadingText}>Getting group details...</Text>
           </View>
         ) : (
           <Text style={styles.errorText}>Group not found</Text>
@@ -271,14 +271,19 @@ const GroupDetails = () => {
   };
 
   return (
-    <LinearGradient
-      colors={["#000000ff", "#000000ff", "#0f0f0f"]}
-      style={styles.container}
-      start={{ x: 0, y: 0 }}
-      end={{ x: 0, y: 1 }}
-      pointerEvents="box-none"
-    >
+    <View style={styles.container} pointerEvents="box-none">
       <SafeAreaView style={styles.safeArea}>
+        {/* Top Navigation Bar */}
+        <View style={styles.navBar}>
+          <TouchableOpacity
+            onPress={() => router.back()}
+            style={styles.backButton}
+          >
+            <Ionicons name="arrow-back" size={24} color="black" />
+          </TouchableOpacity>
+
+          <Text style={styles.navTitle}>Group Details</Text>
+        </View>
         <ScrollView
           showsVerticalScrollIndicator={false}
           contentContainerStyle={styles.scrollContent}
@@ -293,7 +298,7 @@ const GroupDetails = () => {
               onPress={handleSettingsPress}
             >
               <Text style={styles.groupName}>{groupName}</Text>
-              <Ionicons name="settings" size={24} color="white" />
+              <Ionicons name="settings" size={20} color="white" />
             </TouchableOpacity>
 
             <View style={styles.oweSection}>
@@ -312,11 +317,6 @@ const GroupDetails = () => {
                   <Text style={styles.splitMembers}>
                     {groupDetails.members.length}
                   </Text>
-                  {isLoading && (
-                    <View style={styles.refreshIndicator}>
-                      <Text style={styles.refreshText}>↻</Text>
-                    </View>
-                  )}
                 </View>
               </View>
             </View>
@@ -384,7 +384,7 @@ const GroupDetails = () => {
             </TouchableOpacity>
           </View>
 
-          <Text style={styles.sectionTitle}>Expenses</Text>
+          <Text style={styles.sectionTitle}>All Expenses</Text>
 
           {expenses.map((expense) => (
             <Swipeable
@@ -423,7 +423,7 @@ const GroupDetails = () => {
               >
                 <View key={expense._id} style={styles.expensesContainer}>
                   <View style={styles.expenseIcon}>
-                    <Ionicons name="cart" size={18} color="black" />
+                    <Ionicons name="cart" size={18} color="white" />
                   </View>
 
                   <View style={styles.dateContainer}>
@@ -434,7 +434,7 @@ const GroupDetails = () => {
 
                   <View style={styles.expenses}>
                     <Text style={styles.expenseDescription}>
-                      {expense.description}
+                      {expense.description.trim()}
                     </Text>
                     <Text style={styles.expenseAmount}>
                       {expense?.paidBy?.displayName || "Anonymous"} added{" "}
@@ -498,7 +498,7 @@ const GroupDetails = () => {
               );
             }
           } else if (name === "addexpense") {
-            if(groupHasMultipleMembers){
+            if (groupHasMultipleMembers) {
               router.push({
                 pathname: "/AddExpense",
                 params: {
@@ -506,8 +506,8 @@ const GroupDetails = () => {
                   members: JSON.stringify(groupDetails.members),
                 },
               });
-            }else{
-                 Alert.alert(
+            } else {
+              Alert.alert(
                 "You are the only person in this group!",
                 "Do you want to invite anyone in the group before adding an expense?",
                 [
@@ -551,7 +551,7 @@ const GroupDetails = () => {
           visible={visible}
           onBackdropPress={() => setVisible(false)}
         >
-          <Dialog.Title style={{ fontFamily: "Inter-Bold", color: "red" }}>
+          <Dialog.Title style={{ fontFamily: "Inter-Bold" }}>
             Delete Expense
           </Dialog.Title>
           <Dialog.Description style={{ fontFamily: "Inter-Regular" }}>
@@ -559,6 +559,7 @@ const GroupDetails = () => {
           </Dialog.Description>
           <Dialog.Button label="Cancel" onPress={() => setVisible(false)} />
           <Dialog.Button
+            style={{ color: "red" }}
             label="Delete"
             onPress={() => {
               if (selectedExpenseId)
@@ -570,19 +571,13 @@ const GroupDetails = () => {
           />
         </Dialog.Container>
       )}
-    </LinearGradient>
+    </View>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-  },
-  dialogContainer: {
-    flex: 1,
-    backgroundColor: "#fff",
-    alignItems: "center",
-    justifyContent: "center",
   },
   safeArea: {
     flex: 1,
@@ -592,7 +587,6 @@ const styles = StyleSheet.create({
   },
   noMembersContainer: {
     flex: 1,
-    backgroundColor: "#fff",
     justifyContent: "center",
     alignItems: "center",
   },
@@ -615,7 +609,7 @@ const styles = StyleSheet.create({
     marginBottom: 16,
   },
   groupName: {
-    fontSize: 24,
+    fontSize: 20,
     marginBottom: 8,
     color: "white",
     fontFamily: "Inter-Medium",
@@ -625,31 +619,31 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     alignItems: "center",
     width: "100%",
-    marginTop: 50,
+    marginTop: 40,
   },
   billTitle: {
-    fontSize: 16,
-    color: "white",
+    fontSize: 14,
     fontFamily: "Inter-Regular",
+    color: "white",
   },
   billAmount: {
-    fontSize: 32,
+    fontSize: 24,
+    fontFamily: "Inter-Medium",
     color: "white",
-    fontFamily: "Inter-Regular",
   },
   splitTitle: {
-    fontSize: 16,
-    color: "white",
+    fontSize: 14,
     fontFamily: "Inter-Regular",
+    color: "white",
   },
   splitMembersContainer: {
     flexDirection: "row",
     alignItems: "center",
   },
   splitMembers: {
-    fontSize: 32,
+    fontSize: 24,
+    fontFamily: "Inter-Medium",
     color: "white",
-    fontFamily: "Inter-Regular",
   },
   verticalLine: {
     width: 1,
@@ -658,30 +652,21 @@ const styles = StyleSheet.create({
     opacity: 0.5,
   },
   dividendSection: {
-    margin: 12,
-    padding: 16,
-    backgroundColor: "#2a2a2a",
-    borderRadius: 16,
-    shadowColor: "#000",
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.1,
-    shadowRadius: 8,
-    elevation: 3,
+    marginLeft: 12,
+    marginRight: 12,
+    padding: 12,
   },
   ownerDividend: {
-    fontSize: 20,
-    fontWeight: "600",
+    fontSize: 14,
     color: "#16A34A",
     marginBottom: 12,
+    fontFamily: "Inter-Regular",
   },
   ownerOwe: {
-    fontSize: 20,
-    fontWeight: "600",
+    fontSize: 14,
     color: "#EF4444",
     marginBottom: 16,
+    fontFamily: "Inter-Regular",
   },
   buttonContainer: {
     flexDirection: "row",
@@ -695,19 +680,19 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   settleupBtn: {
-    padding: 16,
-    borderRadius: 16,
+    padding: 12,
+    borderRadius: 12,
     alignItems: "center",
   },
   exportBtn: {
-    padding: 16,
-    borderRadius: 16,
+    padding: 12,
+    borderRadius: 12,
     alignItems: "center",
   },
   buttonText: {
-    color: "white",
-    fontSize: 16,
+    fontSize: 14,
     fontFamily: "Inter-Regular",
+    color: "white",
   },
   errorText: {
     color: "red",
@@ -721,7 +706,6 @@ const styles = StyleSheet.create({
     marginTop: 12,
   },
   inviteBtnText: {
-    color: "white",
     fontWeight: "bold",
   },
   inviteSection: {
@@ -729,13 +713,11 @@ const styles = StyleSheet.create({
     marginTop: 20,
   },
   sectionTitle: {
-    fontSize: 20,
+    fontSize: 16,
     marginBottom: 12,
     marginLeft: 12,
-    paddingLeft: 16,
     paddingTop: 16,
-    color: "white",
-    fontFamily: "Inter-Regular",
+    fontFamily: "Inter-Medium",
   },
   expensesContainer: {
     margin: 12,
@@ -745,26 +727,25 @@ const styles = StyleSheet.create({
   expenseIcon: {
     width: 40,
     height: 40,
-    backgroundColor: "#f3f4f6",
+    backgroundColor: "#fccc28",
     justifyContent: "center",
     alignItems: "center",
-    borderRadius: 4,
   },
   expenses: {
     flexDirection: "column",
   },
   expenseAmount: {
-    fontSize: 14,
-    color: "gray",
+    fontSize: 12,
     fontFamily: "Inter-Regular",
+    color: "gray",
   },
   expenseDescription: {
-    color: "white",
-    fontSize: 18,
+    fontSize: 14,
     fontFamily: "Inter-Regular",
   },
   addedTotalCost: {
-    fontWeight: "bold",
+    fontSize: 14,
+    color: "black",
     fontFamily: "Inter-Regular",
   },
   dateContainer: {
@@ -773,46 +754,45 @@ const styles = StyleSheet.create({
   },
   dateText: {
     fontSize: 14,
-    color: "white",
     fontFamily: "Inter-Regular",
   },
   settlementItem: {
     marginBottom: 8,
-    paddingVertical: 4,
   },
   settlementText: {
-    fontSize: 16,
-    color: "white",
+    fontSize: 14,
     fontFamily: "Inter-Regular",
   },
   debtorName: {
-    fontWeight: "600",
     color: "#EF4444",
+    fontFamily: "Inter-Regular",
+    fontSize: 14,
   },
   creditorName: {
-    fontWeight: "600",
     color: "#10B981",
+    fontSize: 14,
+    fontFamily: "Inter-Regular",
   },
   settlementAmount: {
     fontWeight: "600",
-    color: "white",
+    fontSize: 14,
+    fontFamily: "Inter-Regular",
   },
   loadingContainer: {
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
+    backgroundColor: "black",
   },
   loadingText: {
-    color: "white",
     fontSize: 16,
-    fontWeight: "bold",
+    fontFamily: "InterMedium",
   },
   refreshIndicator: {
     marginLeft: 8,
   },
   refreshText: {
     fontSize: 16,
-    color: "white",
   },
   deleteButton: {
     backgroundColor: "red",
@@ -821,8 +801,24 @@ const styles = StyleSheet.create({
     width: 80,
   },
   deleteText: {
-    color: "white",
     fontFamily: "Inter-Regular",
+  },
+  navBar: {
+    width: "100%",
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "#f5f5f5",
+    gap: 18
+  },
+  backButton: {
+    padding: 4,
+  },
+  navTitle: {
+    fontSize: 16,
+    fontFamily: "Inter-Medium",
+    color: "black",
   },
 });
 

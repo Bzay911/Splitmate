@@ -16,6 +16,8 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
+import { Ionicons } from "@expo/vector-icons";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function CameraScreen() {
   const [permission, requestPermission] = useCameraPermissions();
@@ -236,14 +238,25 @@ export default function CameraScreen() {
   };
 
   return (
-    <View style={styles.container}>
+    <SafeAreaView style={styles.container}>
+       {/* Top Navigation Bar */}
+        <View style={styles.navBar}>
+          <TouchableOpacity
+            onPress={() => router.back()}
+            style={styles.backButton}
+          >
+            <Ionicons name="arrow-back" size={24} color="black" />
+          </TouchableOpacity>
+
+          <Text style={styles.navTitle}>Scan Receipt</Text>
+        </View>
       {isPreview && uri ? (
         <>
           <Image source={{ uri: uri }} style={styles.preview} />
 
           {receiptData ? (
             <View style={styles.receiptDataContainer}>
-              <Text style={styles.receiptTitle}>Receipt Details</Text>
+              <Text style={styles.receiptTitle}>----- Receipt Details -----</Text>
               <Text style={styles.receiptText}>
                 Description: {receiptData.description}
               </Text>
@@ -323,7 +336,7 @@ export default function CameraScreen() {
           )}
         </View>
       )}
-    </View>
+    </SafeAreaView>
   );
 }
 
@@ -353,7 +366,7 @@ const styles = StyleSheet.create({
     borderRadius: 10,
   },
   captureText: {
-    fontSize: 16,
+    fontSize: 14,
     color: "#fff",
     fontFamily: "Inter-Regular",
   },
@@ -400,12 +413,12 @@ const styles = StyleSheet.create({
     borderRadius: 8,
   },
   proceedText: {
-    fontSize: 16,
+    fontSize: 14,
     color: "#fff",
     fontFamily: "Inter-Regular",
   },
   retakeText: {
-    fontSize: 16,
+    fontSize: 14,
     color: "#000",
     fontFamily: "Inter-Regular",
   },
@@ -478,7 +491,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   receiptTitle: {
-    fontSize: 20,
+    fontSize: 16,
     marginBottom: 10,
     fontFamily: "Inter-Medium"
   },
@@ -501,8 +514,25 @@ const styles = StyleSheet.create({
     backgroundColor: "#ccc",
   },
   buttonText: {
-    fontSize: 16,
+    fontSize: 14,
     color: "#fff",
      fontFamily: "Inter-Regular"
+  },
+  navBar: {
+    width: "100%",
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "#ffffff",
+    gap: 18
+  },
+  backButton: {
+    padding: 4,
+  },
+  navTitle: {
+    fontSize: 16,
+    fontFamily: "Inter-Medium",
+    color: "black",
   },
 });

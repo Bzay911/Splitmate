@@ -59,19 +59,19 @@ const Profile = () => {
       <View style={styles.section}>
         <Text style={styles.sectionTitle}>Preferences</Text>
         <TouchableOpacity style={styles.settingItem} onPress={handleNotificationsPress}>
-          <MaterialIcons name="notifications" size={24} color="#64748b" />
+          <MaterialIcons name="notifications" size={18} color="#64748b" />
           <Text style={styles.settingText}>Notifications</Text>
-          <MaterialIcons name="chevron-right" size={24} color="#64748b" />
+          <MaterialIcons name="chevron-right" size={18} color="#64748b" />
         </TouchableOpacity>
         <TouchableOpacity style={styles.settingItem} onPress={handleThemePress}>
-          <MaterialIcons name="color-lens" size={24} color="#64748b" />
+          <MaterialIcons name="color-lens" size={18} color="#64748b" />
           <Text style={styles.settingText}>Theme</Text>
-          <MaterialIcons name="chevron-right" size={24} color="#64748b" />
+          <MaterialIcons name="chevron-right" size={18} color="#64748b" />
         </TouchableOpacity>
         <TouchableOpacity style={styles.settingItem} onPress={handleSignOutPress}>
-          <MaterialIcons name="logout" size={24} color="#ef4444" />
+          <MaterialIcons name="logout" size={18} color="#ef4444" />
           <Text style={[styles.settingText, { color: '#ef4444' }]}>Sign Out</Text>
-          <MaterialIcons name="chevron-right" size={24} color="#ef4444" />
+          <MaterialIcons name="chevron-right" size={18} color="#ef4444" />
         </TouchableOpacity>
       </View>
     </SafeAreaView>
@@ -81,14 +81,13 @@ const Profile = () => {
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: 'black'
+    backgroundColor: '#f5f5f5'
   },
   header: {
     padding: 24,
   },
   title: {
     fontSize: 22,
-    color: 'white',
     marginBottom: 4,
     fontFamily: "Inter-Medium"
   },
@@ -123,13 +122,11 @@ const styles = StyleSheet.create({
   },
   userName: {
     fontSize: 22,
-    color: 'white',
     marginBottom: 4,
     fontFamily: "Inter-Medium"
   },
   userEmail: {
     fontSize: 14,
-    color: 'white',
     fontFamily: "Inter-Regular"
   },
   editButton: {
@@ -137,21 +134,19 @@ const styles = StyleSheet.create({
     paddingVertical: 8,
     borderRadius: 8,
     borderWidth: 1,
-    borderColor: 'white',
+    borderColor: 'gray',
     minWidth: 80,
     alignItems: 'center',
   },
   editButtonText: {
     fontSize: 16,
-    color: 'white',
     fontFamily: "Inter-Regular" 
   },
   section: {
     paddingHorizontal: 24,
   },
   sectionTitle: {
-    fontSize: 18,
-    color: 'white',
+    fontSize: 16,
     fontFamily: "Inter-Medium",
     marginVertical: 12,
   },
@@ -162,8 +157,7 @@ const styles = StyleSheet.create({
   },
   settingText: {
     flex: 1,
-    fontSize: 16,
-    color: 'white',
+    fontSize: 14,
     marginLeft: 16,
     fontFamily: "Inter-Regular"
   },

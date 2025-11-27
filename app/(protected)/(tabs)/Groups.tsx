@@ -109,7 +109,7 @@ const Groups = () => {
 const styles = StyleSheet.create({
   safeAreaView: {
     flex: 1,
-    backgroundColor: 'black'
+    backgroundColor: '#f5f5f5'
   },
   renderRecentGroupSection: {
     flexDirection: "row",
@@ -123,7 +123,6 @@ const styles = StyleSheet.create({
   },
   groupName: {
     fontSize: 16,
-    color: 'white',
     marginBottom: 4,
     fontWeight: "500",
   },
@@ -139,7 +138,6 @@ const styles = StyleSheet.create({
     marginVertical: 16,
   },
   createBtn: {
-    color: "white",
     fontFamily: "Inter-Regular"
   },
   createBtnCenter: {
@@ -151,7 +149,6 @@ const styles = StyleSheet.create({
   },
   topBarTitle: {
     fontSize: 22,
-    color: "white",
     marginBottom: 8,
      fontFamily: "Inter-Medium"
   },
@@ -168,13 +165,11 @@ const styles = StyleSheet.create({
   },
   noGroupsText: {
     fontSize: 16,
-    color: "white",
     fontFamily: "Inter-Regular",
     marginBottom: 4
   },
   noGroupssubText: {
     fontSize: 14,
-    color: "gray",
     marginBottom: 16,
     fontFamily: "Inter-Regular"
   },
@@ -195,7 +190,6 @@ const styles = StyleSheet.create({
     borderRadius: 8,
   },
   retryText: {
-    color: "#ffffff",
     fontSize: 16,
     fontWeight: "500",
   },

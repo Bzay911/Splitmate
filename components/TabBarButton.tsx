@@ -34,7 +34,7 @@ const TabBarButton = (props: TabBarButtonProps) => {
   }, [isFocused, scale]);
 
   const animatedStyle = useAnimatedStyle(() => {
-    const scaleValue = interpolate(scale.value, [0, 1], [0.8, 1.2]);
+    const scaleValue = interpolate(scale.value, [0, 1], [0.9, 1.1]);
     return {
       transform: [{ scale: scaleValue }],
     };

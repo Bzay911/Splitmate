@@ -42,7 +42,7 @@ function InputField({
     <View style={styles.inputContainer}>
      <Text style={styles.label}>{label}</Text>
      <View style={styles.inputWrapper}>
-       <MaterialIcons name={icon} size={20} color="white" style={styles.inputIcon} />
+       <MaterialIcons name={icon} size={18} color="black" style={styles.inputIcon} />
        <TextInput
          style={styles.input}
          placeholder={placeholder}
@@ -303,7 +303,7 @@ export default function SignUp() {
 const styles = StyleSheet.create({
  safeArea: {
    flex: 1,
-   backgroundColor: 'black'
+   backgroundColor: '#f5f5f5'
  },
  scrollContent: {
    flexGrow: 1,
@@ -324,13 +324,11 @@ const styles = StyleSheet.create({
    fontSize: 22,
    marginBottom: 8,
    textAlign: "center",
-   color: "white",
    fontFamily: "Inter-Medium"
  },
  subtitle: {
    fontSize: 16,
    textAlign: "center",
-   color: "white",
    fontFamily: "Inter-Regular"
  },
  inputContainer: {
@@ -339,24 +337,14 @@ const styles = StyleSheet.create({
  label: {
    fontSize: 14,
    marginBottom: 8,
-   color: "white",
    fontFamily: "Inter-Regular"
  },
  inputWrapper: {
    flexDirection: "row",
    alignItems: "center",
-   borderRadius: 12,
+   borderRadius: 8,
    borderWidth: 1,
-   borderColor: "#e4e4e7",
-   backgroundColor: "#2a2a2a",
-   shadowColor: "#000",
-   shadowOffset: {
-     width: 0,
-     height: 1,
-   },
-   shadowOpacity: 0.05,
-   shadowRadius: 2,
-   elevation: 2,
+   borderColor: "gray",
  },
  inputIcon: {
    paddingLeft: 16,
@@ -365,8 +353,7 @@ const styles = StyleSheet.create({
    flex: 1,
    height: 52,
    paddingHorizontal: 16,
-   fontSize: 16,
-   color: "white",
+   fontSize: 14,
  },
  termsContainer: {
    flexDirection: "row",
@@ -378,19 +365,11 @@ const styles = StyleSheet.create({
    height: 20,
    borderRadius: 4,
    borderWidth: 1.5,
-   borderColor: "#e4e4e7",
+   borderColor: "gray",
    alignItems: "center",
    justifyContent: "center",
    marginRight: 12,
    marginTop: 2,
-   shadowColor: "#000",
-   shadowOffset: {
-     width: 0,
-     height: 1,
-   },
-   shadowOpacity: 0.05,
-   shadowRadius: 1,
-   elevation: 1,
  },
  checkboxChecked: {
    backgroundColor: "#fccc28",
@@ -400,7 +379,6 @@ const styles = StyleSheet.create({
    flex: 1,
    fontSize: 14,
    lineHeight: 20,
-   color: "white",
    fontFamily: "Inter-Regular"
 
  },
@@ -412,8 +390,8 @@ const styles = StyleSheet.create({
  },
  createAccountButton: {
    width: "100%",
-   height: 52,
-   borderRadius: 12,
+   height: 45,
+   borderRadius: 8,
    marginBottom: 16,
    shadowColor: "#000",
    shadowOffset: {
@@ -436,7 +414,7 @@ const styles = StyleSheet.create({
  },
  createAccountButtonText: {
    color: "#fff",
-   fontSize: 16,
+   fontSize: 14,
    fontFamily: "Inter-Medium"
  },
  signInText: {
