@@ -16,6 +16,7 @@ import {
   TouchableOpacity,
   View,
   Alert,
+  ActivityIndicator,
 } from "react-native";
 import { FloatingAction } from "react-native-floating-action";
 import Swipeable from "react-native-gesture-handler/ReanimatedSwipeable";
@@ -162,7 +163,8 @@ const GroupDetails = () => {
       <SafeAreaView style={styles.container}>
         {isLoading ? (
           <View style={styles.loadingContainer}>
-            <Text style={styles.loadingText}>Getting group details...</Text>
+            <ActivityIndicator size="large" color="#0000ff" />
+            <Text style={styles.loadingText}>Fetching group details...</Text>
           </View>
         ) : (
           <Text style={styles.errorText}>Group not found</Text>
@@ -352,7 +354,7 @@ const GroupDetails = () => {
                 start={{ x: 0, y: 0 }}
                 end={{ x: 1, y: 0 }}
               >
-                <Text style={styles.buttonText}>Settle up</Text>
+                <Text style={styles.settleButtonText}>Settle up</Text>
               </LinearGradient>
             </TouchableOpacity>
 
@@ -360,14 +362,11 @@ const GroupDetails = () => {
               style={styles.buttonWrapper}
               onPress={handleExport}
             >
-              <LinearGradient
-                colors={["#FB923C", "#EAB308"]}
+              <View
                 style={styles.exportBtn}
-                start={{ x: 0, y: 0 }}
-                end={{ x: 1, y: 0 }}
               >
                 <Text style={styles.buttonText}>Export</Text>
-              </LinearGradient>
+              </View>
             </TouchableOpacity>
           </View>
 
@@ -410,7 +409,7 @@ const GroupDetails = () => {
               >
                 <View key={expense._id} style={styles.expensesContainer}>
                   <View style={styles.expenseIcon}>
-                    <Ionicons name="cart" size={18} color="white" />
+                    <Ionicons name="cart" size={18} color="black" />
                   </View>
 
                   <View style={styles.dateContainer}>
@@ -673,10 +672,17 @@ const styles = StyleSheet.create({
   },
   exportBtn: {
     padding: 12,
-    borderRadius: 12,
     alignItems: "center",
+    backgroundColor: "#fccc28",
+    borderRadius: 12,
+    
   },
   buttonText: {
+    fontSize: 14,
+    fontFamily: "Inter-Regular",
+    color: "black",
+  },
+  settleButtonText: {
     fontSize: 14,
     fontFamily: "Inter-Regular",
     color: "white",
@@ -684,19 +690,6 @@ const styles = StyleSheet.create({
   errorText: {
     color: "red",
     textAlign: "center",
-    marginTop: 20,
-  },
-  inviteBtn: {
-    backgroundColor: "#FF9D00",
-    padding: 12,
-    borderRadius: 8,
-    marginTop: 12,
-  },
-  inviteBtnText: {
-    fontWeight: "bold",
-  },
-  inviteSection: {
-    padding: 16,
     marginTop: 20,
   },
   sectionTitle: {
@@ -769,11 +762,12 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
-    backgroundColor: "black",
+    backgroundColor: "#f5f5f5",
   },
   loadingText: {
     fontSize: 16,
     fontFamily: "InterMedium",
+    color: "black",
   },
   refreshIndicator: {
     marginLeft: 8,

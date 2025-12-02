@@ -9,7 +9,6 @@ import {
   Keyboard,
 } from "react-native";
 import { useLocalSearchParams, useRouter } from "expo-router";
-import { LinearGradient } from "expo-linear-gradient";
 import BottomSheet, {
   BottomSheetView,
   BottomSheetBackdrop,
@@ -19,6 +18,7 @@ import { useRef, useState, useMemo } from "react";
 import { useDeleteExpense } from "@/utils/HandleDelete";
 import { apiUrl } from "@/constants/ApiConfig";
 import { useAuth } from "@/contexts/AuthContext";
+import { Ionicons } from "@expo/vector-icons";
 
 const ExpenseDetails = () => {
   const {
@@ -27,7 +27,6 @@ const ExpenseDetails = () => {
     paidByEmail,
     groupName,
     createdAt,
-    colors,
     expenseDescription,
     groupId,
     expenseId,
@@ -52,9 +51,6 @@ const ExpenseDetails = () => {
   const [newAmount, setnewAmount] = useState(initialAmount);
   const [newDescription, setnewDescription] = useState(initialDescription);
   const [loading, setLoading] = useState(false);
-
-  const parsedColors =
-    typeof colors === "string" ? colors.split(",") : ["#6366f1", "#818cf8"];
 
   const createdAtStr = Array.isArray(createdAt) ? createdAt[0] : createdAt;
 
@@ -133,9 +129,23 @@ const ExpenseDetails = () => {
 
   return (
     <View style={{ flex: 1 }}>
+           {/* Top Navigation Bar */}
+        <View style={styles.navBar}>
+          <TouchableOpacity
+            onPress={() => router.back()}
+            style={styles.backButton}
+          >
+            <Ionicons name="arrow-back" size={24} color="black" />
+          </TouchableOpacity>
+
+          <Text style={styles.navTitle}>Group Details</Text>
+        </View>
       <ScrollView contentContainerStyle={styles.container}>
         {/* Main Card */}
         <View style={styles.mainCard}>
+          <TouchableOpacity style={styles.editAmountHeader} onPress={handleEditBtnPress}>
+            <Ionicons name="create-outline" size={24} color="black" />
+          </TouchableOpacity>
           <View style={styles.amountSection}>
             <Text style={styles.amountLabel}>Amount</Text>
             <Text style={styles.amount}>${expenseAmount}</Text>
@@ -170,15 +180,6 @@ const ExpenseDetails = () => {
 
         {/* Action Buttons */}
         <View style={styles.buttonContainer}>
-          <TouchableOpacity onPress={handleEditBtnPress}>
-            <LinearGradient
-              colors={parsedColors as [string, string]}
-              style={[styles.button]}
-            >
-              <Text style={styles.buttonText}>Edit Expense</Text>
-            </LinearGradient>
-          </TouchableOpacity>
-
           <TouchableOpacity
             style={[styles.button, styles.deleteButton]}
             onPress={handleDeleteExpense}
@@ -196,7 +197,7 @@ const ExpenseDetails = () => {
           snapPoints={snapPoints}
           enablePanDownToClose={true}
           onClose={() => setSheetVisible(false)}
-          backgroundStyle={{ backgroundColor: "#1e1e1e" }}
+          backgroundStyle={{ backgroundColor: "#f5f5f5" }}
           enableHandlePanningGesture={true}
           handleIndicatorStyle={{
             backgroundColor: "#666",
@@ -249,30 +250,34 @@ export default ExpenseDetails;
 const styles = StyleSheet.create({
   container: {
     padding: 20,
-    backgroundColor: "#121212",
     minHeight: "100%",
+    backgroundColor: "#f5f5f5"
   },
   mainCard: {
-    backgroundColor: "#1e1e1e",
-    borderRadius: 20,
+    borderRadius: 8,
     padding: 24,
     marginBottom: 24,
     borderWidth: 1,
-    borderColor: "#333",
+    borderColor: "gray"
+  },
+  editAmountHeader:{
+    alignItems: "flex-end",
+    marginBottom: 10,
   },
   amountSection: {
     alignItems: "center",
     marginBottom: 20,
   },
   amountLabel: {
-    fontSize: 16,
+    fontSize: 14,
     color: "#888",
     marginBottom: 8,
     fontFamily: "Inter-Regular"
   },
+ 
   amount: {
-    fontSize: 42,
-    color: "#fccc28",
+    fontSize: 34,
+    color: "green",
     fontFamily: "Inter-Medium"
   },
   divider: {
@@ -284,23 +289,22 @@ const styles = StyleSheet.create({
     gap: 16,
   },
   infoItem: {
-    paddingVertical: 8,
+    paddingVertical: 4,
   },
   infoLabel: {
-    fontSize: 14,
+    fontSize: 12,
     color: "#888",
-    marginBottom: 4,
     letterSpacing: 1,
     fontFamily: "Inter-Regular"
   },
   infoText: {
     fontSize: 16,
-    color: "#fff",
+    color: "black",
     fontFamily: "Inter-Regular"
   },
   infoSubtext: {
     fontSize: 14,
-    color: "#aaa",
+    color: "black",
     marginTop: 2,
     fontFamily: "Inter-Regular"
   },
@@ -309,52 +313,67 @@ const styles = StyleSheet.create({
   },
   button: {
     paddingVertical: 16,
-    borderRadius: 16,
+    borderRadius: 12,
     alignItems: "center",
-    borderWidth: 1,
   },
   deleteButton: {
     backgroundColor: "#FF0000",
     borderColor: "#FF0000",
   },
   buttonText: {
-    fontSize: 16,
+    fontSize: 14,
     color: "#fff",
     fontFamily: "Inter-Regular"
   },
   sheetContent: {
     flex: 1,
     padding: 20,
-    backgroundColor: "#1e1e1e",
+    backgroundColor: "#f5f5f5",
   },
   sheetLabel: {
     marginBottom: 8,
-    color: "#fff",
-    fontSize: 16,
+    color: "gray",
+    fontSize: 12,
     fontFamily: "Inter-Regular"
   },
   sheetInput: {
     borderWidth: 1,
-    borderColor: "#333",
-    backgroundColor: "#2a2a2a",
-    color: "#fff",
+    borderColor: "gray",
+    color: "black",
     padding: 15,
     borderRadius: 12,
     marginBottom: 20,
-    fontSize: 16,
+    fontSize: 14,
     fontFamily: "Inter-Regular"
   },
   saveButton: {
-    backgroundColor: "#6366f1",
+    backgroundColor: "#fccc28",
     paddingVertical: 16,
     borderRadius: 12,
     alignItems: "center",
     marginTop: 20,
   },
   saveButtonText: {
-    color: "#fff",
-    fontSize: 16,
+    color: "black",
+    fontSize: 14,
     marginBottom: 4,
     fontFamily: "Inter-Regular"
+  },
+  navBar: {
+    width: "100%",
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "#f5f5f5",
+    gap: 18
+  },
+  backButton: {
+    padding: 4,
+  },
+  navTitle: {
+    fontSize: 16,
+    fontFamily: "Inter-Medium",
+    color: "black",
   },
 });

@@ -74,7 +74,7 @@ export default function HomeScreen() {
               splitmate.image.trim() &&
               splitmate.image !== "null"
                 ? { uri: splitmate.image }
-                : require("../../../assets/images/cat.png"),
+                : require("../../../assets/images/profileImage6.png"),
           }));
           setSplitmates(formattedSplitmates);
         } else {
@@ -131,9 +131,9 @@ export default function HomeScreen() {
             <View style={styles.rightTop}>
               <TouchableOpacity onPress={() => router.push("/Profile")}>
                 <Image
-                  source={require("../../../assets/images/cat.png")}
+                  source={require("../../../assets/images/profileImage6.png")}
                   style={styles.avatarImage}
-                  placeholder={require("../../../assets/images/cat.png")}
+                  placeholder={require("../../../assets/images/profileImage6.png")}
                   contentFit="cover"
                   transition={200}
                 />
@@ -170,7 +170,11 @@ export default function HomeScreen() {
           <View style={styles.splitMatesContainer}>
             <View style={styles.texts}>
               <Text style={styles.eachTitle}>Your Splitmates</Text>
-              <Text style={styles.seeAll}>see all</Text>
+              {splitmates.length > 0 && (
+                <TouchableOpacity>
+                  <Text style={styles.seeAll}>see all</Text>
+                </TouchableOpacity>
+              )}
             </View>
 
             {splitmates.length <= 0 ? (

@@ -1,5 +1,6 @@
 import { useAuth } from '@/contexts/AuthContext';
 import { MaterialIcons } from '@expo/vector-icons';
+import FontAwesome6 from '@expo/vector-icons/FontAwesome6';
 import { useRouter } from 'expo-router';
 import React from 'react';
 import { Alert, Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
@@ -43,7 +44,7 @@ const Profile = () => {
       <View style={styles.profileSection}>
         <View style={styles.profileHeader}>
           <Image 
-            source={require('../../../assets/images/cat.png')}
+            source={require('../../../assets/images/profileImage6.png')}
             style={styles.avatarImage} 
           />
           <View style={styles.userInfo}>
@@ -64,8 +65,8 @@ const Profile = () => {
           <MaterialIcons name="chevron-right" size={18} color="#64748b" />
         </TouchableOpacity>
         <TouchableOpacity style={styles.settingItem} onPress={handleThemePress}>
-          <MaterialIcons name="color-lens" size={18} color="#64748b" />
-          <Text style={styles.settingText}>Theme</Text>
+        <FontAwesome6 name="user-group" size={16} color="#64748b" />
+          <Text style={styles.settingText}>Splitmates</Text>
           <MaterialIcons name="chevron-right" size={18} color="#64748b" />
         </TouchableOpacity>
         <TouchableOpacity style={styles.settingItem} onPress={handleSignOutPress}>

@@ -97,7 +97,7 @@ const EditProfile = () => {
           <View style={styles.content}>
             <View style={styles.imageContainer}>
               <Image
-                source={require("../../assets/images/cat.png")}
+                source={require("../../assets/images/profileImage6.png")}
                 style={styles.profileImage}
               />
             </View>
@@ -193,9 +193,10 @@ const styles = StyleSheet.create({
     marginBottom: 32,
   },
   label: {
-    fontSize: 14,
+    fontSize: 12,
     marginBottom: 8,
-     fontFamily: "Inter-Regular"
+     fontFamily: "Inter-Regular",
+     color: "gray"
   },
   input: {
     width: "100%",
@@ -233,7 +234,7 @@ const styles = StyleSheet.create({
     elevation: 0,
   },
   saveButtonText: {
-    color: "white",
+    color: "black",
     fontSize: 14,
     fontFamily: "Inter-Regular"
   },

@@ -112,13 +112,13 @@ const InviteMatesBtn: React.FC<InviteMatesBtnProps> = ({ groupId }) => {
 };
 const styles = StyleSheet.create({
   inviteBtn: {
-    backgroundColor: "#FF9D00",
+    backgroundColor: "#fccc28",
     padding: 8,
     borderRadius: 8,
     marginTop: 12,
   },
   inviteBtnText: {
-    color: "white",
+    color: "black",
     textAlign: "center",
     padding: 4,
     fontFamily: "Inter-Regular",
@@ -164,7 +164,7 @@ const styles = StyleSheet.create({
     padding: 8,
   },
   inviteText: {
-    color: "#FF9D00",
+    color: "blue",
     textDecorationLine: 'underline',
     fontFamily: "Inter-Regular"
   },

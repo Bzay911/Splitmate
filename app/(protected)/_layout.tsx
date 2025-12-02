@@ -105,14 +105,7 @@ export default function ProtectedLayout() {
                     <Stack.Screen
                       name="ExpenseDetails"
                       options={{
-                        title: "Expense Details",
-                        headerBackTitle: "Back",
-                        headerTintColor: "white",
-                        headerStyle: { backgroundColor: "black" },
-                        headerTitleStyle: {
-                          fontFamily: "Inter-Regular",
-                          fontSize: 18,
-                        },
+                        headerShown: false,
                       }}
                     />
                   </Stack>

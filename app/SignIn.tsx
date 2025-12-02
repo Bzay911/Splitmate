@@ -1,4 +1,4 @@
-import { FontAwesome, MaterialIcons } from "@expo/vector-icons";
+import { MaterialIcons } from "@expo/vector-icons";
 import { router } from "expo-router";
 import React, { useState } from "react";
 import {
@@ -62,10 +62,11 @@ export function LoginScreen() {
             console.log("Play service not available", error.message);
             break;
           default:
-            console.log(`Something else ${error.message}`);
-            console.log(`Something else ${error.code}`);
+            Alert.alert("Error signing in with Google", "Please proceed using email and password.");
         }
       }
+    }finally{
+      setGoogleLoading(false);
     }
   };
 

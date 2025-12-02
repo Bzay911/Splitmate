@@ -18,26 +18,37 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
+// 1. Define the curated gradients outside the component
+const GRADIENTS: [string, string][] = [
+  ['#EC4899', '#8B5CF6'], // Hyper
+  ['#3B82F6', '#06B6D4'], // Oceanic
+  ['#F59E0B', '#EF4444'], // Sunset
+  ['#10B981', '#3B82F6'], // Mint
+  ['#F59E0B', '#D97706'], // Gilded
+  ['#BE185D', '#4338CA'], // Berry
+  ['#059669', '#047857'], // Forest
+  ['#1E293B', '#334155'], // Midnight
+  ['#F472B6', '#A78BFA'], // Candy
+  ['#1E40AF', '#1E3A8A'], // Corporate
+  ['#6366f1', '#a855f7'], // Aurora
+  ['#facc15', '#f97316'], // Citrus
+  ['#0ea5e9', '#22d3ee'], // Sky
+  ['#8b5cf6', '#d946ef'], // Electric
+];
+
 const CreateGroup = () => {
   const [groupName, setGroupName] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const { refreshGroups } = useGroups();
-  const [colors, setColors] = useState<[string, string]>([getRandomColor(), getRandomColor()]);
-  const {user, token} = useAuth();
-
-  function getRandomColor() {
-    const letters = '0123456789ABCDEF';
-    let color = '#';
-    for (let i = 0; i < 6; i++) {
-      color += letters[Math.floor(Math.random() * 16)];
-    }
-    return color;
-  }
-
-  const randomizeGradient = () => {
-    setColors([getRandomColor(), getRandomColor()]);
+  
+  // 2. Helper to pick a random gradient
+  const getRandomGradient = (): [string, string] => {
+    const randomIndex = Math.floor(Math.random() * GRADIENTS.length);
+    return GRADIENTS[randomIndex];
   };
 
+  const [colors, setColors] = useState<[string, string]>(getRandomGradient());
+  const {user, token} = useAuth();
 
   const handleCreate = async () => {
     // Validate group name
@@ -45,7 +56,11 @@ const CreateGroup = () => {
       Alert.alert("Error", "Please enter a group name");
       return;
     }
-    randomizeGradient();
+
+    // 3. Generate the colors NOW for the API call
+    // This fixes the issue where state wouldn't update fast enough before the fetch
+    const newGroupColors = getRandomGradient();
+    
     setIsLoading(true);
     try {
       if(!user){
@@ -62,7 +77,7 @@ const CreateGroup = () => {
         },
         body: JSON.stringify({
           name: groupName,
-          colors: colors,
+          colors: newGroupColors, // Use the fresh colors directly
         }),
       });
 
@@ -75,6 +90,7 @@ const CreateGroup = () => {
         { text: "OK", onPress: () => router.back() }
       ]);
       setGroupName("");
+      setColors(newGroupColors); // Sync state just in case
     } catch (error) {
       Alert.alert("Error", "Failed to create group");
       console.log(error);
