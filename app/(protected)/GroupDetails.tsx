@@ -27,7 +27,6 @@ import Animated, {
 import { GroupDetails as GroupDetailsType } from "@/types/GroupDetails";
 
 
-
 const formatDate = (date: Date) => {
   const options: Intl.DateTimeFormatOptions = {
     month: "short",
@@ -95,7 +94,7 @@ const GroupDetails = () => {
             setVisible(true);
           }}
         >
-          <Ionicons name="trash" size={24} color="white" />
+          <Ionicons name="trash" size={18} color="white" />
           <Text style={styles.deleteText}>Delete</Text>
         </TouchableOpacity>
       </Animated.View>
@@ -372,67 +371,70 @@ const GroupDetails = () => {
 
           <Text style={styles.sectionTitle}>All Expenses</Text>
 
-          {expenses.map((expense) => (
-            <Swipeable
-              key={expense._id}
-              renderRightActions={(progress) =>
-                renderRightActions(expense._id, progress)
-              }
-              ref={(ref) => {
-                if (ref) {
-                  swipeableRef.current = ref;
-                }
-              }}
-              onSwipeableOpen={closeSwipe}
-            >
-              <TouchableOpacity
-                onPress={() => {
-                  router.push({
-                    pathname: "/ExpenseDetails",
-                    params: {
-                      expenseId: expense._id,
-                      groupId: groupDetails._id,
-                      expenseDescription: expense.description,
-                      expenseAmount: expense.amount,
-                      paidBy: expense.paidBy
-                        ? expense.paidBy.displayName
-                        : "Anonymous",
-                      paidByEmail: expense.paidBy ? expense.paidBy.email : null,
-                      groupName: groupDetails.name,
-                      createdAt: expense.createdAt
-                        ? new Date(expense.createdAt).toISOString()
-                        : null,
-                      colors: colors,
-                    },
-                  });
-                }}
-              >
-                <View key={expense._id} style={styles.expensesContainer}>
-                  <View style={styles.expenseIcon}>
-                    <Ionicons name="cart" size={18} color="black" />
-                  </View>
+      {expenses.length === 0 ? (
+  <Text style={styles.noExpensesText}>
+    Your expenses will appear here
+  </Text>
+) : (
+  expenses.map((expense) => (
+    <Swipeable
+      key={expense._id}
+      renderRightActions={(progress) =>
+        renderRightActions(expense._id, progress)
+      }
+      ref={(ref) => {
+        if (ref) swipeableRef.current = ref;
+      }}
+      onSwipeableOpen={closeSwipe}
+    >
+      <TouchableOpacity
+        onPress={() => {
+          router.push({
+            pathname: "/ExpenseDetails",
+            params: {
+              expenseId: expense._id,
+              groupId: groupDetails._id,
+              expenseDescription: expense.description,
+              expenseAmount: expense.amount,
+              paidBy: expense.paidBy
+                ? expense.paidBy.displayName
+                : "Anonymous",
+              paidByEmail: expense.paidBy ? expense.paidBy.email : null,
+              groupName: groupDetails.name,
+              createdAt: expense.createdAt
+                ? new Date(expense.createdAt).toISOString()
+                : null,
+              colors: colors,
+            },
+          });
+        }}
+      >
+        <View style={styles.expensesContainer}>
+          <View style={styles.expenseIcon}>
+            <Ionicons name="cart" size={18} color="black" />
+          </View>
 
-                  <View style={styles.dateContainer}>
-                    <Text style={styles.dateText}>
-                      {formatDate(expense.date)}
-                    </Text>
-                  </View>
+          <View style={styles.dateContainer}>
+            <Text style={styles.dateText}>
+              {formatDate(expense.date)}
+            </Text>
+          </View>
 
-                  <View style={styles.expenses}>
-                    <Text style={styles.expenseDescription}>
-                      {expense.description.trim()}
-                    </Text>
-                    <Text style={styles.expenseAmount}>
-                      {expense?.paidBy?.displayName || "Anonymous"} added{" "}
-                      <Text style={styles.addedTotalCost}>
-                        ${expense.amount}
-                      </Text>
-                    </Text>
-                  </View>
-                </View>
-              </TouchableOpacity>
-            </Swipeable>
-          ))}
+          <View style={styles.expenses}>
+            <Text style={styles.expenseDescription}>
+              {expense.description.trim()}
+            </Text>
+            <Text style={styles.expenseAmount}>
+              {expense?.paidBy?.displayName || "Anonymous"} added{" "}
+              <Text style={styles.addedTotalCost}>${expense.amount}</Text>
+            </Text>
+          </View>
+        </View>
+      </TouchableOpacity>
+    </Swipeable>
+  ))
+)}
+
         </ScrollView>
       </SafeAreaView>
 
@@ -692,6 +694,13 @@ const styles = StyleSheet.create({
     textAlign: "center",
     marginTop: 20,
   },
+  noExpensesText:{
+    textAlign: "center",
+    marginTop: 80,
+    fontFamily: "Inter-Regular",
+    fontSize: 12,
+    color: "gray",
+  },
   sectionTitle: {
     fontSize: 16,
     marginBottom: 12,
@@ -783,6 +792,8 @@ const styles = StyleSheet.create({
   },
   deleteText: {
     fontFamily: "Inter-Regular",
+    color: "white",
+    fontSize: 12
   },
   navBar: {
     width: "100%",

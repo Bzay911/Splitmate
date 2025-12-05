@@ -72,6 +72,7 @@ export default function CameraScreen() {
   };
 
   const handleAddExpense = async (amount: string, description: string) => {
+    console.log("Adding expense in handle add expense:", amount, description);
     try {
       if (!user) {
         Alert.alert("Error", "Please login to add an expense");
@@ -144,7 +145,7 @@ export default function CameraScreen() {
       const result = await response.json();
 
       if (response.ok && result.success) {
-        console.log("Receipt data:", result.data);
+        console.log("Receipt data (response from scanAI):", result.data);
         setReceiptData(result.data);
         Alert.alert("Success", "Receipt scanned successfully!");
       } else {
@@ -272,8 +273,8 @@ export default function CameraScreen() {
                   style={styles.useButton}
                   onPress={() =>
                     handleAddExpense(
-                      receiptData?.description,
-                      receiptData?.total
+                      receiptData?.total,
+                      receiptData?.description
                     )
                   }
                 >

@@ -83,17 +83,19 @@ const SettleUp = () => {
           <Text style={styles.navTitle}>Settle Up</Text>
         </View>
         <View style={styles.content}>
-          <Text style={styles.titleText}>Do you want to settle up this balance?</Text>
-          <Text style={styles.settleText}>(Press to settle)</Text>
 
           {filteredSettlements.length > 0 ? (
+            <>
+          <Text style={styles.titleText}>Do you want to settle up this balance?</Text>
+          <Text style={styles.settleText}>(Press to settle)</Text>
             <FlatList
               data={filteredSettlements}
               renderItem={renderSettlementItem}
               keyExtractor={(item, index) => `${item.from}-${item.to}-${index}`}
               style={styles.list}
               showsVerticalScrollIndicator={false}
-            />
+              />
+              </>
           ) : (
             <View style={styles.emptyContainer}>
               <Text style={styles.emptyText}>No settlements needed</Text>
@@ -106,11 +108,9 @@ const SettleUp = () => {
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
   safeArea: {
     flex: 1,
+    backgroundColor: "#f5f5f5"
   },
   content: {
     flex:1,
@@ -147,13 +147,12 @@ const styles = StyleSheet.create({
   },
   emptyText: {
     fontSize: 18,
-    color: 'white',
     marginBottom: 8,
-    fontFamily: "Inter-Medium"
+    fontFamily: "Inter-Regular"
   },
   emptySubtext: {
     fontSize: 14,
-    color: '#94a3b8',
+    color: 'gray',
     textAlign: 'center',
     fontFamily: "Inter-Regular"
   },

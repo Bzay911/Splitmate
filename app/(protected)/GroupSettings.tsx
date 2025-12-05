@@ -234,7 +234,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    padding: 12,
+    padding: 10,
     borderRadius: 8,
     marginBottom: 12,
     position: "relative",
@@ -249,11 +249,10 @@ const styles = StyleSheet.create({
   },
   memberName: {
     fontSize: 14,
-    marginBottom: 4,
     fontFamily: "Inter-Regular"
   },
   memberPhone: {
-    fontSize: 14,
+    fontSize: 12,
     color: "gray",
     fontFamily: "Inter-Regular"
   },

@@ -20,20 +20,18 @@ import { SafeAreaView } from "react-native-safe-area-context";
 
 // 1. Define the curated gradients outside the component
 const GRADIENTS: [string, string][] = [
-  ['#EC4899', '#8B5CF6'], // Hyper
-  ['#3B82F6', '#06B6D4'], // Oceanic
-  ['#F59E0B', '#EF4444'], // Sunset
-  ['#10B981', '#3B82F6'], // Mint
-  ['#F59E0B', '#D97706'], // Gilded
-  ['#BE185D', '#4338CA'], // Berry
-  ['#059669', '#047857'], // Forest
-  ['#1E293B', '#334155'], // Midnight
-  ['#F472B6', '#A78BFA'], // Candy
-  ['#1E40AF', '#1E3A8A'], // Corporate
-  ['#6366f1', '#a855f7'], // Aurora
-  ['#facc15', '#f97316'], // Citrus
-  ['#0ea5e9', '#22d3ee'], // Sky
-  ['#8b5cf6', '#d946ef'], // Electric
+  ['#3B82F6', '#06B6D4'], 
+  ['#F59E0B', '#EF4444'], 
+  ['#10B981', '#3B82F6'], 
+  ['#F59E0B', '#D97706'], 
+  ['#059669', '#047857'],
+  ['#1E293B', '#334155'], 
+  ['#F472B6', '#A78BFA'], 
+  ['#1E40AF', '#1E3A8A'], 
+  ['#6366f1', '#a855f7'], 
+  ['#facc15', '#f97316'],
+  ['#0ea5e9', '#22d3ee'], 
+  ['#8b5cf6', '#d946ef'], 
 ];
 
 const CreateGroup = () => {
@@ -260,7 +258,6 @@ const styles = StyleSheet.create({
     elevation: 0,
   },
   createBtnText: {
-    color: "white",
     fontSize: 14,
     fontFamily: "Inter-Regular"
   },

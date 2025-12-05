@@ -7,8 +7,8 @@ import { Alert } from 'react-native';
 interface User {
   id: string;
   email: string;
-  name: string;
   displayName?: string;
+  avatar?: string;
 }
 
 interface AuthContextType {
@@ -47,6 +47,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
   };
 
   const updateUser = (userData: Partial<User>) => {
+    console.log("updating user with data:", userData);
     setUser(prevUser => prevUser ? { ...prevUser, ...userData } : null);
   };
 
@@ -68,6 +69,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
 
           if (response.ok) {
             const userData = await response.json();
+            
             setUser(userData.user);
           } else {
             // Token is invalid, clear it

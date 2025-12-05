@@ -134,9 +134,7 @@ const styles = StyleSheet.create({
     fontFamily: "Inter-Regular"
   },
   createBtnCenter: {
-    borderColor: "#2a2a2a",
-    backgroundColor: "#2a2a2a",
-    borderWidth: 2,
+    backgroundColor: "#fccc28",
     padding: 12,
     borderRadius: 4
   },

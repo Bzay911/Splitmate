@@ -10,6 +10,15 @@ const Profile = () => {
   const router = useRouter();
   const { user, logout } = useAuth();
 
+   const avatarMap = {
+    profileImage1: require("../../../assets/images/profileImage1.png"),
+    profileImage2: require("../../../assets/images/profileImage2.png"),
+    profileImage3: require("../../../assets/images/profileImage3.png"),
+    profileImage4: require("../../../assets/images/profileImage4.png"),
+    profileImage5: require("../../../assets/images/profileImage5.png"),
+    profileImage6: require("../../../assets/images/profileImage6.png"),
+  };
+
   const handleSignOutPress = async () => {
     try {
       await logout();
@@ -44,7 +53,7 @@ const Profile = () => {
       <View style={styles.profileSection}>
         <View style={styles.profileHeader}>
           <Image 
-            source={require('../../../assets/images/profileImage6.png')}
+             source={avatarMap[user?.avatar as keyof typeof avatarMap] || avatarMap["profileImage6"]}
             style={styles.avatarImage} 
           />
           <View style={styles.userInfo}>
