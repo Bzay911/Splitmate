@@ -3,8 +3,9 @@ import { MaterialIcons } from '@expo/vector-icons';
 import FontAwesome6 from '@expo/vector-icons/FontAwesome6';
 import { useRouter } from 'expo-router';
 import React from 'react';
-import { Alert, Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { Alert, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { Image } from 'expo-image';
 
 const Profile = () => {
   const router = useRouter();
@@ -54,7 +55,8 @@ const Profile = () => {
         <View style={styles.profileHeader}>
           <Image 
              source={avatarMap[user?.avatar as keyof typeof avatarMap] || avatarMap["profileImage6"]}
-            style={styles.avatarImage} 
+            style={styles.avatarImage}
+            contentFit='cover'
           />
           <View style={styles.userInfo}>
             <Text style={styles.userName}>{user?.displayName || 'User'}</Text>

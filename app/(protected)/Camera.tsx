@@ -325,6 +325,8 @@ export default function CameraScreen() {
               style={styles.captureButton}
               onLongPress={startScanAnimation}
               delayLongPress={500}
+              onPress={() => Alert.alert("Scan Instruction",
+                "Please long-press and hold the button to scan your receipt")}
             >
               <Text style={styles.captureText}>Hold to Scan</Text>
             </TouchableOpacity>
@@ -362,7 +364,6 @@ const styles = StyleSheet.create({
   },
   captureText: {
     fontSize: 14,
-    color: "#fff",
     fontFamily: "Inter-Regular",
   },
   scanLine: {
@@ -409,7 +410,6 @@ const styles = StyleSheet.create({
   },
   proceedText: {
     fontSize: 14,
-    color: "#fff",
     fontFamily: "Inter-Regular",
   },
   retakeText: {

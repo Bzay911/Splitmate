@@ -111,7 +111,7 @@ const styles = StyleSheet.create({
     paddingVertical: 16,
   },
   recentGroupList: {
-    paddingHorizontal: 24,
+    paddingHorizontal: 16,
     paddingBottom: 100,
   },
   groupName: {

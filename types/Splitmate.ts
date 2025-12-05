@@ -1,5 +1,5 @@
 export interface Splitmate {
   id: string;
   name: string;
-  image: any;
+  avatar: string;
 }

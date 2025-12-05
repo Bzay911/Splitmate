@@ -113,7 +113,7 @@ const AddExpense = () => {
           <View style={styles.content}>
             {/* Calculator Icon */}
             <View style={styles.iconContainer}>
-              <Ionicons name="calculator" size={24} color="white" />
+              <Ionicons name="calculator" size={24} color="black" />
             </View>
 
             {/* Title and Subtitle */}
@@ -256,7 +256,6 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   buttonText: {
-    color: "#fff",
     fontSize: 14,
     fontFamily: "Inter-Regular"
   },

@@ -65,16 +65,12 @@ export default function HomeScreen() {
         }
 
         const data = await response.json();
+        // console.log("Fetched splitmates:", data.splitmates);
         if (data.splitmates && data.splitmates.length > 0) {
           const formattedSplitmates = data.splitmates.map((splitmate: any) => ({
             id: splitmate.id,
             name: splitmate.name,
-            image:
-              splitmate.image &&
-              splitmate.image.trim() &&
-              splitmate.image !== "null"
-                ? { uri: splitmate.image }
-                : require("../../../assets/images/profileImage6.png"),
+            avatar: splitmate.avatar
           }));
           setSplitmates(formattedSplitmates);
         } else {
@@ -91,17 +87,32 @@ export default function HomeScreen() {
     }
   }, [user]);
 
-  const renderSplitmate = ({ item }: { item: Splitmate }) => {
-    return (
-      <View>
-        <Image style={styles.splitmateImage} source={item.image} />
-        <Text style={styles.splitmateName}>
-          {" "}
-          {item.name.split(" ").join("\n")}
-        </Text>
-      </View>
-    );
+   const avatarMap = {
+    profileImage1: require("../../../assets/images/profileImage1.png"),
+    profileImage2: require("../../../assets/images/profileImage2.png"),
+    profileImage3: require("../../../assets/images/profileImage3.png"),
+    profileImage4: require("../../../assets/images/profileImage4.png"),
+    profileImage5: require("../../../assets/images/profileImage5.png"),
+    profileImage6: require("../../../assets/images/profileImage6.png"),
   };
+
+const renderSplitmate = ({ item }: { item: Splitmate }) => {
+  const avatarKey = item.avatar?.replace(".png", "") || "profileImage1";
+
+  return (
+    <View>
+      <Image
+        style={styles.splitmateImage}
+        source={avatarMap[avatarKey]}
+        contentFit="cover"
+      />
+      <Text style={styles.splitmateName}>
+        {item.name.split(" ").join("\n")}
+      </Text>
+    </View>
+  );
+};
+
 
   const handleGroupPress = (group: Group) => {
     router.push({
@@ -131,9 +142,8 @@ export default function HomeScreen() {
             <View style={styles.rightTop}>
               <TouchableOpacity onPress={() => router.push("/Profile")}>
                 <Image
-                  source={require("../../../assets/images/profileImage6.png")}
+                  source={avatarMap[user?.avatar as keyof typeof avatarMap]}
                   style={styles.avatarImage}
-                  placeholder={require("../../../assets/images/profileImage6.png")}
                   contentFit="cover"
                   transition={200}
                 />
