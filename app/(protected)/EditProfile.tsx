@@ -33,10 +33,11 @@ const EditProfile = () => {
   const [isSaving, setIsSaving] = useState(false);
   const { user, token, updateUser } = useAuth();
   const [isModalVisible, setIsModalVisible] = useState(false);
-  const [selectedAvatar, setSelectedAvatar] =
-    useState<string>(user?.avatar || "profileImage6");
+  const [selectedAvatar, setSelectedAvatar] = useState<string>(
+    user?.avatar || "profileImage6"
+  );
 
-    // for displaying avatar options in modal
+  // for displaying avatar options in modal
   const avatarImages = [
     require("../../assets/images/profileImage1.png"),
     require("../../assets/images/profileImage2.png"),
@@ -56,7 +57,7 @@ const EditProfile = () => {
     "profileImage6",
   ] as const;
 
-      // mapping avatar names to image sources 
+  // mapping avatar names to image sources
   const avatarMap = {
     profileImage1: require("../../assets/images/profileImage1.png"),
     profileImage2: require("../../assets/images/profileImage2.png"),
@@ -91,8 +92,6 @@ const EditProfile = () => {
 
     setIsSaving(true);
     try {
-  
-
       // Update backend profile
       const response = await fetch(apiUrl(`api/auth/profile`), {
         method: "PUT",
@@ -114,10 +113,9 @@ const EditProfile = () => {
       console.log("Profile updated:", data);
       // Update the user in AuthContext immediately
       updateUser({
-  displayName: data.user.displayName ?? user.displayName,
-  avatar: data.user.avatar ?? user.avatar,
-});
-
+        displayName: data.user.displayName ?? user.displayName,
+        avatar: data.user.avatar ?? user.avatar,
+      });
 
       Alert.alert("Success", "Profile updated successfully!");
       router.back();
@@ -210,9 +208,7 @@ const EditProfile = () => {
           <View style={styles.content}>
             <View style={styles.imageContainer}>
               <Image
-                source={
-                  avatarMap[selectedAvatar as keyof typeof avatarMap]
-                }
+                source={avatarMap[selectedAvatar as keyof typeof avatarMap] ?? avatarMap["profileImage6"]}
                 style={styles.profileImage}
               />
             </View>

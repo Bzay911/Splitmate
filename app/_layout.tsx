@@ -1,7 +1,7 @@
-import { Slot, useRouter } from 'expo-router';
-import { useEffect, useState } from 'react';
-import { ActivityIndicator, View } from 'react-native';
-import { AuthProvider, useAuth } from '../contexts/AuthContext';
+import { Slot, useRouter } from "expo-router";
+import { useEffect, useState } from "react";
+import { ActivityIndicator, View, StatusBar } from "react-native";
+import { AuthProvider, useAuth } from "../contexts/AuthContext";
 
 function LayoutController() {
   const { token, loading } = useAuth();
@@ -17,15 +17,15 @@ function LayoutController() {
     if (!isMounted || loading) return; // Wait for mount and auth to load
 
     if (!token) {
-      router.replace('/SignIn');
+      router.replace("/SignIn");
     } else {
-      router.replace('/(protected)/(tabs)');
+      router.replace("/(protected)/(tabs)");
     }
   }, [isMounted, loading, token]);
 
   if (!isMounted || loading) {
     return (
-      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+      <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
         <ActivityIndicator size="large" />
       </View>
     );
@@ -37,6 +37,11 @@ function LayoutController() {
 export default function RootLayout() {
   return (
     <AuthProvider>
+      <StatusBar
+        barStyle="dark-content"
+        backgroundColor="#f5f5f5"
+        translucent={false}
+      />
       <LayoutController />
     </AuthProvider>
   );

@@ -5,8 +5,8 @@ import GroupsContext from "@/contexts/GroupsContext";
 import { Ionicons } from "@expo/vector-icons";
 import { Image } from "expo-image";
 import { LinearGradient } from "expo-linear-gradient";
-import { router } from "expo-router";
-import { useContext, useEffect, useState } from "react";
+import { router, useFocusEffect } from "expo-router";
+import { useContext, useEffect, useState, useCallback } from "react";
 import {
   FlatList,
   ScrollView,
@@ -18,7 +18,6 @@ import {
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Group } from "@/types/Group";
 import { Splitmate } from "@/types/Splitmate";
-
 
 // Helper function to handle floating point precision in financial display
 const formatFinancialAmount = (amount: number | undefined) => {
@@ -35,6 +34,7 @@ export default function HomeScreen() {
   const { user, token } = useAuth();
   const { groups, refreshGroups } = useContext(GroupsContext);
   const [splitmates, setSplitmates] = useState<Splitmate[]>([]);
+
 
   useEffect(() => {
     const fetchData = async () => {
@@ -70,7 +70,7 @@ export default function HomeScreen() {
           const formattedSplitmates = data.splitmates.map((splitmate: any) => ({
             id: splitmate.id,
             name: splitmate.name,
-            avatar: splitmate.avatar
+            avatar: splitmate.avatar,
           }));
           setSplitmates(formattedSplitmates);
         } else {
@@ -87,7 +87,14 @@ export default function HomeScreen() {
     }
   }, [user]);
 
-   const avatarMap = {
+  useFocusEffect(
+  useCallback(() => {
+    refreshFinancialSummary();
+    refreshGroups();
+  }, [])
+);
+
+  const avatarMap = {
     profileImage1: require("../../../assets/images/profileImage1.png"),
     profileImage2: require("../../../assets/images/profileImage2.png"),
     profileImage3: require("../../../assets/images/profileImage3.png"),
@@ -96,23 +103,23 @@ export default function HomeScreen() {
     profileImage6: require("../../../assets/images/profileImage6.png"),
   };
 
-const renderSplitmate = ({ item }: { item: Splitmate }) => {
-  const avatarKey = item.avatar?.replace(".png", "") || "profileImage1";
+  const renderSplitmate = ({ item }: { item: Splitmate }) => {
+    const avatarKey = (item.avatar?.replace(".png", "") ||
+      "profileImage1") as keyof typeof avatarMap;
 
-  return (
-    <View>
-      <Image
-        style={styles.splitmateImage}
-        source={avatarMap[avatarKey]}
-        contentFit="cover"
-      />
-      <Text style={styles.splitmateName}>
-        {item.name.split(" ").join("\n")}
-      </Text>
-    </View>
-  );
-};
-
+    return (
+      <View>
+        <Image
+          style={styles.splitmateImage}
+          source={avatarMap[avatarKey]}
+          contentFit="cover"
+        />
+        <Text style={styles.splitmateName}>
+          {item.name.split(" ").join("\n")}
+        </Text>
+      </View>
+    );
+  };
 
   const handleGroupPress = (group: Group) => {
     router.push({
@@ -126,128 +133,129 @@ const renderSplitmate = ({ item }: { item: Splitmate }) => {
     });
   };
 
-  return (
-      <SafeAreaView style={styles.safeArea}>
-        <ScrollView
-          contentContainerStyle={styles.scrollContent}
-          showsVerticalScrollIndicator={false}
-        >
-          {/* Topbar */}
-          <View style={styles.topBar}>
-            <View>
-              <Text style={styles.title}>Welcome back,</Text>
-              <Text style={styles.username}>{user?.displayName || "User"}</Text>
-            </View>
 
-            <View style={styles.rightTop}>
-              <TouchableOpacity onPress={() => router.push("/Profile")}>
-                <Image
-                  source={avatarMap[user?.avatar as keyof typeof avatarMap]}
-                  style={styles.avatarImage}
-                  contentFit="cover"
-                  transition={200}
-                />
-              </TouchableOpacity>
-            </View>
+  return (
+    <SafeAreaView style={styles.safeArea}>
+      <ScrollView
+        contentContainerStyle={styles.scrollContent}
+        showsVerticalScrollIndicator={false}
+      >
+        {/* Topbar */}
+        <View style={styles.topBar}>
+          <View>
+            <Text style={styles.title}>Welcome back,</Text>
+            <Text style={styles.username}>{user?.displayName || "User"}</Text>
           </View>
 
-          {/* Owe section */}
-          <View style={styles.amountSection}>
-            <View style={styles.oweSection}>
-              <Text style={styles.amountTitle}>I'm owed</Text>
+          <View style={styles.rightTop}>
+            <TouchableOpacity onPress={() => router.push("/Profile")}>
+              <Image
+                source={avatarMap[user?.avatar as keyof typeof avatarMap] ?? avatarMap["profileImage6"]}
+                style={styles.avatarImage}
+                contentFit="cover"
+                transition={200}
+              />
+            </TouchableOpacity>
+          </View>
+        </View>
+
+        {/* Owe section */}
+        <View style={styles.amountSection}>
+          <View style={styles.oweSection}>
+            <Text style={styles.amountTitle}>I'm owed</Text>
+            <Text style={styles.amount}>
+              ${formatFinancialAmount(financialSummary?.creditAmount)}
+            </Text>
+          </View>
+
+          <View style={styles.amountSubSection}>
+            <View style={styles.paySection}>
+              <Text style={styles.amountTitle}>Need to pay</Text>
               <Text style={styles.amount}>
-                ${formatFinancialAmount(financialSummary?.creditAmount)}
+                -${formatFinancialAmount(financialSummary?.debtAmount)}
               </Text>
             </View>
-
-            <View style={styles.amountSubSection}>
-              <View style={styles.paySection}>
-                <Text style={styles.amountTitle}>Need to pay</Text>
-                <Text style={styles.amount}>
-                  -${formatFinancialAmount(financialSummary?.debtAmount)}
-                </Text>
-              </View>
-              <View style={styles.expenseSection}>
-                <Text style={styles.amountTitle}>Total expenses</Text>
-                <Text style={styles.amount}>
-                  ${formatFinancialAmount(financialSummary?.totalExpenses)}
-                </Text>
-              </View>
+            <View style={styles.expenseSection}>
+              <Text style={styles.amountTitle}>Total expenses</Text>
+              <Text style={styles.amount}>
+                ${formatFinancialAmount(financialSummary?.totalExpenses)}
+              </Text>
             </View>
           </View>
+        </View>
 
-          {/* Splitmates */}
-          <View style={styles.splitMatesContainer}>
-            <View style={styles.texts}>
-              <Text style={styles.eachTitle}>Your Splitmates</Text>
-              {splitmates.length > 0 && (
-                <TouchableOpacity>
-                  <Text style={styles.seeAll}>see all</Text>
-                </TouchableOpacity>
-              )}
-            </View>
-
-            {splitmates.length <= 0 ? (
-              <View style={styles.emptySplitmates}>
-                <Text style={styles.emptyText}>No any splitmates</Text>
-              </View>
-            ) : (
-              <FlatList
-                data={splitmates}
-                renderItem={renderSplitmate}
-                keyExtractor={(item) => item.id}
-                horizontal
-                showsHorizontalScrollIndicator={false}
-                contentContainerStyle={styles.splitmatesList}
-              />
-            )}
-          </View>
-
-          {/* Recent Group Section */}
-          <View style={styles.recentGroupSection}>
-            <View style={styles.texts}>
-              <Text style={styles.eachTitle}>Recent Groups</Text>
-              <TouchableOpacity onPress={() => router.replace("/Groups")}>
-              <Text style={styles.seeAll}>see all</Text>
+        {/* Splitmates */}
+        <View style={styles.splitMatesContainer}>
+          <View style={styles.texts}>
+            <Text style={styles.eachTitle}>Your Splitmates</Text>
+            {splitmates.length > 0 && (
+              <TouchableOpacity>
+                <Text style={styles.seeAll}>see all</Text>
               </TouchableOpacity>
-            </View>
-
-            {groups.length === 0 ? (
-              <View style={styles.emptyGroups}>
-                <Text style={styles.emptyText}>No groups found</Text>
-              </View>
-            ) : (
-              groups.slice(0, 3).map((item : Group) => (
-                <TouchableOpacity
-                  key={item._id}
-                  onPress={() => handleGroupPress(item)}
-                >
-                  <View style={styles.renderRecentGroupSection}>
-                    <LinearGradient
-                      colors={item.colors ?? ["#6366f1", "#818cf8"]}
-                      style={{
-                        height: 50,
-                        width: 50,
-                        borderRadius: 25,
-                        justifyContent: "center",
-                        alignItems: "center",
-                      }}
-                    >
-                      <Ionicons name="people" size={24} color="white" />
-                    </LinearGradient>
-                    <View>
-                      <Text style={styles.groupName}>{item.name}</Text>
-                      <Text style={styles.totalExpense}>
-                        Total Expense: ${item.totalExpense.toFixed(2)}
-                      </Text>
-                    </View>
-                  </View>
-                </TouchableOpacity>
-              ))
             )}
           </View>
-        </ScrollView>
-      </SafeAreaView>
+
+          {splitmates.length <= 0 ? (
+            <View style={styles.emptySplitmates}>
+              <Text style={styles.emptyText}>No any splitmates</Text>
+            </View>
+          ) : (
+            <FlatList
+              data={splitmates}
+              renderItem={renderSplitmate}
+              keyExtractor={(item) => item.id}
+              horizontal
+              showsHorizontalScrollIndicator={false}
+              contentContainerStyle={styles.splitmatesList}
+            />
+          )}
+        </View>
+
+        {/* Recent Group Section */}
+        <View style={styles.recentGroupSection}>
+          <View style={styles.texts}>
+            <Text style={styles.eachTitle}>Recent Groups</Text>
+            <TouchableOpacity onPress={() => router.replace("/Groups")}>
+              <Text style={styles.seeAll}>see all</Text>
+            </TouchableOpacity>
+          </View>
+
+          {groups.length === 0 ? (
+            <View style={styles.emptyGroups}>
+              <Text style={styles.emptyText}>No groups found</Text>
+            </View>
+          ) : (
+            groups.slice(0, 3).map((item: Group) => (
+              <TouchableOpacity
+                key={item._id}
+                onPress={() => handleGroupPress(item)}
+              >
+                <View style={styles.renderRecentGroupSection}>
+                  <LinearGradient
+                    colors={item.colors ?? ["#6366f1", "#818cf8"]}
+                    style={{
+                      height: 50,
+                      width: 50,
+                      borderRadius: 25,
+                      justifyContent: "center",
+                      alignItems: "center",
+                    }}
+                  >
+                    <Ionicons name="people" size={24} color="white" />
+                  </LinearGradient>
+                  <View>
+                    <Text style={styles.groupName}>{item.name}</Text>
+                    <Text style={styles.totalExpense}>
+                      Total Expense: ${item.totalExpense.toFixed(2)}
+                    </Text>
+                  </View>
+                </View>
+              </TouchableOpacity>
+            ))
+          )}
+        </View>
+      </ScrollView>
+    </SafeAreaView>
   );
 }
 
@@ -260,7 +268,7 @@ const styles = StyleSheet.create({
   },
   safeArea: {
     flex: 1,
-    backgroundColor: '#f5f5f5'
+    backgroundColor: "#f5f5f5",
   },
   scrollContent: {
     paddingBottom: 100,
@@ -280,25 +288,25 @@ const styles = StyleSheet.create({
     width: 45,
     height: 45,
     borderRadius: 25,
-       shadowColor: "#000",
-  shadowOffset: {
-    width: 0,
-    height: 6,
-  },
-  shadowOpacity: 0.15,
-  shadowRadius: 3.5,
-  elevation: 5,
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 6,
+    },
+    shadowOpacity: 0.15,
+    shadowRadius: 3.5,
+    elevation: 5,
   },
   camera: {
     flex: 1,
   },
   username: {
     fontSize: 22,
-    fontFamily: "Inter-Medium"
+    fontFamily: "Inter-Medium",
   },
   title: {
     fontSize: 14,
-    fontFamily: "Inter-Regular"
+    fontFamily: "Inter-Regular",
   },
   rightTop: {
     flexDirection: "row",
@@ -321,13 +329,13 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     backgroundColor: "#fccc28",
     shadowColor: "#000",
-  shadowOffset: {
-    width: 0,
-    height: 6,
-  },
-  shadowOpacity: 0.15,
-  shadowRadius: 3.5,
-  elevation: 5,
+    shadowOffset: {
+      width: 0,
+      height: 6,
+    },
+    shadowOpacity: 0.15,
+    shadowRadius: 3.5,
+    elevation: 5,
   },
   amountSubSection: {
     flexDirection: "row",
@@ -335,22 +343,22 @@ const styles = StyleSheet.create({
     width: "100%",
     paddingHorizontal: 12,
   },
-paySection: {
-  height: 100,
-  borderRadius: 8,
-  padding: 12,
-  flex: 1,
-  justifyContent: "center",
-  backgroundColor: "#fccc28",
-  shadowColor: "#000",
-  shadowOffset: {
-    width: 0,
-    height: 6,
+  paySection: {
+    height: 100,
+    borderRadius: 8,
+    padding: 12,
+    flex: 1,
+    justifyContent: "center",
+    backgroundColor: "#fccc28",
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 6,
+    },
+    shadowOpacity: 0.15,
+    shadowRadius: 3.5,
+    elevation: 5,
   },
-  shadowOpacity: 0.15,
-  shadowRadius: 3.5,
-  elevation: 5,
-},
   expenseSection: {
     height: 100,
     flex: 1,
@@ -359,13 +367,13 @@ paySection: {
     justifyContent: "center",
     backgroundColor: "#fccc28",
     shadowColor: "#000",
-  shadowOffset: {
-    width: 0,
-    height: 6,
-  },
-  shadowOpacity: 0.15,
-  shadowRadius: 3.5,
-  elevation: 5,
+    shadowOffset: {
+      width: 0,
+      height: 6,
+    },
+    shadowOpacity: 0.15,
+    shadowRadius: 3.5,
+    elevation: 5,
   },
   splitMatesContainer: {
     width: "100%",
@@ -385,7 +393,7 @@ paySection: {
   emptyText: {
     color: "gray",
     fontSize: 14,
-    fontFamily: "Inter-Regular"
+    fontFamily: "Inter-Regular",
   },
   texts: {
     flexDirection: "row",
@@ -405,7 +413,7 @@ paySection: {
     fontSize: 12,
     textAlign: "center",
     marginTop: 4,
-    fontFamily: "Inter-Regular"
+    fontFamily: "Inter-Regular",
   },
   recentGroupSection: {
     width: "100%",
@@ -427,25 +435,25 @@ paySection: {
   groupName: {
     fontSize: 14,
     marginBottom: 4,
-    fontFamily: "Inter-Medium"
+    fontFamily: "Inter-Medium",
   },
   totalExpense: {
     fontSize: 12,
     color: "gray",
-    fontFamily: "Inter-Regular"
+    fontFamily: "Inter-Regular",
   },
   eachTitle: {
     fontSize: 16,
-    fontFamily: "Inter-Medium"
+    fontFamily: "Inter-Medium",
   },
   amountTitle: {
     fontSize: 14,
     marginBottom: 4,
-    fontFamily: "Inter-Medium"
+    fontFamily: "Inter-Medium",
   },
   amount: {
     fontSize: 26,
-    fontFamily: "Inter-Regular"
+    fontFamily: "Inter-Regular",
   },
   seeAll: {
     fontSize: 12,

@@ -23,6 +23,7 @@ import {
   statusCodes,
 } from "@react-native-google-signin/google-signin";
 import { handlePostSignupInvites } from "../utils/HandlePostSignupInvites";
+import { usePushNotifications } from "@/customHooks/usePushNotifications";
 
 export function LoginScreen() {
   const [email, setEmail] = useState("");
@@ -31,6 +32,7 @@ export function LoginScreen() {
   const [emailError, setEmailError] = useState("");
   const [passwordError, setPasswordError] = useState("");
   const [googleLoading, setGoogleLoading] = useState(false);
+  const {expoPushToken} = usePushNotifications();
 
   const { login } = useAuth();
   GoogleSignin.configure({
@@ -77,7 +79,7 @@ export function LoginScreen() {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ idToken }),
+        body: JSON.stringify({ idToken, expoPushToken: expoPushToken?.data }),
       });
       const data = await res.json();
       if (!res.ok) {

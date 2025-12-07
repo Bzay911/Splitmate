@@ -1,8 +1,9 @@
 import { Tabs } from "expo-router";
 import React from "react";
-import { Platform } from "react-native";
+import { Platform, TouchableOpacity } from "react-native";
 import IconFA from "react-native-vector-icons/FontAwesome";
 import Feather from "react-native-vector-icons/Feather";
+import * as Haptics from "expo-haptics";
 
 const iconMapping = {
   index: { outline: "th-large", filled: "th-large" },
@@ -15,6 +16,24 @@ export default function TabLayout() {
     <Tabs
       screenOptions={({ route }) => ({
         headerShown: false,
+
+        tabBarButton: (props) => {
+          const { onPress, children, style } = props;
+
+          return (
+            <TouchableOpacity
+              onPress={() => {
+                Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                onPress?.({} as any);
+              }}
+              style={style}
+              activeOpacity={1}
+            >
+              {children}
+            </TouchableOpacity>
+          );
+        },
+
         tabBarActiveTintColor: "#0a7ea4",
         tabBarInactiveTintColor: "#8E8E93",
         tabBarStyle: {
@@ -26,19 +45,16 @@ export default function TabLayout() {
         },
         tabBarLabelStyle: {
           fontSize: 10,
-          fontFamily: "Inter-Regular"
+          fontFamily: "Inter-Regular",
         },
 
-        tabBarIcon: ({ focused, color, size }) => {
-          const routeName = route.name;
-
-          if (routeName === "History") {
+        tabBarIcon: ({ focused, color }) => {
+          if (route.name === "History") {
             return <Feather name="trending-up" size={22} color={color} />;
           }
 
           const iconKey = route.name as keyof typeof iconMapping;
           const iconSet = iconMapping[iconKey];
-
           if (!iconSet) return null;
 
           const iconName = focused ? iconSet.filled : iconSet.outline;

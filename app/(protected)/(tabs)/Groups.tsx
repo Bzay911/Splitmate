@@ -162,7 +162,8 @@ const styles = StyleSheet.create({
   noGroupssubText: {
     fontSize: 14,
     marginBottom: 16,
-    fontFamily: "Inter-Regular"
+    fontFamily: "Inter-Regular",
+    color: 'gray'
   },
   centerContainer: {
     flex: 1,

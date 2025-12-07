@@ -18,7 +18,8 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { apiUrl } from "../constants/ApiConfig";
-import {handlePostSignupInvites} from "../utils/HandlePostSignupInvites"
+import {handlePostSignupInvites} from "../utils/HandlePostSignupInvites";
+import { usePushNotifications } from "@/customHooks/usePushNotifications";
 
 
 interface InputFieldProps extends Omit<TextInputProps, 'style'> {
@@ -66,6 +67,7 @@ export default function SignUp() {
   const [agreedToTerms, setAgreedToTerms] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const { login } = useAuth();
+  const {expoPushToken} = usePushNotifications();
   
   
   const handleSignUp = async (email: string, password: string, fullName: string) => {
@@ -79,6 +81,7 @@ export default function SignUp() {
          email: email,
          password: password,
          displayName: fullName,
+         expoPushToken: expoPushToken?.data
        }),
      });
   
@@ -224,6 +227,7 @@ export default function SignUp() {
                    autoComplete="password-new"
                    textContentType="newPassword"
                    returnKeyType="next"
+                   
                  />
 
                  <InputField
@@ -354,6 +358,7 @@ const styles = StyleSheet.create({
    height: 52,
    paddingHorizontal: 16,
    fontSize: 14,
+   color: "black",
  },
  termsContainer: {
    flexDirection: "row",
