@@ -32,15 +32,17 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
   const [user, setUser] = useState<User | null>(null);    
   const [loading, setLoading] = useState(true);
 
-
+console.log("AuthContext Rendered. User:", user, "Token:", token);
 
   const login = async (token: string, userData: User) => {
     setToken(token);
     setUser(userData);
     await AsyncStorage.setItem('token', token);
+    console.log("User logged in:", userData);
   };
 
   const logout = async () => {
+    console.log("Logging out user:", user);
     setToken(null);
     setUser(null);
     await AsyncStorage.removeItem('token');

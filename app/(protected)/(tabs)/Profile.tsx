@@ -3,7 +3,7 @@ import { MaterialIcons } from '@expo/vector-icons';
 import FontAwesome6 from '@expo/vector-icons/FontAwesome6';
 import { useRouter } from 'expo-router';
 import React from 'react';
-import { Alert, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { Alert, StyleSheet, Text, TouchableOpacity, View, Linking, Platform } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Image } from 'expo-image';
 
@@ -36,13 +36,17 @@ const Profile = () => {
     router.push('/EditProfile');
   };
 
-  const handleThemePress = () => {
-    Alert.alert('Under Development!', 'This feature is not available yet.');
+  const handleSplitmatePress = () => {
+    router.push('/');
   };
 
-  const handleNotificationsPress = () => {
-    Alert.alert('Under Development!', 'This feature is not available yet.');
-  };
+const handleNotificationsPress = () => {
+  if (Platform.OS === "ios") {
+    Linking.openURL("app-settings:");
+  } else {
+    Linking.openSettings(); 
+  }
+};
 
   return (
     <SafeAreaView style={styles.safeArea}>
@@ -75,7 +79,7 @@ const Profile = () => {
           <Text style={styles.settingText}>Notifications</Text>
           <MaterialIcons name="chevron-right" size={18} color="#64748b" />
         </TouchableOpacity>
-        <TouchableOpacity style={styles.settingItem} onPress={handleThemePress}>
+        <TouchableOpacity style={styles.settingItem} onPress={handleSplitmatePress}>
         <FontAwesome6 name="user-group" size={16} color="#64748b" />
           <Text style={styles.settingText}>Splitmates</Text>
           <MaterialIcons name="chevron-right" size={18} color="#64748b" />

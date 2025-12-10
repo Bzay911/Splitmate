@@ -2,19 +2,22 @@ import { Slot, useRouter } from "expo-router";
 import { useEffect, useState } from "react";
 import { ActivityIndicator, View, StatusBar } from "react-native";
 import { AuthProvider, useAuth } from "../contexts/AuthContext";
+import { useFonts } from "expo-font";
+import * as SplashScreen from "expo-splash-screen";
+
+SplashScreen.preventAutoHideAsync();
 
 function LayoutController() {
   const { token, loading } = useAuth();
   const router = useRouter();
   const [isMounted, setIsMounted] = useState(false);
 
-  // Ensure component is mounted before navigation
   useEffect(() => {
     setIsMounted(true);
   }, []);
 
   useEffect(() => {
-    if (!isMounted || loading) return; // Wait for mount and auth to load
+    if (!isMounted || loading) return;
 
     if (!token) {
       router.replace("/SignIn");
@@ -35,6 +38,23 @@ function LayoutController() {
 }
 
 export default function RootLayout() {
+  // Load fonts BEFORE ANYTHING ELSE
+  const [loaded] = useFonts({
+    "Inter-Bold": require("../assets/fonts/Inter_18pt-Bold.ttf"),
+    "Inter-Regular": require("../assets/fonts/Inter_18pt-Regular.ttf"),
+    "Inter-Medium": require("../assets/fonts/Inter_18pt-Medium.ttf"),
+  });
+
+  useEffect(() => {
+    if (loaded) {
+      SplashScreen.hideAsync();
+    }
+  }, [loaded]);
+
+  if (!loaded) {
+    return null; // Prevent any UI from rendering before fonts load
+  }
+
   return (
     <AuthProvider>
       <StatusBar

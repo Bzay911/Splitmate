@@ -35,6 +35,8 @@ export default function HomeScreen() {
   const { groups, refreshGroups } = useContext(GroupsContext);
   const [splitmates, setSplitmates] = useState<Splitmate[]>([]);
 
+  console.log("Financial Summary:", financialSummary);
+
 
   useEffect(() => {
     const fetchData = async () => {

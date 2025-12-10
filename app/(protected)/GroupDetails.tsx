@@ -68,6 +68,9 @@ const GroupDetails = () => {
     null
   );
 
+  // console.log("Rendered GroupDetails Component", groupDetails);
+  // console.log('groups', groups);
+
   const closeSwipe = () => {
     if (swipeableRef.current) {
       swipeableRef.current.close();
@@ -142,9 +145,9 @@ const GroupDetails = () => {
     }
   }, [groupId, user]);
 
-  useEffect(() => {
-    if (user) fetchGroupDetails();
-  }, [fetchGroupDetails]);
+  // useEffect(() => {
+  //   if (user) fetchGroupDetails();
+  // }, [fetchGroupDetails]);
 
   // Refetch data every time screen comes into focus
   useFocusEffect(
@@ -213,6 +216,7 @@ const GroupDetails = () => {
 
   const handleSettleUp = () => {
     const allSettlements = whoNeedsToPayWhom();
+    console.log("All Settlements:", allSettlements);
     router.push({
       pathname: "/SettleUp",
       params: {

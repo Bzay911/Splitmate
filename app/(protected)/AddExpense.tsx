@@ -43,6 +43,11 @@ const AddExpense = () => {
       return;
     }
 
+    if(parseFloat(amount) > 10000){
+      Alert.alert("Amount Warning", "Maximum allowable amount is $10,000");
+      return;
+    }
+
     try {
       setLoading(true);
       if (!user) {

@@ -80,10 +80,6 @@ const EditProfile = () => {
     }
   }, [user]);
 
-  console.log("Avatar from backend:", user?.avatar);
-  console.log("user from backend:", user);
-  console.log("Matched:", avatarMap[user?.avatar as AvatarName]);
-
   const handleSave = async () => {
     if (!displayName.trim()) {
       Alert.alert("Error", "Please enter a display name");
@@ -199,18 +195,21 @@ const EditProfile = () => {
               </View>
             </View>
           </Modal>
-          <TouchableOpacity
-            style={styles.selectImageBtn}
-            onPress={() => setIsModalVisible(!isModalVisible)}
-          >
-            <Ionicons name="create-outline" size={24} color="black" />
-          </TouchableOpacity>
           <View style={styles.content}>
             <View style={styles.imageContainer}>
               <Image
-                source={avatarMap[selectedAvatar as keyof typeof avatarMap] ?? avatarMap["profileImage6"]}
+                source={
+                  avatarMap[selectedAvatar as keyof typeof avatarMap] ??
+                  avatarMap["profileImage6"]
+                }
                 style={styles.profileImage}
               />
+              <TouchableOpacity
+                style={styles.selectImageBtn}
+                onPress={() => setIsModalVisible(!isModalVisible)}
+              >
+                <Ionicons name="create-outline" size={24} color="black" />
+              </TouchableOpacity>
             </View>
 
             <Text style={styles.subtitle}>Your profile picture</Text>
@@ -281,13 +280,6 @@ const styles = StyleSheet.create({
     padding: 24,
     alignItems: "center",
   },
-  selectImageBtn: {
-    flexDirection: "row",
-    justifyContent: "flex-end",
-    paddingHorizontal: 24,
-    marginBottom: 8,
-    width: "100%",
-  },
   closeBtnModel: {
     alignSelf: "flex-end",
     marginBottom: 8,
@@ -295,6 +287,19 @@ const styles = StyleSheet.create({
   imageContainer: {
     position: "relative",
     marginBottom: 16,
+  },
+  selectImageBtn: {
+    position: "absolute",
+    bottom: 0,
+    right: 0,
+    backgroundColor: "#fccc28",
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    justifyContent: "center",
+    alignItems: "center",
+    borderWidth: 1,
+    borderColor: "white",
   },
   profileImage: {
     width: 120,

@@ -138,6 +138,8 @@ export const ExpenseProvider = ({ children }: ExpenseProviderProps) => {
     [user, token]
   );
 
+  // console.log('Expenses:', expenses);
+
   const extractGroupMembers = (expenses: Expense[]) => {
     const memberMap = new Map<string, GroupMember>();
 
